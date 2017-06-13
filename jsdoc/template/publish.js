@@ -430,6 +430,9 @@ exports.publish = function(taffyData, opts, tutorials) {
     view.tutoriallink = tutoriallink;
     view.htmlsafe = htmlsafe;
     view.members = members; //@davidshimjs: To make navigation for customizing
+    view.fixEventName = function (e) {
+      return (e || '').replace('event:', '');
+    };
 
     // once for all
     view.nav = buildNav(members);
