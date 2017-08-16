@@ -4,7 +4,7 @@
     width: 100%; }
 
   .content-wrapper {
-    height: calc(100% - 50px);
+    height: 100%;
     padding-top: 70px; }
 
   .page.example {
