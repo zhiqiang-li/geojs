@@ -208,7 +208,7 @@ $(video).on('timeupdate', function () {
  * when we started playing backwards and seek to this position.
  */
 function next_reverse_frame() {
-  if (rate >= 0 || !reverse) {
+  if (rate &gt;= 0 || !reverse) {
     return;
   }
   if (!video.seeking) {
@@ -229,12 +229,30 @@ function next_reverse_frame() {
  *   backwards, -2 is twice as fast.
  */
 function play_reverse(newRate) {
-  if (newRate >= 0) {
+  if (newRate &gt;= 0) {
     return;
   }
   rate = newRate;
   // show the selected speed
-  $('#speed').text((rate <= 0="" -1="" ?="" rate="" :="" '-1="" '="" +="" math.round(-1="" rate))="" 'x');="" record="" where="" the="" video="" currently="" is;="" we="" use="" animation="" from="" loop to="" calculate="" which="" frame="" should="" be="" shown.="" reverse="{" starttime:="" new="" date().gettime(),="" startposition:="" video.currenttime="" }="" video.pause();="" map.scheduleanimationframe(next_reverse_frame);="" handle="" transport="" buttons="" $('#controls="" img').click(function="" (evt)="" {="" switch="" ($(evt.target).attr('id'))="" case="" 'back':="" if="" (!video.paused="" ||="" reverse)="" playing="" or="" in="" reverse,="" play="" reverse;="" slow="" down="" clicked="" repeatedly="" play_reverse((rate="" <="" &&=""> -1) ? (rate < -1./24 ? rate / 2 : rate) : -1/2);
+  $('#speed').text((rate &lt;= -1 ? rate : '-1/' + Math.round(-1/rate)) + 'x');
+  // record where the video currently is; we use the animation from loop to
+  // calculate which frame should be shown.
+  reverse = {
+    startTime: new Date().getTime(),
+    startPosition: video.currentTime
+  }
+  video.pause();
+  map.scheduleAnimationFrame(next_reverse_frame);
+}
+
+// handle the transport buttons
+$('#controls img').click(function (evt) {
+  switch ($(evt.target).attr('id')) {
+    case 'back':
+      if (!video.paused || reverse) {
+        // if playing or playing in reverse, play in reverse; slow down the play rate
+        // if clicked repeatedly
+        play_reverse((rate < 0 && rate > -1) ? (rate < -1./24 ? rate / 2 : rate) : -1/2);
         break;
       }
       // if paused, back up one frame
@@ -245,7 +263,27 @@ function play_reverse(newRate) {
       if (video.paused || reverse) {
         video.playbackRate = rate = 2;
       } else {
-        video.playbackRate = rate = (rate <= 1="" 2="" 32="" ?="" :="" (rate="" <="" rate="" *="" rate));="" }="" video.play();="" reverse="false;" $('#speed').text(rate="" +="" 'x');="" break;="" case="" 'pause':="" video.pause();="" $('#speed').text('1x');="" 'play':="" video.playbackrate="rate" =="" 1;="" 'rewind':="" double="" the="" speed="" each="" time="" this="" is="" clicked="" play_reverse(rate="">= -0.75 ? -1 : (rate > -32 ? rate * 2 : rate));
+        video.playbackRate = rate = (rate &lt;= 1 ? 2 : (rate < 32 ? rate * 2 : rate));
+      }
+      video.play();
+      reverse = false;
+      $('#speed').text(rate + 'x');
+      break;
+    case 'pause':
+      video.pause();
+      reverse = false;
+      rate = 1;
+      $('#speed').text('1x');
+      break;
+    case 'play':
+      video.playbackRate = rate = 1;
+      video.play();
+      reverse = false;
+      $('#speed').text('1x');
+      break;
+    case 'rewind':
+      // double the reverse speed each time this is clicked
+      play_reverse(rate &gt;= -0.75 ? -1 : (rate > -32 ? rate * 2 : rate));
       break;
     case 'step':
       if (!video.paused || reverse) {
@@ -259,7 +297,7 @@ function play_reverse(newRate) {
       video.currentTime = (video.currentTime + 1.0/videoFPS) % video.duration;
       break;
   }
-});</=></=></textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 4</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div></div><iframe id="workframe"></iframe></div>
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 4</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div></div><iframe id="workframe"></iframe></div>
 </div>
     </div>
     
