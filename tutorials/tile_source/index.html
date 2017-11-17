@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,19 +15,19 @@
     <title>GeoJS - Changing Tile Source</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/geojs/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../vendor/bootstrap/css/bootstrap.min.css">
 
     <!-- Custom Fonts -->
-    <link href="/geojs/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/font-awesome/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <!-- Theme CSS -->
-    <link href="/geojs/css/agency.css" rel="stylesheet">
-    <link href="/geojs/css/main.css" rel="stylesheet">
-    <link href="/geojs/css/syntax.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/agency.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/highlight.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,10 +37,10 @@
     <![endif]-->
     
     <!-- jQuery -->
-    <script src="/geojs/vendor/jquery/jquery.min.js"></script>
+    <script src="../../vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/geojs/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
     
     <link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
@@ -59,7 +62,6 @@
 </head>
 
 <body id="page-top" class="index">
-
     <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-custom navbar-fixed-top affix">
         <div class="container">
@@ -68,9 +70,9 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span><i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="/geojs/"><img class="navbar-logo" src="/geojs/images/logo_transparent.png" /></a>
-            </div>
-
+                <a class="navbar-brand" href="../../index.html"><img class="navbar-logo" src="../../images/logo_transparent.png" /></a>
+            </div> 
+            
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -78,13 +80,13 @@
                         <a href="#page-top"></a>
                     </li>
                     <li class="">
-                        <a href="/geojs/">Welcome</a>
+                        <a href="../../">Welcome</a>
                     </li>
-                    <li class="active">
-                        <a href="/geojs/tutorials">Tutorials</a>
+                    <li class=" active ">
+                        <a href="..">Tutorials</a>
                     </li>
                     <li class="">
-                        <a href="/geojs/examples">Examples</a>
+                        <a href="../../examples">Examples</a>
                     </li>
                     <li>
                         <a href="https://github.com/OpenGeoscience/geojs">GitHub</a>
@@ -97,35 +99,35 @@
     </nav>
 
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/geojs/css/tutorial.css">
+        <link rel="stylesheet" href="../../css/tutorial.css">
 <script type="text/javascript" src="../bundle.js" charset="UTF-8"></script>
 <div class="page tutorial">
     <!-- include tutorial sources--><!-- Include tutorial specific files--><script type="text/javascript">$(start_tutorial);
 
 </script><!-- Add the default main content element--><div id="maincontent"><div id="tutorial"><h1>Tutorial - Changing Tile Source</h1>
-<p>When a map is created with teh default map tile layer, it defaults to using tiles from <a href="">tile.openstreetmap.org</a>.</p>
+<p>When a map is created with the default map tile layer, it defaults to using tiles from <a href="">tile.openstreetmap.org</a>.</p>
 <div class="codeblock" format="javascript" step="1" initial="true" stepname="Step 1" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">var map = geo.map({
   node: "#map"
 });
-var layer = map.createLayer('osm');</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has one osm layer from openstreetmap" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;layer.url().match(/openstreetmap/)&quot;]" data-idleFuncs="[&quot;map.onIdle&quot;]"></div><p>You can use a different tile source by changing the URL used by the tile layer.  You should also set the attribution.</p>
+var layer = map.createLayer('osm');</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has one osm layer from openstreetmap" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;layer.url().match(/openstreetmap/)&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>You can use a different tile source by changing the URL used by the tile layer.  You should also set the attribution.</p>
 <div class="codeblock" format="javascript" step="2" parentstep="1" stepname="Step 2" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">layer.url('http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png')
 layer.attribution(
-  'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-  'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.  ' +
-  'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, ' +
-  'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.')</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="url is from stamen.com" data-tests="[&quot;layer.url().match(/stamen/)&quot;]" data-idleFuncs="[&quot;map.onIdle&quot;]"></div><p>We could have initially created the layer with a different tile server:</p>
+  'Map tiles by <a href="http://stamen.com" target="_blank" rel="noopener">Stamen Design</a>, ' +
+  'under <a href="http://creativecommons.org/licenses/by/3.0" target="_blank" rel="noopener">CC BY 3.0</a>.  ' +
+  'Data by <a href="http://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a>, ' +
+  'under <a href="http://www.openstreetmap.org/copyright" target="_blank" rel="noopener">ODbL</a>.')</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="url is from stamen.com" data-tests="[&quot;layer.url().match(/stamen/)&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>We could have initially created the layer with a different tile server:</p>
 <div class="codeblock" format="javascript" step="3" stepname="Step 1-B" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">var map = geo.map({
   node: "#map"
 });
 var layer = map.createLayer('osm', {
   url: 'http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png',
-  attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
-});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1-B</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has one osm layer from stamen" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;layer.url().match(/stamen/)&quot;]" data-idleFuncs="[&quot;map.onIdle&quot;]"></div></div><iframe id="workframe"></iframe></div>
+  attribution: 'Map tiles by <a href="http://stamen.com" target="_blank" rel="noopener">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0" target="_blank" rel="noopener">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright" target="_blank" rel="noopener">ODbL</a>.'
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1-B</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has one osm layer from stamen" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;layer.url().match(/stamen/)&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div></div><iframe id="workframe"></iframe></div>
 </div>
     </div>
     
     <!-- Theme JavaScript -->
-    <script src="/geojs/js/agency.js"></script>
+    <script src="../../js/agency.js"></script>
 
 </body>
 

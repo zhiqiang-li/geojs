@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+<body>
+<table>
+<tr>
+<td>choropleth</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="choropleth-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="choropleth-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="choropleth-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>d3GeoJson</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3GeoJson-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3GeoJson-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3GeoJson-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>d3Graph</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Graph-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Graph-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Graph-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>d3Lines</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Lines-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Lines-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Lines-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>d3Points</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Points-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Points-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Points-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>d3StickyLayer</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3StickyLayer-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3StickyLayer-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3StickyLayer-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>d3Vectors</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Vectors-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Vectors-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="d3Vectors-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>exampleBlogLines</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLines-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLines-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLines-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>exampleBlogLines10k</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLines10k-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLines10k-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLines10k-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>exampleBlogLinesRoundCap</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLinesRoundCap-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLinesRoundCap-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleBlogLinesRoundCap-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>exampleLines</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLines-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLines-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLines-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>exampleLines100k</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLines100k-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLines100k-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLines100k-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>exampleLinesThin</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLinesThin-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLinesThin-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="exampleLinesThin-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glContour</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContour-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContour-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContour-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glContourIso</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourIso-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourIso-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourIso-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glContourOptions</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourOptions-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourOptions-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourOptions-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glContourRange</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourRange-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourRange-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glContourRange-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glLines</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glLines-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glLines-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glLines-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glLinesOpts</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glLinesOpts-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glLinesOpts-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glLinesOpts-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glMultiPolygons</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glMultiPolygons-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glMultiPolygons-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glMultiPolygons-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPoints</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPoints-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPoints-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPoints-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPointsNoFill</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsNoFill-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsNoFill-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsNoFill-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPointsNoStroke</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsNoStroke-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsNoStroke-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsNoStroke-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPointsTransparent</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsTransparent-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsTransparent-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsTransparent-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPointsWithQuad</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsWithQuad-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsWithQuad-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPointsWithQuad-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPolygons</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPolygons-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPolygons-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPolygons-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glPolygonsHover</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPolygonsHover-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPolygonsHover-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glPolygonsHover-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>glQuad</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glQuad-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glQuad-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="glQuad-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrder123</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder123-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder123-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder123-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrder132</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder132-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder132-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder132-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrder213</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder213-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder213-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder213-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrder321</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder321-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder321-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrder321-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrderDown0</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown0-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown0-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown0-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrderDown0_-5</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown0_-5-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown0_-5-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown0_-5-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrderDown2_1</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown2_1-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown2_1-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderDown2_1-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrderUp0_2</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp0_2-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp0_2-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp0_2-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrderUp1_1</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp1_1-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp1_1-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp1_1-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>layerOrderUp2_-1</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp2_-1-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp2_-1-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="layerOrderUp2_-1-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>mapBounds</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapBounds-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapBounds-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapBounds-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>mapCenter</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapCenter-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapCenter-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapCenter-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>mapTwo</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapTwo-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapTwo-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapTwo-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>mapZoom</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapZoom-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapZoom-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="mapZoom-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>osmLayerCanvas</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerCanvas-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerCanvas-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerCanvas-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>osmLayerD3</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerD3-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerD3-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerD3-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>osmLayerHTML</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerHTML-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerHTML-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerHTML-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>osmLayerVgl</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerVgl-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerVgl-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="osmLayerVgl-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>pixelAlignment</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pixelAlignment-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pixelAlignment-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pixelAlignment-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>pointClustering</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pointClustering-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pointClustering-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pointClustering-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>pointClusteringZoom</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pointClusteringZoom-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pointClusteringZoom-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="pointClusteringZoom-diff.png"/>
+</td>
+</tr>
+<tr>
+<td>uiLayer</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="uiLayer-base.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="uiLayer-test.png"/>
+</td>
+<td>
+<img style="max-width: 400px; max-height: 400px" src="uiLayer-diff.png"/>
+</td>
+</tr>
+</table>
+</body>
+</html>

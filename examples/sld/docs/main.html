@@ -30,7 +30,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> colorbrewer = colorbrewer;
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/* global colorbrewer */</span>
 
 <span class="hljs-keyword">var</span> layer = {</pre></div></div>
             
@@ -57,6 +57,8 @@
   <span class="hljs-attr">projection</span>: <span class="hljs-string">'EPSG:3785'</span>
 };
 
+<span class="hljs-keyword">var</span> baseUrl = <span class="hljs-string">'https://demo.boundlessgeo.com/geoserver/ows'</span>;
+
 <span class="hljs-keyword">var</span> layerViewer = {
   <span class="hljs-attr">renderPalettes</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">var</span> paletteArray = <span class="hljs-built_in">Object</span>.keys(colorbrewer);
@@ -77,8 +79,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#color-count'</span>)
-      .empty();
+            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#color-count'</span>).empty();
     <span class="hljs-keyword">var</span> numberArray = <span class="hljs-built_in">Object</span>.keys(colorbrewer[layer.palette]);
     utility.populateDropdown(<span class="hljs-string">'#color-count'</span>, numberArray);</pre></div></div>
             
@@ -95,8 +96,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#color-count'</span>)
-      .val(layer.selectedNum);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#color-count'</span>).val(layer.selectedNum);</pre></div></div>
             
         </li>
         
@@ -111,8 +111,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#palette-type'</span>)
-      .val(layer.type);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#palette-type'</span>).val(layer.type);</pre></div></div>
             
         </li>
         
@@ -127,10 +126,12 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#min'</span>)
-      .val(layer.min);
-    $(<span class="hljs-string">'#max'</span>)
-      .val(layer.max);
+            <div class="content"><div class='highlight'><pre>    $(<span class="hljs-string">'#min'</span>).val(layer.min);
+    $(<span class="hljs-string">'#max'</span>).val(layer.max);
+
+    $(<span class="hljs-string">'#name'</span>).val(layer.name);
+    $(<span class="hljs-string">'#projection'</span>).val(layer.projection);
+    $(<span class="hljs-string">'#baseurl'</span>).val(baseUrl);
   }
 };
 
@@ -150,8 +151,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    layer.palette = $(<span class="hljs-string">'#palette'</span>)
-      .val();
+            <div class="content"><div class='highlight'><pre>    layer.palette = $(<span class="hljs-string">'#palette'</span>).val();
 
     <span class="hljs-keyword">var</span> items = <span class="hljs-built_in">Object</span>.keys(colorbrewer[layer.palette]);
     <span class="hljs-keyword">var</span> maxNumber = <span class="hljs-built_in">parseInt</span>(items[items.length - <span class="hljs-number">1</span>]);
@@ -162,13 +162,14 @@
       layer.selectedNum = <span class="hljs-built_in">String</span>(maxNumber);
     }
 
-    layer.type = $(<span class="hljs-string">'#palette-type'</span>)
-      .val();
-    layer.min = $(<span class="hljs-string">'#min'</span>)
-      .val();
-    layer.max = $(<span class="hljs-string">'#max'</span>)
-      .val();
+    layer.type = $(<span class="hljs-string">'#palette-type'</span>).val();
+    layer.min = $(<span class="hljs-string">'#min'</span>).val();
+    layer.max = $(<span class="hljs-string">'#max'</span>).val();
     layer.sld = <span class="hljs-keyword">this</span>.generateSld(layer);
+
+    layer.name = $(<span class="hljs-string">'#name'</span>).val();
+    layer.projection = $(<span class="hljs-string">'#projection'</span>).val();
+    baseUrl = $(<span class="hljs-string">'#baseurl'</span>).val();
   },
   <span class="hljs-attr">generateSld</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">layer</span>) </span>{</pre></div></div>
             
@@ -224,9 +225,9 @@
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> map = geo.map({
     <span class="hljs-attr">node</span>: <span class="hljs-string">'#map'</span>,
-    <span class="hljs-attr">zoom</span>: <span class="hljs-number">8</span>,
+    <span class="hljs-attr">zoom</span>: <span class="hljs-number">9</span>,
     <span class="hljs-attr">center</span>: {
-      <span class="hljs-attr">x</span>: <span class="hljs-number">-76.0</span>,
+      <span class="hljs-attr">x</span>: <span class="hljs-number">-77.0</span>,
       <span class="hljs-attr">y</span>: <span class="hljs-number">39</span>
     }
   });</pre></div></div>
@@ -319,7 +320,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  $(<span class="hljs-string">'#palette, #color-count, #min, #max, #palette-type'</span>)
+            <div class="content"><div class='highlight'><pre>  $(<span class="hljs-string">'#palette, #color-count, #min, #max, #palette-type, #baseurl, #projection, #name'</span>)
     .change(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
       layerController.syncLayer(layer);
       layerViewer.renderWidget(layer);
@@ -595,13 +596,10 @@ stop and count variables</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> baseUrl =
-        <span class="hljs-string">'http://demo.boundlessgeo.com/geoserver/ows'</span>;
-      <span class="hljs-keyword">return</span> baseUrl + <span class="hljs-string">'?'</span> + $.param(params);
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> baseUrl + (baseUrl.indexOf(<span class="hljs-string">'?'</span>) &gt;= <span class="hljs-number">0</span> ? <span class="hljs-string">'&amp;'</span> : <span class="hljs-string">'?'</span>) + $.param(params);
     });
 
     <span class="hljs-keyword">return</span> wms;
-
   }
 };</pre></div></div>
             

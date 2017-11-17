@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,19 +15,19 @@
     <title>GeoJS - Examples</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/geojs/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
 
     <!-- Custom Fonts -->
-    <link href="/geojs/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <!-- Theme CSS -->
-    <link href="/geojs/css/agency.css" rel="stylesheet">
-    <link href="/geojs/css/main.css" rel="stylesheet">
-    <link href="/geojs/css/syntax.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/agency.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/highlight.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,10 +37,10 @@
     <![endif]-->
     
     <!-- jQuery -->
-    <script src="/geojs/vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/geojs/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
     
     <link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
@@ -59,7 +62,6 @@
 </head>
 
 <body id="page-top" class="index">
-
     <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-custom navbar-fixed-top">
         <div class="container">
@@ -68,9 +70,9 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span><i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="/geojs/"><img class="navbar-logo" src="/geojs/images/logo_transparent.png" /></a>
-            </div>
-
+                <a class="navbar-brand" href="../index.html"><img class="navbar-logo" src="../images/logo_transparent.png" /></a>
+            </div> 
+            
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -78,13 +80,13 @@
                         <a href="#page-top"></a>
                     </li>
                     <li class="">
-                        <a href="/geojs/">Welcome</a>
+                        <a href="../">Welcome</a>
                     </li>
                     <li class="">
-                        <a href="/geojs/tutorials">Tutorials</a>
+                        <a href="../tutorials">Tutorials</a>
                     </li>
-                    <li class="active">
-                        <a href="/geojs/examples">Examples</a>
+                    <li class=" active ">
+                        <a href="">Examples</a>
                     </li>
                     <li>
                         <a href="https://github.com/OpenGeoscience/geojs">GitHub</a>
@@ -99,7 +101,6 @@
     <div class="content-wrapper">
         <div class="container">
     <div class="row">
-        <!-- <div class="col-md-10 col-md-offset-1"> -->
         <div class="col-md-12">
             <section>
                 <h2>Examples</h2>
@@ -110,46 +111,14 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/heatmap">
+                            <a href="hurricanes">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/heatmap/thumb.jpg">
+                                <img src="hurricanes/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/heatmap"><h4 class="title">Heatmap Feature</h4></a>
-                            <div class="description">This example shows how to add a heatmap to a map.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/deepzoom">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/deepzoom/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/deepzoom"><h4 class="title">Deepzoom tiled image example</h4></a>
-                            <div class="description">Rendering a tiled image using the Deepzoom protocol.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/hurricanes">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/hurricanes/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/hurricanes"><h4 class="title">Hurricane tracking data</h4></a>
+                            <a href="hurricanes"><h4 class="title">Hurricane tracking data</h4></a>
                             <div class="description">Explore historic hurricane paths since 1980 on an interactive map.</div>
                         </div>
                     </div>
@@ -158,15 +127,15 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/annotations">
+                            <a href="animation">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/annotations/thumb.jpg">
+                                <img src="animation/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/annotations"><h4 class="title">Annotation Layer</h4></a>
-                            <div class="description">Add annotations, such as marked rectangles, to a map.</div>
+                            <a href="animation"><h4 class="title">Animate Features</h4></a>
+                            <div class="description">This example shows how to animate features by updating styles.</div>
                         </div>
                     </div>
                 </div>
@@ -174,15 +143,15 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/choropleth">
+                            <a href="annotations">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/choropleth/thumb.jpg">
+                                <img src="annotations/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/choropleth"><h4 class="title">Choropleth plot</h4></a>
-                            <div class="description">Add choropleth features to a map. Choropleths color each region in a set of regions based on a scalar value for each region.</div>
+                            <a href="annotations"><h4 class="title">Annotation Layer</h4></a>
+                            <div class="description">This example shows how to add annotations, such as marked rectangles, to a map.</div>
                         </div>
                     </div>
                 </div>
@@ -190,15 +159,15 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/contour">
+                            <a href="choropleth">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/contour/thumb.jpg">
+                                <img src="choropleth/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/contour"><h4 class="title">Contour plot</h4></a>
-                            <div class="description">Add contour features to a map.  Contours color a region based on an array of scalar values.</div>
+                            <a href="choropleth"><h4 class="title">Choropleth plot</h4></a>
+                            <div class="description">This example shows how to add choropleth features to a map.  Choropleths color each region in a set of regions based on a scalar value for each region.</div>
                         </div>
                     </div>
                 </div>
@@ -206,15 +175,15 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/geoJSON">
+                            <a href="contour">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/geoJSON/thumb.jpg">
+                                <img src="contour/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/geoJSON"><h4 class="title">GeoJSON file reader</h4></a>
-                            <div class="description">Shows how to use geoJSON reader and use properties to adjust the style of the features. You can edit the json file while the features on the map update in response.</div>
+                            <a href="contour"><h4 class="title">Contour plot</h4></a>
+                            <div class="description">This example shows how to add contour features to a map.  Contours color a region based on an array of scalar values.</div>
                         </div>
                     </div>
                 </div>
@@ -222,14 +191,30 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/legend">
+                            <a href="deepzoom">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/legend/thumb.jpg">
+                                <img src="deepzoom/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/legend"><h4 class="title">Feature legends</h4></a>
+                            <a href="deepzoom"><h4 class="title">Deepzoom tiled image example</h4></a>
+                            <div class="description">Rendering a tiled image using the Deepzoom protocol.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="legend">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="legend/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="legend"><h4 class="title">Feature legends</h4></a>
                             <div class="description">This example shows how to create a legend to describe feature styles on a map.</div>
                         </div>
                     </div>
@@ -238,14 +223,46 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/lines">
+                            <a href="geoJSON">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/lines/thumb.jpg">
+                                <img src="geoJSON/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/lines"><h4 class="title">Line Feature</h4></a>
+                            <a href="geoJSON"><h4 class="title">GeoJSON file reader</h4></a>
+                            <div class="description">Shows how to use the included geoJSON reader, and how to use the properties to adjust the style of the features.  In this example, you can edit the json file while the features on the map update in response.  You can also drop a new geoJSON file onto the text editor to load it.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="heatmap">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="heatmap/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="heatmap"><h4 class="title">Heatmap Feature</h4></a>
+                            <div class="description">This example shows how to add a heatmap to a map.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="lines">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="lines/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="lines"><h4 class="title">Line Feature</h4></a>
                             <div class="description">This example shows the variations that are available for line features.</div>
                         </div>
                     </div>
@@ -254,126 +271,14 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/pixelmap">
+                            <a href="widgets">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/pixelmap/thumb.jpg">
+                                <img src="widgets/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/pixelmap"><h4 class="title">Pixelmap feature</h4></a>
-                            <div class="description">This example shows how to use a pixelmap feature.  The pixelmap colors areas based on an index derived from an image and some data per index.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/polygons">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/polygons/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/polygons"><h4 class="title">Polygon features</h4></a>
-                            <div class="description">This example shows how to add polygons to a map.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/quads">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/quads/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/quads"><h4 class="title">Quad features</h4></a>
-                            <div class="description">This example shows how to add dynamic quads to a map.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/reprojection">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/reprojection/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/reprojection"><h4 class="title">Reproject tiles</h4></a>
-                            <div class="description">Shows how you can reproject tiles from one projection to another.  The source tiles are in Web Mercator, but can be drawn in many different projections.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/sld">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/sld/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/sld"><h4 class="title">Adding styles to WMS raster layers</h4></a>
-                            <div class="description">Rendering tiles from a WMS server by customizing the style.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/tiles">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/tiles/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/tiles"><h4 class="title">Tile layer with controllable options</h4></a>
-                            <div class="description">This example shows the options on tile layers. The code and query parameters allow even more options to be adjusted.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/transitions">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/transitions/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/transitions"><h4 class="title">Using animated transitions</h4></a>
-                            <div class="description">Using animations to transition between points on a map.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 example-container">
-                    <div class="row">
-                        <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/widgets">
-                                <div class="thumbnail-hover">
-                                </div>
-                                <img src="/geojs/examples/widgets/thumb.jpg">
-                            </a>
-                        </div>
-                        <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/widgets"><h4 class="title">Map Widgets</h4></a>
+                            <a href="widgets"><h4 class="title">Map Widgets</h4></a>
                             <div class="description">This example shows how the widgets API can be used to place elements on top of the map.</div>
                         </div>
                     </div>
@@ -382,15 +287,111 @@
                 <div class="col-md-6 example-container">
                     <div class="row">
                         <div class="col-xs-5 thumbnail-container">
-                            <a href="/geojs/examples/wms">
+                            <a href="pixelmap">
                                 <div class="thumbnail-hover">
                                 </div>
-                                <img src="/geojs/examples/wms/thumb.jpg">
+                                <img src="pixelmap/thumb.jpg">
                             </a>
                         </div>
                         <div class="col-xs-7 word-container">
-                            <a href="/geojs/examples/wms"><h4 class="title">Rendering tiles from a WMS server</h4></a>
+                            <a href="pixelmap"><h4 class="title">Pixelmap feature</h4></a>
+                            <div class="description">This example shows how to use a pixelmap feature.  The pixelmap colors areas based on an index derived from an image and some data per index.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="polygons">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="polygons/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="polygons"><h4 class="title">Polygon features</h4></a>
+                            <div class="description">This example shows how to add polygons to a map.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="wms">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="wms/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="wms"><h4 class="title">Rendering tiles from a WMS server</h4></a>
                             <div class="description">Rendering tiles from a WMS server by customizing the tile URL of an OSM layer.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="reprojection">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="reprojection/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="reprojection"><h4 class="title">Reproject tiles</h4></a>
+                            <div class="description">This example shows how you can reproject tiles from one projection to another.  The source tiles are in Web Mercator (EPSG:3857), but can be drawn in many different projections.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="sld">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="sld/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="sld"><h4 class="title">Styling WMS raster layers</h4></a>
+                            <div class="description">Rendering tiles from a WMS server by customizing the style.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="tiles">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="tiles/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="tiles"><h4 class="title">Tile layer with controllable options</h4></a>
+                            <div class="description">This example provides controls for changing many options on tile layers.  The code and query parameters allow even more options to be adjusted.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 example-container">
+                    <div class="row">
+                        <div class="col-xs-5 thumbnail-container">
+                            <a href="transitions">
+                                <div class="thumbnail-hover">
+                                </div>
+                                <img src="transitions/thumb.jpg">
+                            </a>
+                        </div>
+                        <div class="col-xs-7 word-container">
+                            <a href="transitions"><h4 class="title">Using animated transitions</h4></a>
+                            <div class="description">Using animations to transition between points on a map.</div>
                         </div>
                     </div>
                 </div>
@@ -425,7 +426,7 @@
     </footer>
     
     <!-- Theme JavaScript -->
-    <script src="/geojs/js/agency.js"></script>
+    <script src="../js/agency.js"></script>
 
 </body>
 

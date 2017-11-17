@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,19 +15,19 @@
     <title>GeoJS - Line Feature</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/geojs/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../vendor/bootstrap/css/bootstrap.min.css">
 
     <!-- Custom Fonts -->
-    <link href="/geojs/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/font-awesome/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <!-- Theme CSS -->
-    <link href="/geojs/css/agency.css" rel="stylesheet">
-    <link href="/geojs/css/main.css" rel="stylesheet">
-    <link href="/geojs/css/syntax.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/agency.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/highlight.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,10 +37,10 @@
     <![endif]-->
     
     <!-- jQuery -->
-    <script src="/geojs/vendor/jquery/jquery.min.js"></script>
+    <script src="../../vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/geojs/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
     
     <link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
@@ -59,7 +62,6 @@
 </head>
 
 <body id="page-top" class="index">
-
     <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-custom navbar-fixed-top affix">
         <div class="container">
@@ -68,9 +70,9 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span><i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="/geojs/"><img class="navbar-logo" src="/geojs/images/logo_transparent.png" /></a>
-            </div>
-
+                <a class="navbar-brand" href="../../index.html"><img class="navbar-logo" src="../../images/logo_transparent.png" /></a>
+            </div> 
+            
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -78,13 +80,13 @@
                         <a href="#page-top"></a>
                     </li>
                     <li class="">
-                        <a href="/geojs/">Welcome</a>
+                        <a href="../../">Welcome</a>
                     </li>
                     <li class="">
-                        <a href="/geojs/tutorials">Tutorials</a>
+                        <a href="../../tutorials">Tutorials</a>
                     </li>
-                    <li class="active">
-                        <a href="/geojs/examples">Examples</a>
+                    <li class=" active ">
+                        <a href="..">Examples</a>
                     </li>
                     <li>
                         <a href="https://github.com/OpenGeoscience/geojs">GitHub</a>
@@ -98,14 +100,18 @@
 
     <div class="content-wrapper">
         <!-- This will put script and link in the body, which has certain drawbacks, but it's relatively minor for the current use -->
-<script type="text/javascript" src="/geojs/js/example.js"></script>
-<link rel="stylesheet" href="/geojs/css/example.css">
+<script type="text/javascript" src="../../js/example.js"></script>
+<link rel="stylesheet" href="../../css/example.css">
 <script type="text/javascript" src="../bundle.js" charset="UTF-8"></script>
 <div class="page example">
-    <script type="text/javascript" src="main.js" charset="UTF-8"></script>
-    <link rel="stylesheet" href="main.css">
+    
+        <script type="text/javascript" src="main.js"></script>
+    
+    
+        <link rel="stylesheet" href="main.css">
+    
     <div id="map"></div>
-     <div id="controls"><div class="form-group" title="Number of lines segments.  Leave blank for a small default value."><label for="lines">Number of Lines</label><input id="lines" type="number" min="1" step="100"/><span id="lines-shown"></span></div><div class="form-group" title="Stroke Color (any css color).  A comma-separated list will cycle through the listed colors.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to colors, with undefined values using the 'other' entry."><label for="strokeColor">strokeColor</label><input id="strokeColor" placeholder="black"/></div><div class="form-group" title="Stroke Opacity (a number in the range [0, 1]).  A comma-separated list will cycle through the listed opacities.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to opacities, with undefined values using the 'other' entry."><label for="strokeOpacity">strokeOpacity</label><input id="strokeOpacity" placeholder="1"/></div><div class="form-group" title="Stroke Width (a positive number).  A comma-separated list will cycle through the listed widths.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to widths, with undefined values using the 'other' entry."><label for="strokeWidth">strokeWidth</label><input id="strokeWidth" placeholder="2"/></div><div class="form-group" title="Stroke Offset (a number in the range [-1, 1]).  A comma-separated list will cycle through the listed offsets.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to offsets, with undefined values using the 'other' entry."><label for="strokeOffset">strokeOffset</label><input id="strokeOffset" placeholder="0"/></div><div class="form-group" title="Line Cap (one of 'butt', 'round', or 'square').  A comma-separated list will cycle through the listed line caps.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to line caps, with undefined values using the 'other' entry."><label for="lineCap">lineCap</label><input id="lineCap" placeholder="butt"/></div><div class="form-group" title="Line Join (one of 'miter', 'bevel', 'round', or 'miter-clip').  A comma-separated list will cycle through the listed line joins.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to line joins, with undefined values using the 'other' entry."><label for="lineJoin">lineJoin</label><input id="lineJoin" placeholder="miter"/></div><div class="form-group" title="Miter Limit (a positive number).  Any miter whose length relative to the stroke with longer than this value will either be beveled or clipped."><label for="miterLimit">miterLimit</label><input id="miterLimit" placeholder="10"/></div><div class="form-group" title="Antialiasing (a non-negative number).  Edges of lines will be antialiased by this many pixels.  Values larger than 2 tend to make things blurry."><label for="antialiasing">antialiasing</label><input id="antialiasing" placeholder="2"/></div><div class="form-group" title="Show road names and categories on hover."><label for="hovertext">Info on Hover</label><input id="hovertext" type="checkbox" placeholder="false"/></div><div class="form-group" title="Show an OSM map underneath the lines."><label for="showmap">Show Map</label><input id="showmap" type="checkbox" placeholder="true" checked="checked"/></div><div class="form-group"><div class="shortlabel">Presets</div><button class="preset" strokeColor="{&quot;residential&quot;:&quot;blue&quot;,&quot;service&quot;:&quot;green&quot;,&quot;other&quot;:&quot;black&quot;}" strokeWidth="{&quot;residential&quot;:4,&quot;service&quot;:1,&quot;other&quot;:8}" lineCap="round" showmap="true" title="Properties based on road category">Categories</button><button class="preset" strokeColor="" strokeWidth="{&quot;residential&quot;:1,&quot;service&quot;:0.25,&quot;other&quot;:3}" lineCap="round" lineJoin="" miterLimit="" showmap="false" title="Thin lines based on road category">Thin</button><button class="preset" strokeColor="line:red,orange,yellow,green,blue,indigo,violet" strokeWidth="line:1,2,4,8,16" lineCap="line:butt,round,square" lineJoin="line:miter,bevel,round,miter-clip" miterLimit="4" title="Properties varied by line">Lines</button><button class="preset" strokeColor="red,orange,yellow,green,blue,indigo,violet" strokeWidth="1,2,4,8,16" lineCap="butt,round,square" lineJoin="miter,bevel,round,miter-clip" miterLimit="4" title="Properties varied by line segment">Segments</button></div></div>
+    <div><div id="controls"><div class="form-group" title="Number of lines segments.  Leave blank for a small default value."><label for="lines">Number of Lines</label><input id="lines" type="number" min="1" step="100"><span id="lines-shown"></span></div><div class="form-group" title="Stroke Color (any css color).  A comma-separated list will cycle through the listed colors.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to colors, with undefined values using the 'other' entry."><label for="strokeColor">strokeColor</label><input id="strokeColor" placeholder="black"></div><div class="form-group" title="Stroke Opacity (a number in the range [0, 1]).  A comma-separated list will cycle through the listed opacities.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to opacities, with undefined values using the 'other' entry."><label for="strokeOpacity">strokeOpacity</label><input id="strokeOpacity" placeholder="1"></div><div class="form-group" title="Stroke Width (a positive number).  A comma-separated list will cycle through the listed widths.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to widths, with undefined values using the 'other' entry."><label for="strokeWidth">strokeWidth</label><input id="strokeWidth" placeholder="2"></div><div class="form-group" title="Stroke Offset (a number in the range [-1, 1]).  A comma-separated list will cycle through the listed offsets.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to offsets, with undefined values using the 'other' entry."><label for="strokeOffset">strokeOffset</label><input id="strokeOffset" placeholder="0"></div><div class="form-group" title="Line Cap (one of 'butt', 'round', or 'square').  A comma-separated list will cycle through the listed line caps.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to line caps, with undefined values using the 'other' entry."><label for="lineCap">lineCap</label><input id="lineCap" placeholder="butt"></div><div class="form-group" title="Line Join (one of 'miter', 'bevel', 'round', or 'miter-clip').  A comma-separated list will cycle through the listed line joins.  line:(comma-separate list) will cycle through by line.  A JSON dictionary will map road categories to line joins, with undefined values using the 'other' entry."><label for="lineJoin">lineJoin</label><input id="lineJoin" placeholder="miter"></div><div class="form-group" title="Miter Limit (a positive number).  Any miter whose length relative to the stroke with longer than this value will either be beveled or clipped."><label for="miterLimit">miterLimit</label><input id="miterLimit" placeholder="10"></div><div class="form-group" title="Antialiasing (a non-negative number).  Edges of lines will be antialiased by this many pixels.  Values larger than 2 tend to make things blurry."><label for="antialiasing">antialiasing</label><input id="antialiasing" placeholder="2"></div><div class="form-group" title="Show road names and categories on hover."><label for="hovertext">Info on Hover</label><input id="hovertext" type="checkbox" placeholder="false"></div><div class="form-group" title="Show an OSM map underneath the lines."><label for="showmap">Show Map</label><input id="showmap" type="checkbox" placeholder="true" checked="checked"></div><div class="form-group"><div class="shortlabel">Presets</div><button class="preset" strokecolor="{&quot;residential&quot;:&quot;blue&quot;,&quot;service&quot;:&quot;green&quot;,&quot;other&quot;:&quot;black&quot;}" strokewidth="{&quot;residential&quot;:4,&quot;service&quot;:1,&quot;other&quot;:8}" linecap="round" showmap="true" title="Properties based on road category">Categories</button><button class="preset" strokecolor="" strokewidth="{&quot;residential&quot;:1,&quot;service&quot;:0.25,&quot;other&quot;:3}" linecap="round" linejoin="" miterlimit="" showmap="false" title="Thin lines based on road category">Thin</button><button class="preset" strokecolor="line:red,orange,yellow,green,blue,indigo,violet" strokewidth="line:1,2,4,8,16" linecap="line:butt,round,square" linejoin="line:miter,bevel,round,miter-clip" miterlimit="4" title="Properties varied by line">Lines</button><button class="preset" strokecolor="red,orange,yellow,green,blue,indigo,violet" strokewidth="1,2,4,8,16" linecap="butt,round,square" linejoin="miter,bevel,round,miter-clip" miterlimit="4" title="Properties varied by line segment">Segments</button></div></div></div>
     <div class="modal fade screenshot-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -146,7 +152,7 @@
     </div>
     
     <!-- Theme JavaScript -->
-    <script src="/geojs/js/agency.js"></script>
+    <script src="../../js/agency.js"></script>
 
 </body>
 

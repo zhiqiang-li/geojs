@@ -40,7 +40,7 @@
       <span class="hljs-attr">x</span>: <span class="hljs-number">-98</span>,
       <span class="hljs-attr">y</span>: <span class="hljs-number">39</span>
     },
-    <span class="hljs-attr">zoom</span>: <span class="hljs-number">3</span>
+    <span class="hljs-attr">zoom</span>: <span class="hljs-number">4</span>
   });
   <span class="hljs-keyword">var</span> layer, heatmap, points, datapoints;
 
@@ -213,7 +213,8 @@
     });
   }
 
-  <span class="hljs-comment">/* Given a set of datapoints, optionally truncate or expand it, then show it
+  <span class="hljs-comment">/**
+   * Given a set of datapoints, optionally truncate or expand it, then show it
    * as a heatmap.
    *
    * @param {array} datapoints: an array of points to show.
@@ -228,9 +229,10 @@
       rows = rows.slice();
       <span class="hljs-keyword">while</span> (rows.length &lt; maxrows) {
         <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = rows.length - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span> &amp;&amp; rows.length &lt; maxrows; i -= <span class="hljs-number">1</span>) {
-          rows.push([rows[i][<span class="hljs-number">0</span>] + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">0.1</span> - <span class="hljs-number">0.05</span>,
-                     rows[i][<span class="hljs-number">1</span>] + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">0.1</span> - <span class="hljs-number">0.05</span>,
-                     rows[i][<span class="hljs-number">2</span>] + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">0.1</span> - <span class="hljs-number">0.05</span>]);
+          rows.push([
+            rows[i][<span class="hljs-number">0</span>] + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">0.1</span> - <span class="hljs-number">0.05</span>,
+            rows[i][<span class="hljs-number">1</span>] + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">0.1</span> - <span class="hljs-number">0.05</span>,
+            rows[i][<span class="hljs-number">2</span>] + <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">0.1</span> - <span class="hljs-number">0.05</span>]);
         }
       }
     }

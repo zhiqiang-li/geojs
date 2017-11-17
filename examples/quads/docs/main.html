@@ -63,6 +63,7 @@
     <span class="hljs-attr">renderer</span>: query.renderer ? (query.renderer === <span class="hljs-string">'html'</span> ? <span class="hljs-literal">null</span> : query.renderer) : <span class="hljs-literal">undefined</span>,
     <span class="hljs-attr">features</span>: query.renderer ? <span class="hljs-literal">undefined</span> : [<span class="hljs-string">'quad'</span>]
   });
+  <span class="hljs-keyword">var</span> previewImage = <span class="hljs-keyword">new</span> Image();
   <span class="hljs-keyword">var</span> quads = layer.createFeature(<span class="hljs-string">'quad'</span>, {<span class="hljs-attr">selectionAPI</span>: <span class="hljs-literal">true</span>});
   <span class="hljs-keyword">var</span> quadData = [{
     <span class="hljs-attr">ll</span>: {<span class="hljs-attr">x</span>: <span class="hljs-number">-108</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">29</span>},
@@ -185,6 +186,23 @@ canvas element is changed.</p>
       quads.draw();
     }, <span class="hljs-number">10000</span>);
   }
+  <span class="hljs-keyword">if</span> (query.video === <span class="hljs-string">'true'</span>) {
+    <span class="hljs-comment">/* You can render videos on a quad.  This is currently only supported on
+     * the canvas renderer. */</span>
+    quadData.push({
+      <span class="hljs-attr">ul</span>: {<span class="hljs-attr">x</span>: <span class="hljs-number">-128</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">9</span>},
+      <span class="hljs-attr">lr</span>: {<span class="hljs-attr">x</span>: <span class="hljs-number">-98</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">-11</span>},
+      <span class="hljs-attr">video</span>: <span class="hljs-string">'../../data/earthquakes-video.webm'</span>
+    });
+    <span class="hljs-comment">/* Add the same video via a video element and flip it vertically. */</span>
+    <span class="hljs-keyword">var</span> vid = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'video'</span>);
+    vid.src = <span class="hljs-string">'../../data/earthquakes-video.webm'</span>;
+    quadData.push({
+      <span class="hljs-attr">ll</span>: {<span class="hljs-attr">x</span>: <span class="hljs-number">-158</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">9</span>},
+      <span class="hljs-attr">ur</span>: {<span class="hljs-attr">x</span>: <span class="hljs-number">-128</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">-11</span>},
+      <span class="hljs-attr">video</span>: vid
+    });
+  }
   <span class="hljs-keyword">if</span> (query.warped === <span class="hljs-string">'true'</span>) {
     <span class="hljs-comment">/* You can specify quads so that the corners are 'twisted' and the quad
      * would be non-convex.  In this case, the quads are each rendered as a
@@ -204,7 +222,6 @@ canvas element is changed.</p>
       <span class="hljs-attr">image</span>: <span class="hljs-string">'../../data/tilefancy.png'</span>
     });
   }
-  <span class="hljs-keyword">var</span> previewImage = <span class="hljs-keyword">new</span> Image();
   previewImage.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
     quads
@@ -241,17 +258,33 @@ asked for it not to have been cached to begin with.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">delete</span> evt.data._cachedQuad;
-        <span class="hljs-keyword">this</span>.modified();
-        <span class="hljs-keyword">this</span>.draw();
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.cacheUpdate(evt.data);
+        <span class="hljs-keyword">this</span>.draw();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>if this is a video element, start it playing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (quads.video(evt.data)) {
+          quads.video(evt.data).currentTime = <span class="hljs-number">0</span>;
+          quads.video(evt.data).play();
+        }
       })
       .geoOn(geo.event.feature.mouseout, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) </span>{
         <span class="hljs-keyword">if</span> (evt.data.orig_opacity === <span class="hljs-literal">undefined</span>) {
           evt.data.orig_opacity = (evt.data.opacity || <span class="hljs-literal">null</span>);
         }
         evt.data.opacity = evt.data.orig_opacity || <span class="hljs-literal">undefined</span>;
-        <span class="hljs-keyword">delete</span> evt.data._cachedQuad;
-        <span class="hljs-keyword">this</span>.modified();
+        <span class="hljs-keyword">this</span>.cacheUpdate(evt.data);
         <span class="hljs-keyword">this</span>.draw();
       })
       .draw();

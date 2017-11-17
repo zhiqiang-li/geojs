@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,19 +15,19 @@
     <title>GeoJS - Using a WMS Tile Source</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/geojs/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../vendor/bootstrap/css/bootstrap.min.css">
 
     <!-- Custom Fonts -->
-    <link href="/geojs/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/font-awesome/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <!-- Theme CSS -->
-    <link href="/geojs/css/agency.css" rel="stylesheet">
-    <link href="/geojs/css/main.css" rel="stylesheet">
-    <link href="/geojs/css/syntax.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/agency.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/highlight.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,10 +37,10 @@
     <![endif]-->
     
     <!-- jQuery -->
-    <script src="/geojs/vendor/jquery/jquery.min.js"></script>
+    <script src="../../vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/geojs/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
     
     <link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
@@ -59,7 +62,6 @@
 </head>
 
 <body id="page-top" class="index">
-
     <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-custom navbar-fixed-top affix">
         <div class="container">
@@ -68,9 +70,9 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span><i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="/geojs/"><img class="navbar-logo" src="/geojs/images/logo_transparent.png" /></a>
-            </div>
-
+                <a class="navbar-brand" href="../../index.html"><img class="navbar-logo" src="../../images/logo_transparent.png" /></a>
+            </div> 
+            
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -78,13 +80,13 @@
                         <a href="#page-top"></a>
                     </li>
                     <li class="">
-                        <a href="/geojs/">Welcome</a>
+                        <a href="../../">Welcome</a>
                     </li>
-                    <li class="active">
-                        <a href="/geojs/tutorials">Tutorials</a>
+                    <li class=" active ">
+                        <a href="..">Tutorials</a>
                     </li>
                     <li class="">
-                        <a href="/geojs/examples">Examples</a>
+                        <a href="../../examples">Examples</a>
                     </li>
                     <li>
                         <a href="https://github.com/OpenGeoscience/geojs">GitHub</a>
@@ -97,7 +99,7 @@
     </nav>
 
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/geojs/css/tutorial.css">
+        <link rel="stylesheet" href="../../css/tutorial.css">
 <script type="text/javascript" src="../bundle.js" charset="UTF-8"></script>
 <div class="page tutorial">
     <!-- include tutorial sources--><!-- Include tutorial specific files--><script type="text/javascript">$(start_tutorial);
@@ -136,7 +138,7 @@ function getWMSURL(x, y, zoom) {
     size: '256,256',
     layers: 'show:3',
     f: 'image'
-  }
+  };
   // construct the url for a tile.  We can use jQuery's $.param function.
   var url =  baseUrl + '?' + $.param(params);
   return url;
@@ -144,18 +146,18 @@ function getWMSURL(x, y, zoom) {
 
 // create a tile layer with the WMS data
 map.createLayer('osm', {
-  attribution: 'Data from <a href="https://idpgis.ncep.noaa.gov/arcgis/rest/services/NWS_Observations/">NOAA</a>',
+  attribution: 'Data from <a href="https://idpgis.ncep.noaa.gov/arcgis/rest/services/NWS_Observations/" target="_blank" rel="noopener">NOAA</a>',
   // the tiles are transparent, so don't keep the lower level ones; they
   // would build up
   keepLower: false,
   // the map tile URL is generated from a function
   url: getWMSURL
-});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has two osm layers, one from a WMS server" data-tests="[&quot;map.layers().length === 2&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;map.layers()[1] instanceof geo.osmLayer&quot;,&quot;geo.util.isFunction(map.layers()[1].url())&quot;,&quot;$.ajax({url: getWMSURL.call(map.layers()[1], 3, 6, 4), dataFilter: function (resp) { return resp.substr(1, 3) == \&quot;PNG\&quot;; }})&quot;]" data-idleFuncs="[&quot;map.onIdle&quot;]"></div></div><iframe id="workframe"></iframe></div>
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has two osm layers, one from a WMS server" data-tests="[&quot;map.layers().length === 2&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;map.layers()[1] instanceof geo.osmLayer&quot;,&quot;geo.util.isFunction(map.layers()[1].url())&quot;,&quot;$.ajax({url: getWMSURL.call(map.layers()[1], 3, 6, 4), dataFilter: function (resp) { return resp.substr(1, 3) == \&quot;PNG\&quot;; }})&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div></div><iframe id="workframe"></iframe></div>
 </div>
     </div>
     
     <!-- Theme JavaScript -->
-    <script src="/geojs/js/agency.js"></script>
+    <script src="../../js/agency.js"></script>
 
 </body>
 

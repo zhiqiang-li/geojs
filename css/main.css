@@ -22,6 +22,7 @@ p {
 @media (max-width: 768px) {
   .content-wrapper {
     padding-top: 50px; } }
+
 footer {
   padding: 14px 0;
   border-top: 1px solid #eee; }
@@ -32,18 +33,23 @@ footer {
   width: 80%;
   margin: 0 auto;
   display: block; }
+
 .page.welcome .description {
   text-align: left; }
+
 .page.welcome h1 {
   font-size: 16px;
   color: #999;
   text-transform: uppercase; }
+
 .page.welcome h3 {
   font-size: 20px;
   color: #1B70B5; }
+
 @media (min-width: 768px) {
   .page.welcome section {
     padding: 45px 0 35px 0; } }
+
 .page.welcome section.highlight {
   background-color: #f5f5f5; }
   .page.welcome section.highlight .highlight-icon {
@@ -53,19 +59,20 @@ footer {
     border-radius: 55px;
     overflow: hidden; }
     .page.welcome section.highlight .highlight-icon.heatmap {
-      background-image: url(/geojs/examples/heatmap/thumb.jpg);
+      background-image: url("../examples/heatmap/thumb.jpg");
       background-size: auto 80px;
       background-position: 3px 15px;
       background-repeat: no-repeat;
       background-color: white; }
     .page.welcome section.highlight .highlight-icon.contour {
-      background-image: url(/geojs/examples/contour/thumb.jpg);
+      background-image: url("../examples/contour/thumb.jpg");
       background-size: auto 110px;
       background-position: -20px -5px; }
     .page.welcome section.highlight .highlight-icon.choropleth {
-      background-image: url(/geojs/examples/choropleth/thumb.jpg);
+      background-image: url("../examples/choropleth/thumb.jpg");
       background-size: auto 105px;
       background-position: -5px 5px; }
+
 .page.welcome section.get-started .fa {
   width: 1.4em; }
 
@@ -74,7 +81,19 @@ footer {
   padding-top: 25px;
   padding-bottom: 25px;
   border-bottom: 1px solid #eee; }
+  .example-container > .row {
+    position: relative;
+    overflow-y: hidden; }
+    .example-container > .row::after {
+      content: ' ';
+      width: 54.16666%;
+      position: absolute;
+      height: 50px;
+      background: linear-gradient(rgba(255, 0, 0, 0), white);
+      right: 0;
+      bottom: 0; }
   .example-container .thumbnail-container {
+    float: left;
     padding-right: 0;
     width: 45.83333%; }
     .example-container .thumbnail-container a {
@@ -96,22 +115,26 @@ footer {
     .example-container .thumbnail-container .thumbnail-hover:hover {
       opacity: 0.4; }
   .example-container .word-container {
+    float: left;
     width: 54.16666%;
     padding-right: 5px; }
   .example-container h4.title {
     font-size: 17px; }
   .example-container .description {
+    height: 0;
     margin-top: 20px; }
 
 .page.tutorials .portfolio-item {
   right: 0;
   margin: 0 0 15px;
   color: #fff; }
+
 .page.tutorials .portfolio-item .portfolio-link {
   display: block;
   position: relative;
   max-width: 400px;
   margin: 0 auto; }
+
 .page.tutorials .portfolio-item .portfolio-link .portfolio-hover {
   background: rgba(18, 100, 183, 0.9);
   position: absolute;
@@ -121,8 +144,10 @@ footer {
   transition: all ease 0.5s;
   -webkit-transition: all ease 0.5s;
   -moz-transition: all ease 0.5s; }
+
 .page.tutorials .portfolio-item .portfolio-link .portfolio-hover:hover {
   opacity: 0.4; }
+
 .page.tutorials .portfolio-item .portfolio-caption {
   max-width: 400px;
   margin: 0 auto;

@@ -1,8 +1,8 @@
 {
-  "path": "lines",
   "title": "Line Feature",
   "exampleCss": ["main.css"],
   "exampleJs": ["main.js"],
+  "thumbquery": "lines=250000",
   "about": {
     "text": "This example shows the variations that are available for line features."
   }

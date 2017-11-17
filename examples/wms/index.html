@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,22 +12,22 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>GeoJS - WMS Tile</title>
+    <title>GeoJS - Rendering tiles from a WMS server</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/geojs/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../vendor/bootstrap/css/bootstrap.min.css">
 
     <!-- Custom Fonts -->
-    <link href="/geojs/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/font-awesome/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <!-- Theme CSS -->
-    <link href="/geojs/css/agency.css" rel="stylesheet">
-    <link href="/geojs/css/main.css" rel="stylesheet">
-    <link href="/geojs/css/syntax.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/agency.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/highlight.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,10 +37,10 @@
     <![endif]-->
     
     <!-- jQuery -->
-    <script src="/geojs/vendor/jquery/jquery.min.js"></script>
+    <script src="../../vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/geojs/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
     
     <link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
@@ -59,7 +62,6 @@
 </head>
 
 <body id="page-top" class="index">
-
     <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-custom navbar-fixed-top affix">
         <div class="container">
@@ -68,9 +70,9 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span><i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="/geojs/"><img class="navbar-logo" src="/geojs/images/logo_transparent.png" /></a>
-            </div>
-
+                <a class="navbar-brand" href="../../index.html"><img class="navbar-logo" src="../../images/logo_transparent.png" /></a>
+            </div> 
+            
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -78,13 +80,13 @@
                         <a href="#page-top"></a>
                     </li>
                     <li class="">
-                        <a href="/geojs/">Welcome</a>
+                        <a href="../../">Welcome</a>
                     </li>
                     <li class="">
-                        <a href="/geojs/tutorials">Tutorials</a>
+                        <a href="../../tutorials">Tutorials</a>
                     </li>
-                    <li class="active">
-                        <a href="/geojs/examples">Examples</a>
+                    <li class=" active ">
+                        <a href="..">Examples</a>
                     </li>
                     <li>
                         <a href="https://github.com/OpenGeoscience/geojs">GitHub</a>
@@ -98,14 +100,16 @@
 
     <div class="content-wrapper">
         <!-- This will put script and link in the body, which has certain drawbacks, but it's relatively minor for the current use -->
-<script type="text/javascript" src="/geojs/js/example.js"></script>
-<link rel="stylesheet" href="/geojs/css/example.css">
+<script type="text/javascript" src="../../js/example.js"></script>
+<link rel="stylesheet" href="../../css/example.css">
 <script type="text/javascript" src="../bundle.js" charset="UTF-8"></script>
 <div class="page example">
-    <script type="text/javascript" src="main.js" charset="UTF-8"></script>
-    <link rel="stylesheet" href="main.css">
-    <div id="map"></div>
     
+        <script type="text/javascript" src="main.js"></script>
+    
+    
+    <div id="map"></div>
+    <div></div>
     <div class="modal fade screenshot-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -127,7 +131,7 @@
             <div class="col-md-4 col-md-offset-8 col-sm-6 col-sm-offset-6 col-xs-9 col-xs-offset-3">
                 <div class="row">
                     <div class="col-xs-6">
-                        <a class="source" target="gj-docco-WMS Tile" href="docs/main.html">Source code</a>
+                        <a class="source" target="gj-docco-Rendering tiles from a WMS server" href="docs/main.html">Source code</a>
                     </div>
                     <div class="col-xs-6">
                         <a class="screenshot" href="#">Take screenshot</a>
@@ -146,7 +150,7 @@
     </div>
     
     <!-- Theme JavaScript -->
-    <script src="/geojs/js/agency.js"></script>
+    <script src="../../js/agency.js"></script>
 
 </body>
 
