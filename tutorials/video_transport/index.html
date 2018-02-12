@@ -128,7 +128,7 @@
   </div>
 </body>
 </html>
-</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><p>In addition to CSS to have the map fill the page, also style the transport
+</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><p>In addition to CSS to have the map fill the page, also style the transport
 controls.</p>
 <div class="codeblock" format="css" step="2" parentstep="1" stepname="Step 2" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">html,body,#map {
   width: 100%;
@@ -162,7 +162,7 @@ controls.</p>
 }
 #controls span#speed {
   width: 50px;
-}</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><p>We load the video first so we can get its size and duration.  It isn't
+}</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><p>We load the video first so we can get its size and duration.  It isn't
 possible to get the framerate, so we have to specify that.</p>
 <div class="codeblock" htmlvideo="htmlvideo" format="javascript" step="3" parentstep="2" stepname="Step 3" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">var videoFPS = 30;
 var videoSrc = '../../data/earthquakes-video.webm';
@@ -191,7 +191,7 @@ $(video).on('loadeddata', function () {
   }]).draw();
   // set the range of the scrubber to the duration of the video
   $('#scrubber').attr({step: 1.0/videoFPS, max: video.duration-1.0/videoFPS});
-});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 3</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has a single feature layer" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.featureLayer&quot;,&quot;map.layers()[0].features().length === 1&quot;,&quot;map.layers()[0].features()[0] instanceof geo.quadFeature&quot;]" data-idlefuncs="[&quot;waitForLoadAndMap = function (done) {\n  $(video).on(\&quot;loadeddata\&quot;, function () {\n    map.onIdle(done);\n  });\n}&quot;]"></div><p>Set up handling of the transport controls.  Reverse speeds are complicated
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 3</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><div class="codeblock_test" data-description="map has a single feature layer" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.featureLayer&quot;,&quot;map.layers()[0].features().length === 1&quot;,&quot;map.layers()[0].features()[0] instanceof geo.quadFeature&quot;]" data-idlefuncs="[&quot;waitForLoadAndMap = function (done) {\n  if (video.HAVE_CURRENT_DATA !== undefined &amp;&amp; video.readyState &gt;= video.HAVE_CURRENT_DATA) {\n    map.onIdle(done);\n  } else {\n    $(video).on(\&quot;loadeddata\&quot;, function () {\n      map.onIdle(done);\n    });\n  }\n}&quot;]"></div><p>Set up handling of the transport controls.  Reverse speeds are complicated
 because HTML video doesn't support them natively.</p>
 <div class="codeblock" format="javascript" step="4" parentstep="3" initial="true" stepname="Step 4" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">// when the scrubber moves, seek the video
 $('#scrubber').on('change input', function (evt) {
@@ -297,7 +297,7 @@ $('#controls img').click(function (evt) {
       video.currentTime = (video.currentTime + 1.0/videoFPS) % video.duration;
       break;
   }
-});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 4</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div></div><iframe id="workframe"></iframe></div>
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 4</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div></div><iframe id="workframe"></iframe></div>
 </div>
     </div>
     

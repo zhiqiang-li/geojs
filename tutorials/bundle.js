@@ -34,7 +34,7 @@
 /******/ 	__webpack_require__.c = installedModules;
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/tutorials";
+/******/ 	__webpack_require__.p = "/tutorials/";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -12356,46 +12356,46 @@
 	  annotationLayer: __webpack_require__(225),
 	  camera: __webpack_require__(217),
 	  choroplethFeature: __webpack_require__(230),
-	  contourFeature: __webpack_require__(231),
-	  domRenderer: __webpack_require__(232),
+	  contourFeature: __webpack_require__(235),
+	  domRenderer: __webpack_require__(236),
 	  event: __webpack_require__(15),
 	  feature: __webpack_require__(213),
 	  featureLayer: __webpack_require__(226),
-	  fetchQueue: __webpack_require__(233),
-	  fileReader: __webpack_require__(234),
+	  fetchQueue: __webpack_require__(237),
+	  fileReader: __webpack_require__(238),
 	  geo_action: __webpack_require__(16),
-	  graphFeature: __webpack_require__(235),
-	  heatmapFeature: __webpack_require__(236),
-	  imageTile: __webpack_require__(237),
-	  jsonReader: __webpack_require__(239),
+	  graphFeature: __webpack_require__(239),
+	  heatmapFeature: __webpack_require__(240),
+	  imageTile: __webpack_require__(241),
+	  jsonReader: __webpack_require__(243),
 	  layer: __webpack_require__(216),
 	  lineFeature: __webpack_require__(212),
-	  map: __webpack_require__(240),
+	  map: __webpack_require__(244),
 	  mapInteractor: __webpack_require__(228),
 	  object: __webpack_require__(209),
-	  osmLayer: __webpack_require__(242),
-	  pathFeature: __webpack_require__(245),
+	  osmLayer: __webpack_require__(246),
+	  pathFeature: __webpack_require__(249),
 	  pointFeature: __webpack_require__(218),
 	  polygonFeature: __webpack_require__(223),
 	  quadFeature: __webpack_require__(229),
-	  pixelmapFeature: __webpack_require__(246),
+	  pixelmapFeature: __webpack_require__(250),
 	  renderer: __webpack_require__(208),
 	  sceneObject: __webpack_require__(214),
 	  textFeature: __webpack_require__(224),
-	  tile: __webpack_require__(238),
-	  tileCache: __webpack_require__(244),
-	  tileLayer: __webpack_require__(243),
+	  tile: __webpack_require__(242),
+	  tileCache: __webpack_require__(248),
+	  tileLayer: __webpack_require__(247),
 	  timestamp: __webpack_require__(215),
 	  transform: __webpack_require__(17),
-	  typedef: __webpack_require__(247),
-	  vectorFeature: __webpack_require__(248),
+	  typedef: __webpack_require__(251),
+	  vectorFeature: __webpack_require__(252),
 	  inherit: __webpack_require__(14),
-	  version: __webpack_require__(249),
-	  sha: __webpack_require__(250),
+	  version: __webpack_require__(253),
+	  sha: __webpack_require__(254),
 	
 	  util: __webpack_require__(89),
 	  jQuery: $,
-	  d3: __webpack_require__(251),
+	  d3: __webpack_require__(255),
 	  gl: __webpack_require__(263),
 	  canvas: __webpack_require__(273),
 	  gui: __webpack_require__(301)
@@ -22670,7 +22670,8 @@
 	    return new annotation(type, args);
 	  }
 	
-	  var m_options = $.extend({}, {showLabel: true}, args || {}),
+	  var m_this = this,
+	      m_options = $.extend({}, {showLabel: true}, args || {}),
 	      m_id = m_options.annotationId;
 	  delete m_options.annotationId;
 	  if (m_id === undefined || (m_options.layer && m_options.layer.annotationById(m_id))) {
@@ -22729,10 +22730,10 @@
 	      arg = ('' + arg).trim();
 	      if (arg !== m_name) {
 	        m_name = arg;
-	        this.modified();
+	        m_this.modified();
 	      }
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -22750,9 +22751,9 @@
 	    }
 	    if (arg !== m_label) {
 	      m_label = arg;
-	      this.modified();
+	      m_this.modified();
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -22762,20 +22763,7 @@
 	   *    or `undefined` if no such position exists.
 	   */
 	  this._labelPosition = function () {
-	    var coor = this._coordinates(), position = {x: 0, y: 0}, i;
-	    if (!coor || !coor.length) {
-	      return undefined;
-	    }
-	    if (coor.length === 1) {
-	      return coor[0];
-	    }
-	    for (i = 0; i < coor.length; i += 1) {
-	      position.x += coor[i].x;
-	      position.y += coor[i].y;
-	    }
-	    position.x /= coor.length;
-	    position.y /= coor.length;
-	    return position;
+	    return util.centerFromPerimeter(m_this._coordinates());
 	  };
 	
 	  /**
@@ -22786,19 +22774,19 @@
 	   *    `undefined` if it should not be shown.
 	   */
 	  this.labelRecord = function () {
-	    var show = this.options('showLabel');
+	    var show = m_this.options('showLabel');
 	    if (!show) {
 	      return;
 	    }
-	    var state = this.state();
+	    var state = m_this.state();
 	    if ((show === true && state === annotationState.create) ||
 	        (show !== true && show.indexOf(state) < 0)) {
 	      return;
 	    }
-	    var style = this.options('labelStyle');
+	    var style = m_this.options('labelStyle');
 	    var labelRecord = {
-	      text: this.label(),
-	      position: this._labelPosition()
+	      text: m_this.label(),
+	      position: m_this._labelPosition()
 	    };
 	    if (!labelRecord.position) {
 	      return;
@@ -22822,9 +22810,9 @@
 	    }
 	    if (arg !== m_description) {
 	      m_description = arg;
-	      this.modified();
+	      m_this.modified();
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -22839,7 +22827,7 @@
 	      return m_layer;
 	    }
 	    m_layer = arg;
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -22856,13 +22844,13 @@
 	    }
 	    if (m_state !== arg) {
 	      m_state = arg;
-	      if (this.layer()) {
-	        this.layer().geoTrigger(geo_event.annotation.state, {
+	      if (m_this.layer()) {
+	        m_this.layer().geoTrigger(geo_event.annotation.state, {
 	          annotation: this
 	        });
 	      }
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -22922,24 +22910,24 @@
 	    if (m_options.coordinates) {
 	      var coor = m_options.coordinates;
 	      delete m_options.coordinates;
-	      this._coordinates(coor);
+	      m_this._coordinates(coor);
 	    }
 	    if (m_options.name !== undefined) {
 	      var name = m_options.name;
 	      delete m_options.name;
-	      this.name(name);
+	      m_this.name(name);
 	    }
 	    if (m_options.label !== undefined) {
 	      var label = m_options.label;
 	      delete m_options.label;
-	      this.label(label);
+	      m_this.label(label);
 	    }
 	    if (m_options.description !== undefined) {
 	      var description = m_options.description;
 	      delete m_options.description;
-	      this.description(description);
+	      m_this.description(description);
 	    }
-	    this.modified();
+	    m_this.modified();
 	    return this;
 	  };
 	
@@ -22967,8 +22955,8 @@
 	    } else {
 	      m_options.style[arg1] = arg2;
 	    }
-	    this.modified();
-	    return this;
+	    m_this.modified();
+	    return m_this;
 	  };
 	
 	  /**
@@ -22995,8 +22983,8 @@
 	    } else {
 	      m_options.editStyle[arg1] = arg2;
 	    }
-	    this.modified();
-	    return this;
+	    m_this.modified();
+	    return m_this;
 	  };
 	
 	  /**
@@ -23066,9 +23054,9 @@
 	   * @returns {geo.geoPosition[]} An array of coordinates.
 	   */
 	  this.coordinates = function (gcs) {
-	    var coord = this._coordinates() || [];
-	    if (this.layer()) {
-	      var map = this.layer().map();
+	    var coord = m_this._coordinates() || [];
+	    if (m_this.layer()) {
+	      var map = m_this.layer().map();
 	      gcs = (gcs === null ? map.gcs() : (
 	             gcs === undefined ? map.ingcs() : gcs));
 	      if (gcs !== map.gcs()) {
@@ -23085,10 +23073,10 @@
 	   * @returns {this} The annotation.
 	   */
 	  this.modified = function () {
-	    if (this.layer()) {
-	      this.layer().modified();
+	    if (m_this.layer()) {
+	      m_this.layer().modified();
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -23097,11 +23085,11 @@
 	   * @returns {this} The annotation.
 	   */
 	  this.draw = function () {
-	    if (this.layer()) {
-	      this.layer()._update();
-	      this.layer().draw();
+	    if (m_this.layer()) {
+	      m_this.layer()._update();
+	      m_this.layer().draw();
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -23148,11 +23136,11 @@
 	   *    should not be represented (for instance, while it is being created).
 	   */
 	  this.geojson = function (gcs, includeCrs) {
-	    var coor = this._geojsonCoordinates(gcs),
-	        geotype = this._geojsonGeometryType(),
-	        styles = this._geojsonStyles(),
-	        objStyle = this.options('style') || {},
-	        objLabelStyle = this.options('labelStyle') || {},
+	    var coor = m_this._geojsonCoordinates(gcs),
+	        geotype = m_this._geojsonGeometryType(),
+	        styles = m_this._geojsonStyles(),
+	        objStyle = m_this.options('style') || {},
+	        objLabelStyle = m_this.options('labelStyle') || {},
 	        i, key, value;
 	    if (!coor || !coor.length || !geotype) {
 	      return;
@@ -23165,8 +23153,8 @@
 	      },
 	      properties: {
 	        annotationType: m_type,
-	        name: this.name(),
-	        annotationId: this.id()
+	        name: m_this.name(),
+	        annotationId: m_this.id()
 	      }
 	    };
 	    if (m_label) {
@@ -23175,8 +23163,8 @@
 	    if (m_description) {
 	      obj.properties.description = m_description;
 	    }
-	    if (this.options('showLabel') === false) {
-	      obj.properties.showLabel = this.options('showLabel');
+	    if (m_this.options('showLabel') === false) {
+	      obj.properties.showLabel = m_this.options('showLabel');
 	    }
 	    for (i = 0; i < styles.length; i += 1) {
 	      key = styles[i];
@@ -23199,7 +23187,7 @@
 	      }
 	    }
 	    if (includeCrs) {
-	      var map = this.layer().map();
+	      var map = m_this.layer().map();
 	      gcs = (gcs === null ? map.gcs() : (
 	             gcs === undefined ? map.ingcs() : gcs));
 	      obj.crs = {
@@ -23281,6 +23269,9 @@
 	  delete args.coordinates;
 	  annotation.call(this, 'rectangle', args);
 	
+	  var m_this = this,
+	      s_actions = this.actions;
+	
 	  /**
 	   * Return actions needed for the specified state of this annotation.
 	   *
@@ -23290,7 +23281,7 @@
 	   */
 	  this.actions = function (state) {
 	    if (!state) {
-	      state = this.state();
+	      state = m_this.state();
 	    }
 	    switch (state) {
 	      case annotationState.create:
@@ -23303,7 +23294,7 @@
 	          selectionRectangle: true
 	        }];
 	      default:
-	        return [];
+	        return s_actions.apply(m_this, arguments);
 	    }
 	  };
 	
@@ -23317,21 +23308,27 @@
 	   *    anything.
 	   */
 	  this.processAction = function (evt) {
-	    var layer = this.layer();
-	    if (this.state() !== annotationState.create || !layer ||
+	    var layer = m_this.layer();
+	    if (m_this.state() !== annotationState.create || !layer ||
 	        evt.event !== geo_event.actionselection ||
 	        evt.state.action !== geo_action.annotation_rectangle) {
 	      return;
 	    }
-	    var map = layer.map();
-	    this.options('corners', [
-	      /* Keep in map gcs, not interface gcs to avoid wrapping issues */
-	      map.displayToGcs({x: evt.lowerLeft.x, y: evt.lowerLeft.y}, null),
-	      map.displayToGcs({x: evt.lowerLeft.x, y: evt.upperRight.y}, null),
-	      map.displayToGcs({x: evt.upperRight.x, y: evt.upperRight.y}, null),
-	      map.displayToGcs({x: evt.upperRight.x, y: evt.lowerLeft.y}, null)
-	    ]);
-	    this.state(annotationState.done);
+	    var map = layer.map(),
+	        corners = [
+	          /* Keep in map gcs, not interface gcs to avoid wrapping issues */
+	          map.displayToGcs({x: evt.lowerLeft.x, y: evt.lowerLeft.y}, null),
+	          map.displayToGcs({x: evt.lowerLeft.x, y: evt.upperRight.y}, null),
+	          map.displayToGcs({x: evt.upperRight.x, y: evt.upperRight.y}, null),
+	          map.displayToGcs({x: evt.upperRight.x, y: evt.lowerLeft.y}, null)
+	        ];
+	    /* Don't keep rectangles that have nearly zero area in display pixels */
+	    if (layer.displayDistance(corners[0], null, corners[1], null) *
+	        layer.displayDistance(corners[0], null, corners[3], null) < 0.01) {
+	      return 'remove';
+	    }
+	    m_this.options('corners', corners);
+	    m_this.state(annotationState.done);
 	    return 'done';
 	  };
 	
@@ -23341,8 +23338,8 @@
 	   * @returns {array} An array of features.
 	   */
 	  this.features = function () {
-	    var opt = this.options(),
-	        state = this.state(),
+	    var opt = m_this.options(),
+	        state = m_this.state(),
 	        features;
 	    switch (state) {
 	      case annotationState.create:
@@ -23378,11 +23375,11 @@
 	   */
 	  this._coordinates = function (coordinates) {
 	    if (coordinates && coordinates.length >= 4) {
-	      this.options('corners', coordinates.slice(0, 4));
+	      m_this.options('corners', coordinates.slice(0, 4));
 	      /* Should we ensure that the four points form a rectangle in the current
 	       * projection, though this might not be rectangular in another gcs? */
 	    }
-	    return this.options('corners');
+	    return m_this.options('corners');
 	  };
 	
 	  /**
@@ -23394,8 +23391,8 @@
 	   *    coordinate system.  `undefined` if this annotation is incomplete.
 	   */
 	  this._geojsonCoordinates = function (gcs) {
-	    var src = this.coordinates(gcs);
-	    if (!src || this.state() === annotationState.create || src.length < 4) {
+	    var src = m_this.coordinates(gcs);
+	    if (!src || m_this.state() === annotationState.create || src.length < 4) {
 	      return;
 	    }
 	    var coor = [];
@@ -23434,7 +23431,7 @@
 	   * @param {geo.event} evt The mouse move event.
 	   */
 	  this._setCornersFromMouse = function (corners, evt) {
-	    var map = this.layer().map(),
+	    var map = m_this.layer().map(),
 	        c0 = map.gcsToDisplay({x: corners[0].x, y: corners[0].y}, null),
 	        c2 = map.gcsToDisplay(evt.mapgcs, null),
 	        c1 = {x: c2.x, y: c0.y},
@@ -23452,12 +23449,12 @@
 	   *    update anything.
 	   */
 	  this.mouseMove = function (evt) {
-	    if (this.state() !== annotationState.create) {
+	    if (m_this.state() !== annotationState.create) {
 	      return;
 	    }
-	    var corners = this.options('corners');
+	    var corners = m_this.options('corners');
 	    if (corners.length) {
-	      this._setCornersFromMouse(corners, evt);
+	      m_this._setCornersFromMouse(corners, evt);
 	      return true;
 	    }
 	  };
@@ -23473,21 +23470,26 @@
 	   *    anything.
 	   */
 	  this.mouseClick = function (evt) {
-	    var layer = this.layer();
-	    if (this.state() !== annotationState.create || !layer) {
+	    var layer = m_this.layer();
+	    if (m_this.state() !== annotationState.create || !layer) {
 	      return;
 	    }
 	    if (!evt.buttonsDown.left && !evt.buttonsDown.right) {
 	      return;
 	    }
-	    var corners = this.options('corners');
+	    var corners = m_this.options('corners');
 	    if (evt.buttonsDown.right && !corners.length) {
 	      return;
 	    }
 	    evt.handled = true;
 	    if (corners.length) {
-	      this._setCornersFromMouse(corners, evt);
-	      this.state(annotationState.done);
+	      m_this._setCornersFromMouse(corners, evt);
+	      /* Don't keep rectangles that have nearly zero area in display pixels */
+	      if (layer.displayDistance(corners[0], null, corners[1], null) *
+	          layer.displayDistance(corners[0], null, corners[3], null) < 0.01) {
+	        return 'remove';
+	      }
+	      m_this.state(annotationState.done);
 	      return 'done';
 	    }
 	    if (evt.buttonsDown.left) {
@@ -23544,8 +23546,6 @@
 	    return new polygonAnnotation(args);
 	  }
 	
-	  var m_this = this;
-	
 	  args = $.extend(true, {}, {
 	    style: {
 	      fill: true,
@@ -23584,6 +23584,8 @@
 	  delete args.coordinates;
 	  annotation.call(this, 'polygon', args);
 	
+	  var m_this = this;
+	
 	  /**
 	   * Get a list of renderable features for this annotation.  When the polygon
 	   * is done, this is just a single polygon.  During creation this can be a
@@ -23592,8 +23594,8 @@
 	   * @returns {array} An array of features.
 	   */
 	  this.features = function () {
-	    var opt = this.options(),
-	        state = this.state(),
+	    var opt = m_this.options(),
+	        state = m_this.state(),
 	        features;
 	    switch (state) {
 	      case annotationState.create:
@@ -23637,9 +23639,9 @@
 	   */
 	  this._coordinates = function (coordinates) {
 	    if (coordinates) {
-	      this.options('vertices', coordinates);
+	      m_this.options('vertices', coordinates);
 	    }
-	    return this.options('vertices');
+	    return m_this.options('vertices');
 	  };
 	
 	  /**
@@ -23650,10 +23652,10 @@
 	   *    update anything.
 	   */
 	  this.mouseMove = function (evt) {
-	    if (this.state() !== annotationState.create) {
+	    if (m_this.state() !== annotationState.create) {
 	      return;
 	    }
-	    var vertices = this.options('vertices');
+	    var vertices = m_this.options('vertices');
 	    if (vertices.length) {
 	      vertices[vertices.length - 1] = evt.mapgcs;
 	      return true;
@@ -23671,15 +23673,15 @@
 	   *    anything.
 	   */
 	  this.mouseClick = function (evt) {
-	    var layer = this.layer();
-	    if (this.state() !== annotationState.create || !layer) {
+	    var layer = m_this.layer();
+	    if (m_this.state() !== annotationState.create || !layer) {
 	      return;
 	    }
 	    var end = !!evt.buttonsDown.right, skip;
 	    if (!evt.buttonsDown.left && !evt.buttonsDown.right) {
 	      return;
 	    }
-	    var vertices = this.options('vertices');
+	    var vertices = m_this.options('vertices');
 	    if (evt.buttonsDown.right && !vertices.length) {
 	      return;
 	    }
@@ -23690,8 +23692,8 @@
 	            vertices[vertices.length - 2], null, evt.map, 'display') <=
 	            layer.options('adjacentPointProximity')) {
 	          skip = true;
-	          if (this.lastClick &&
-	              evt.time - this.lastClick < layer.options('dblClickTime')) {
+	          if (m_this._lastClick &&
+	              evt.time - m_this._lastClick < layer.options('dblClickTime')) {
 	            end = true;
 	          }
 	        } else if (vertices.length >= 2 && layer.displayDistance(
@@ -23707,14 +23709,14 @@
 	      if (!end && !skip) {
 	        vertices.push(evt.mapgcs);
 	      }
-	      this.lastClick = evt.time;
+	      m_this._lastClick = evt.time;
 	    }
 	    if (end) {
 	      if (vertices.length < 4) {
 	        return 'remove';
 	      }
 	      vertices.pop();
-	      this.state(annotationState.done);
+	      m_this.state(annotationState.done);
 	      return 'done';
 	    }
 	    return (end || !skip);
@@ -23729,8 +23731,8 @@
 	   *    coordinate system.  `undefined` if this annotation is incomplete.
 	   */
 	  this._geojsonCoordinates = function (gcs) {
-	    var src = this.coordinates(gcs);
-	    if (!src || src.length < 3 || this.state() === annotationState.create) {
+	    var src = m_this.coordinates(gcs);
+	    if (!src || src.length < 3 || m_this.state() === annotationState.create) {
 	      return;
 	    }
 	    var coor = [];
@@ -23802,8 +23804,6 @@
 	    return new lineAnnotation(args);
 	  }
 	
-	  var m_this = this;
-	
 	  args = $.extend(true, {}, {
 	    style: {
 	      line: function (d) {
@@ -23844,14 +23844,17 @@
 	  delete args.coordinates;
 	  annotation.call(this, 'line', args);
 	
+	  var m_this = this,
+	      s_actions = this.actions;
+	
 	  /**
 	   * Get a list of renderable features for this annotation.
 	   *
 	   * @returns {array} An array of features.
 	   */
 	  this.features = function () {
-	    var opt = this.options(),
-	        state = this.state(),
+	    var opt = m_this.options(),
+	        state = m_this.state(),
 	        features;
 	    switch (state) {
 	      case annotationState.create:
@@ -23884,9 +23887,9 @@
 	   */
 	  this._coordinates = function (coordinates) {
 	    if (coordinates) {
-	      this.options('vertices', coordinates);
+	      m_this.options('vertices', coordinates);
 	    }
-	    return this.options('vertices');
+	    return m_this.options('vertices');
 	  };
 	
 	  /**
@@ -23897,10 +23900,10 @@
 	   *    update anything.
 	   */
 	  this.mouseMove = function (evt) {
-	    if (this.state() !== annotationState.create) {
+	    if (m_this.state() !== annotationState.create) {
 	      return;
 	    }
-	    var vertices = this.options('vertices');
+	    var vertices = m_this.options('vertices');
 	    if (vertices.length) {
 	      vertices[vertices.length - 1] = evt.mapgcs;
 	      return true;
@@ -23918,15 +23921,15 @@
 	   *    anything.
 	   */
 	  this.mouseClick = function (evt) {
-	    var layer = this.layer();
-	    if (this.state() !== annotationState.create || !layer) {
+	    var layer = m_this.layer();
+	    if (m_this.state() !== annotationState.create || !layer) {
 	      return;
 	    }
 	    var end = !!evt.buttonsDown.right, skip;
 	    if (!evt.buttonsDown.left && !evt.buttonsDown.right) {
 	      return;
 	    }
-	    var vertices = this.options('vertices');
+	    var vertices = m_this.options('vertices');
 	    if (evt.buttonsDown.right && !vertices.length) {
 	      return;
 	    }
@@ -23937,8 +23940,8 @@
 	            vertices[vertices.length - 2], null, evt.map, 'display') <=
 	            layer.options('adjacentPointProximity')) {
 	          skip = true;
-	          if (this.lastClick &&
-	              evt.time - this.lastClick < layer.options('dblClickTime')) {
+	          if (m_this._lastClick &&
+	              evt.time - m_this._lastClick < layer.options('dblClickTime')) {
 	            end = true;
 	          }
 	        } else if (vertices.length >= 2 && layer.displayDistance(
@@ -23954,15 +23957,16 @@
 	      if (!end && !skip) {
 	        vertices.push(evt.mapgcs);
 	      }
-	      this.lastClick = evt.time;
+	      m_this._lastClick = evt.time;
+	      m_this._lastClickVertexCount = vertices.length;
 	    }
 	    if (end) {
 	      if (vertices.length < 3) {
 	        return 'remove';
 	      }
 	      vertices.pop();
-	      this.options('style').closed = end === 'close';
-	      this.state(annotationState.done);
+	      m_this.options('style').closed = end === 'close';
+	      m_this.state(annotationState.done);
 	      return 'done';
 	    }
 	    return (end || !skip);
@@ -23977,7 +23981,7 @@
 	   */
 	  this.actions = function (state) {
 	    if (!state) {
-	      state = this.state();
+	      state = m_this.state();
 	    }
 	    switch (state) {
 	      case annotationState.create:
@@ -23994,7 +23998,7 @@
 	          input: 'pan'
 	        }];
 	      default:
-	        return [];
+	        return s_actions.apply(m_this, arguments);
 	    }
 	  };
 	
@@ -24008,23 +24012,34 @@
 	   *    anything.
 	   */
 	  this.processAction = function (evt) {
-	    var layer = this.layer();
-	    if (this.state() !== annotationState.create || !layer ||
+	    var layer = m_this.layer();
+	    if (m_this.state() !== annotationState.create || !layer ||
 	        evt.state.action !== geo_action.annotation_line) {
 	      return;
 	    }
 	    var cpp = layer.options('continuousPointProximity');
+	    var cpc = layer.options('continuousPointColinearity');
 	    if (cpp || cpp === 0) {
-	      var vertices = this.options('vertices');
+	      var vertices = m_this.options('vertices');
 	      if (!vertices.length) {
 	        vertices.push(evt.mouse.mapgcs);
 	        vertices.push(evt.mouse.mapgcs);
 	        return true;
 	      }
-	      var dist = layer.displayDistance(
-	            vertices[vertices.length - 2], null, evt.mouse.map, 'display');
+	      var dist = layer.displayDistance(vertices[vertices.length - 2], null, evt.mouse.map, 'display');
 	      if (dist && dist > cpp) {
-	        // we should combine nearly colinear points, but we don't
+	        // combine nearly colinear points
+	        if (vertices.length >= (m_this._lastClickVertexCount || 1) + 3) {
+	          var d01 = layer.displayDistance(vertices[vertices.length - 3], null, vertices[vertices.length - 2], null),
+	              d12 = dist,
+	              d02 = layer.displayDistance(vertices[vertices.length - 3], null, evt.mouse.map, 'display');
+	          if (d01 && d02) {
+	            var costheta = (d02 * d02 - d01 * d01 - d12 * d12) / (2 * d01 * d12);
+	            if (costheta > Math.cos(cpc)) {
+	              vertices.pop();
+	            }
+	          }
+	        }
 	        vertices[vertices.length - 1] = evt.mouse.mapgcs;
 	        vertices.push(evt.mouse.mapgcs);
 	        return true;
@@ -24041,8 +24056,8 @@
 	   *    coordinate system.  `undefined` if this annotation is incomplete.
 	   */
 	  this._geojsonCoordinates = function (gcs) {
-	    var src = this.coordinates(gcs);
-	    if (!src || src.length < 2 || this.state() === annotationState.create) {
+	    var src = m_this.coordinates(gcs);
+	    if (!src || src.length < 2 || m_this.state() === annotationState.create) {
 	      return;
 	    }
 	    var coor = [];
@@ -24105,15 +24120,14 @@
 	 *    zoom level.  If it is `true`, the radius is based on the zoom level at
 	 *    first instantiation.  Otherwise, if it is a number, the radius is used
 	 *    at that zoom level.
-	 * @param {object} [args.editStyle] The style to apply to a line in edit
-	 *    mode.  This uses styles for lines.
+	 * @param {object} [args.editStyle] The style to apply to a point in edit
+	 *    mode.
 	 */
 	var pointAnnotation = function (args) {
 	  'use strict';
 	  if (!(this instanceof pointAnnotation)) {
 	    return new pointAnnotation(args);
 	  }
-	  var m_this = this;
 	
 	  args = $.extend(true, {}, {
 	    style: {
@@ -24132,14 +24146,16 @@
 	  delete args.coordinates;
 	  annotation.call(this, 'point', args);
 	
+	  var m_this = this;
+	
 	  /**
 	   * Get a list of renderable features for this annotation.
 	   *
 	   * @returns {array} An array of features.
 	   */
 	  this.features = function () {
-	    var opt = this.options(),
-	        state = this.state(),
+	    var opt = m_this.options(),
+	        state = m_this.state(),
 	        features, style, scaleOnZoom;
 	    switch (state) {
 	      case annotationState.create:
@@ -24149,14 +24165,14 @@
 	        style = opt.style;
 	        if (opt.style.scaled || opt.style.scaled === 0) {
 	          if (opt.style.scaled === true) {
-	            opt.style.scaled = this.layer().map().zoom();
+	            opt.style.scaled = m_this.layer().map().zoom();
 	          }
 	          style = $.extend({}, style, {
 	            radius: function () {
 	              var radius = opt.style.radius,
 	                  zoom = m_this.layer().map().zoom();
 	              if (util.isFunction(radius)) {
-	                radius = radius.apply(this, arguments);
+	                radius = radius.apply(m_this, arguments);
 	              }
 	              radius *= Math.pow(2, zoom - opt.style.scaled);
 	              return radius;
@@ -24187,12 +24203,12 @@
 	   */
 	  this._coordinates = function (coordinates) {
 	    if (coordinates && coordinates.length >= 1) {
-	      this.options('position', coordinates[0]);
+	      m_this.options('position', coordinates[0]);
 	    }
-	    if (this.state() === annotationState.create) {
+	    if (m_this.state() === annotationState.create) {
 	      return [];
 	    }
-	    return [this.options('position')];
+	    return [m_this.options('position')];
 	  };
 	
 	  /**
@@ -24206,15 +24222,15 @@
 	   *    anything.
 	   */
 	  this.mouseClick = function (evt) {
-	    if (this.state() !== annotationState.create) {
+	    if (m_this.state() !== annotationState.create) {
 	      return;
 	    }
 	    if (!evt.buttonsDown.left) {
 	      return;
 	    }
 	    evt.handled = true;
-	    this.options('position', evt.mapgcs);
-	    this.state(annotationState.done);
+	    m_this.options('position', evt.mapgcs);
+	    m_this.state(annotationState.done);
 	    return 'done';
 	  };
 	
@@ -24239,8 +24255,8 @@
 	   *    coordinate system.  `undefined` if this annotation is incomplete.
 	   */
 	  this._geojsonCoordinates = function (gcs) {
-	    var src = this.coordinates(gcs);
-	    if (!src || this.state() === annotationState.create || src.length < 1 || src[0] === undefined) {
+	    var src = m_this.coordinates(gcs);
+	    if (!src || m_this.state() === annotationState.create || src.length < 1 || src[0] === undefined) {
 	      return;
 	    }
 	    return [src[0].x, src[0].y];
@@ -25035,7 +25051,7 @@
 	
 	  return $.ajax({
 	    url: 'http://epsg.io/?q=' + code + '&format=json'
-	  }).then(function (data) {
+	  }).done(function (data) {
 	    var result = (data.results || [])[0];
 	    if (!result || !result.proj4) {
 	      return defer.reject(data).promise();
@@ -31716,6 +31732,42 @@
 	  },
 	
 	  /**
+	   * Return the coordinate associated with the center of the perimeter formed
+	   * from a list of points.  This averages all of the vertices in the perimeter
+	   * weighted by the line length on either side of each point.  Functionally,
+	   * this is the same as the average of all the points of the lines of the
+	   * perimeter.
+	   *
+	   * @param {geo.geoPosition[]} coor An array of coordinates.
+	   * @returns {geo.geoPosition|undefined} The position for the center, or
+	   *    `undefined` if no such position exists.
+	   */
+	  centerFromPerimeter: function (coor) {
+	    var position, p0, p1, w, sumw, i;
+	    if (!coor || !coor.length) {
+	      return;
+	    }
+	    if (coor.length === 1) {
+	      return {x: coor[0].x, y: coor[0].y};
+	    }
+	    position = {x: 0, y: 0};
+	    sumw = 0;
+	    p0 = coor[coor.length - 1];
+	    for (i = 0; i < coor.length; i += 1) {
+	      p1 = p0;
+	      p0 = coor[i];
+	      w = Math.sqrt(Math.pow(p1.x - p0.x, 2) + Math.pow(p1.y - p0.y, 2));
+	      position.x += (p0.x + p1.x) * w;
+	      position.y += (p0.y + p1.y) * w;
+	      sumw += 2 * w;
+	    }
+	    position.x /= sumw;
+	    position.y /= sumw;
+	    // return a copy of p0 if all points are the same
+	    return sumw ? position : {x: p0.x, y: p0.y};
+	  },
+	
+	  /**
 	   * Escape any character in a string that has a code point >= 127.
 	   *
 	   * @param {string} text The string to escape.
@@ -32724,7 +32776,6 @@
 	    vgl.renderWindow = _renderWindow;
 	    vglRenderer.supported = _supported;
 	    delete vgl._mocked;
-	    // delete vgl._mockedRenderWindow;
 	    delete vgl.mockCounts;
 	  }
 	};
@@ -49139,19 +49190,46 @@
 	   * This clears the render timer and actually renders.
 	   */
 	  this._renderFrame = function () {
-	    if (m_updateCamera) {
-	      m_updateCamera = false;
-	      m_this._updateRendererCamera();
+	    if (m_viewer) {
+	      if (m_updateCamera) {
+	        m_updateCamera = false;
+	        m_this._updateRendererCamera();
+	      }
+	      m_viewer.render();
 	    }
-	    m_viewer.render();
+	  };
+	
+	  /**
+	   * Get the GL context for this renderer.
+	   *
+	   * @returns {WebGLRenderingContext} The current context.  If unavailable,
+	   *    falls back to the vgl generic context.
+	   */
+	  this._glContext = function () {
+	    if (m_viewer && m_viewer.renderWindow()) {
+	      return m_viewer.renderWindow().context();
+	    }
+	    return vgl.GL;
 	  };
 	
 	  /**
 	   * Exit.
 	   */
 	  this._exit = function () {
+	    m_this.layer().map().scheduleAnimationFrame(this._renderFrame, 'remove');
 	    m_this.canvas().remove();
-	    m_viewer.exit();
+	    if (m_viewer) {
+	      var renderState = new vgl.renderState();
+	      renderState.m_renderer = m_viewer;
+	      renderState.m_context = this._glContext();
+	      m_viewer.exit(renderState);
+	      if (this._glContext() !== vgl.GL && this._glContext().getExtension('WEBGL_lose_context') && this._glContext().getExtension('WEBGL_lose_context').loseContext) {
+	        this._glContext().getExtension('WEBGL_lose_context').loseContext();
+	      }
+	    }
+	    // make sure we clear shaders associated with the generate context, too
+	    vgl.clearCachedShaders(vgl.GL);
+	    m_viewer = null;
 	    s_exit();
 	  };
 	
@@ -49929,6 +50007,8 @@
 	    return new object();
 	  }
 	
+	  var util = __webpack_require__(89);
+	
 	  var m_this = this,
 	      m_eventHandlers = {},
 	      m_idleHandlers = [],
@@ -49969,7 +50049,11 @@
 	      }
 	    }
 	    m_promiseCount += 1;
-	    promise.then(onDone, onDone);
+	    if (promise.always) {
+	      promise.always(onDone);
+	    } else {
+	      promise.then(onDone, onDone);
+	    }
 	    return m_this;
 	  };
 	
@@ -49989,11 +50073,36 @@
 	      });
 	      return m_this;
 	    }
+	    if (!util.isFunction(handler)) {
+	      console.warn('Handler for ' + event + ' is not a function', handler, m_this);
+	      return m_this;
+	    }
 	    if (!m_eventHandlers.hasOwnProperty(event)) {
 	      m_eventHandlers[event] = [];
 	    }
 	    m_eventHandlers[event].push(handler);
 	    return m_this;
+	  };
+	
+	  /**
+	   * Report if an event handler is bound to this object.
+	   *
+	   * @param {string|string[]} event An event or list of events to check.
+	   * @param {function} [handler] A function that might be bound.  If
+	   *   `undefined`, this will report `true` if there is any handler for the
+	   *   specified event.
+	   * @returns {boolean} true if any of the specified events are bound to the
+	   *   specified handler.
+	   */
+	  this.geoIsOn = function (event, handler) {
+	    if (Array.isArray(event)) {
+	      return event.some(function (e) {
+	        return m_this.geoIsOn(e, handler);
+	      });
+	    }
+	    return (m_eventHandlers[event] || []).some(function (h) {
+	      return h === handler || handler === undefined;
+	    });
 	  };
 	
 	  /**
@@ -50021,7 +50130,11 @@
 	
 	    if (m_eventHandlers.hasOwnProperty(event)) {
 	      m_eventHandlers[event].forEach(function (handler) {
-	        handler.call(m_this, args);
+	        try {
+	          handler.call(m_this, args);
+	        } catch (err) {
+	          console.warn('Event handler for ' + event + ' threw an error', err);
+	        }
 	      });
 	    }
 	
@@ -50734,6 +50847,8 @@
 	   * corner extensions due to mitering may be outside of the selection area and
 	   * that variable width lines will have a greater selection region than their
 	   * visual size at the narrow end.
+	   *
+	   * @param {geo.geoPosition} p point to search for in map interface gcs.
 	   */
 	  this.pointSearch = function (p) {
 	    var data = m_this.data(), indices = [], found = [];
@@ -50747,7 +50862,7 @@
 	    var map = m_this.layer().map(),
 	        scale = map.unitsPerPixel(map.zoom()),
 	        scale2 = scale * scale,
-	        pt = transform.transformCoordinates(m_this.gcs(), map.gcs(), p),
+	        pt = transform.transformCoordinates(map.ingcs(), map.gcs(), p),
 	        i, j, record;
 	
 	    // minimum l2 distance squared from
@@ -51416,8 +51531,8 @@
 	   */
 	  this.gcs = function (val) {
 	    if (val === undefined) {
-	      if ((m_gcs === undefined || m_gcs === null) && m_renderer) {
-	        return m_renderer.layer().map().ingcs();
+	      if ((m_gcs === undefined || m_gcs === null) && m_layer) {
+	        return m_layer.map().ingcs();
 	      }
 	      return m_gcs;
 	    } else {
@@ -51433,9 +51548,8 @@
 	   * @param {geo.geoPosition} c The input coordinate to convert.
 	   * @returns {geo.screenPosition} Display space coordinates.
 	   */
-	  ////////////////////////////////////////////////////////////////////////////
 	  this.featureGcsToDisplay = function (c) {
-	    var map = m_renderer.layer().map();
+	    var map = m_layer.map();
 	    c = map.gcsToWorld(c, m_this.gcs());
 	    c = map.worldToDisplay(c);
 	    if (m_renderer.baseToLocal) {
@@ -51896,7 +52010,7 @@
 	   * Free all resources and destroy the object.
 	   */
 	  this._exit = function () {
-	    m_this.children = [];
+	    m_children = [];
 	    delete m_this.parent;
 	    s_exit();
 	  };
@@ -53071,7 +53185,7 @@
 	      point = this.worldToDisplay4(
 	        [point.x, point.y, z, w]
 	      );
-	      return {x: point[0], y: point[1], z: point[2]};
+	      return {x: point[0], y: point[1]};
 	    };
 	
 	    /**
@@ -53722,6 +53836,7 @@
 	   */
 	  this.pointSearch = function (p) {
 	    var min, max, data, idx = [], found = [], ifound = [], map, pt,
+	        fgcs = m_this.gcs(), // this feature's gcs
 	        corners,
 	        stroke = m_this.style.get('stroke'),
 	        strokeWidth = m_this.style.get('strokeWidth'),
@@ -53743,10 +53858,10 @@
 	    pt = map.gcsToDisplay(p);
 	    // check all corners to make sure we handle rotations
 	    corners = [
-	      map.displayToGcs({x: pt.x - m_maxRadius, y: pt.y - m_maxRadius}),
-	      map.displayToGcs({x: pt.x + m_maxRadius, y: pt.y - m_maxRadius}),
-	      map.displayToGcs({x: pt.x - m_maxRadius, y: pt.y + m_maxRadius}),
-	      map.displayToGcs({x: pt.x + m_maxRadius, y: pt.y + m_maxRadius})
+	      map.displayToGcs({x: pt.x - m_maxRadius, y: pt.y - m_maxRadius}, fgcs),
+	      map.displayToGcs({x: pt.x + m_maxRadius, y: pt.y - m_maxRadius}, fgcs),
+	      map.displayToGcs({x: pt.x - m_maxRadius, y: pt.y + m_maxRadius}, fgcs),
+	      map.displayToGcs({x: pt.x + m_maxRadius, y: pt.y + m_maxRadius}, fgcs)
 	    ];
 	    min = {
 	      x: Math.min(corners[0].x, corners[1].x, corners[2].x, corners[3].x),
@@ -53769,7 +53884,7 @@
 	      rad = radius(data[i], i);
 	      rad += stroke(data[i], i) ? strokeWidth(data[i], i) : 0;
 	      rad2 = rad * rad;
-	      p = map.gcsToDisplay(p);
+	      p = map.gcsToDisplay(p, fgcs);
 	      dx = p.x - pt.x;
 	      dy = p.y - pt.y;
 	      if (dx * dx + dy * dy <= rad2) {
@@ -54136,6 +54251,7 @@
 	var $ = __webpack_require__(7);
 	var inherit = __webpack_require__(14);
 	var feature = __webpack_require__(213);
+	var transform = __webpack_require__(17);
 	
 	/**
 	 * Polygon feature specification.
@@ -54347,23 +54463,38 @@
 	   * Point search method for selection api.  Returns markers containing the
 	   * given point.
 	   *
-	   * @argument {object} coordinate
-	   * @returns {object}
+	   * @param {geo.geoPosition} coordinate point to search for in map interface
+	   *    gcs.
+	   * @returns {object} An object with `index`: a list of quad indices, and
+	   *    `found`: a list of quads that contain the specified coordinate.
 	   */
 	  this.pointSearch = function (coordinate) {
-	    var found = [], indices = [], data = m_this.data();
+	    var found = [], indices = [], irecord = {}, data = m_this.data(),
+	        map = m_this.layer().map(),
+	        pt = transform.transformCoordinates(map.ingcs(), m_this.gcs(), coordinate);
 	    m_coordinates.forEach(function (coord, i) {
 	      var inside = util.pointInPolygon(
-	        coordinate,
+	        pt,
 	        coord.outer,
 	        coord.inner,
 	        coord.range
 	      );
 	      if (inside) {
 	        indices.push(i);
+	        irecord[i] = true;
 	        found.push(data[i]);
 	      }
 	    });
+	    if (m_lineFeature) {
+	      var lineFound = m_lineFeature.pointSearch(coordinate);
+	      lineFound.found.forEach(function (lineData) {
+	        if (lineData.length && lineData[0].length === 4 && !irecord[lineData[0][3]]) {
+	          indices.push(lineData[0][3]);
+	          irecord[lineData[0][3]] = true;
+	          found.push(data[lineData[0][3]]);
+	        }
+	      });
+	    }
 	    return {
 	      index: indices,
 	      found: found
@@ -54835,9 +54966,13 @@
 	 * @param {number} [args.adjacentPointProximity=5] The minimum distance in
 	 *    display coordinates (pixels) between two adjacent points when creating a
 	 *    polygon or line.  A value of 0 requires an exact match.
-	 * @param {number} [args.continousPointProximity=5] The minimum distance in
+	 * @param {number} [args.continuousPointProximity=5] The minimum distance in
 	 *    display coordinates (pixels) between two adjacent points when dragging
 	 *    to create an annotation.  `false` disables continuous drawing mode.
+	 * @param {number} [args.continuousPointColinearity=1.0deg] The minimum
+	 *    angle between a series of three points when dragging to not interpret
+	 *    them as colinear.  Only applies if `continuousPointProximity` is not
+	 *    `false`.
 	 * @param {number} [args.finalPointProximity=10] The maximum distance in
 	 *    display coordinates (pixels) between the starting point and the mouse
 	 *    coordinates to signal closing a polygon.  A value of 0 requires an exact
@@ -54910,6 +55045,9 @@
 	    // in pixels; set to continuousPointProximity to false to disable
 	    // continuous drawing modes.
 	    continuousPointProximity: 5,
+	    // in radians, minimum angle between continuous points to interpret them as
+	    // being coliner
+	    continuousPointColinearity: 1.0 * Math.PI / 180,
 	    finalPointProximity: 10,  // in pixels, 0 is exact
 	    showLabels: true
 	  }, args);
@@ -54924,10 +55062,10 @@
 	    var update;
 	    if (evt.state && evt.state.actionRecord &&
 	        evt.state.actionRecord.owner === geo_annotation.actionOwner &&
-	        this.currentAnnotation) {
-	      update = this.currentAnnotation.processAction(evt);
+	        m_this.currentAnnotation) {
+	      update = m_this.currentAnnotation.processAction(evt);
 	    }
-	    this._updateFromEvent(update);
+	    m_this._updateFromEvent(update);
 	  };
 	
 	  /**
@@ -54961,8 +55099,8 @@
 	   * @param {geo.event} evt The mouse move event.
 	   */
 	  this._handleMouseMove = function (evt) {
-	    if (this.mode() && this.currentAnnotation) {
-	      var update = this.currentAnnotation.mouseMove(evt);
+	    if (m_this.mode() && m_this.currentAnnotation) {
+	      var update = m_this.currentAnnotation.mouseMove(evt);
 	      if (update) {
 	        m_this.modified();
 	        m_this.draw();
@@ -54977,9 +55115,9 @@
 	   * @param {geo.event} evt The mouse click event.
 	   */
 	  this._handleMouseClick = function (evt) {
-	    if (this.mode() && this.currentAnnotation) {
-	      var update = this.currentAnnotation.mouseClick(evt);
-	      this._updateFromEvent(update);
+	    if (m_this.mode() && m_this.currentAnnotation) {
+	      var update = m_this.currentAnnotation.mouseClick(evt);
+	      m_this._updateFromEvent(update);
 	    }
 	  };
 	
@@ -55006,8 +55144,8 @@
 	    } else {
 	      m_options[arg1] = arg2;
 	    }
-	    this.modified();
-	    return this;
+	    m_this.modified();
+	    return m_this;
 	  };
 	
 	  /**
@@ -55015,16 +55153,16 @@
 	   *
 	   * @param {geo.geoPosition|geo.screenPosition} coord1 The first coordinates.
 	   * @param {string|geo.transform|null} gcs1 `undefined` to use the interface
-	   *    gcs, `null` to use the map gcs, `'display`' if the coordinates are
+	   *    gcs, `null` to use the map gcs, `'display'` if the coordinates are
 	   *    already in display coordinates, or any other transform.
 	   * @param {geo.geoPosition|geo.screenPosition} coord2 the second coordinates.
 	   * @param {string|geo.transform|null} [gcs2] `undefined` to use the interface
-	   *    gcs, `null` to use the map gcs, `'display`' if the coordinates are
+	   *    gcs, `null` to use the map gcs, `'display'` if the coordinates are
 	   *    already in display coordinates, or any other transform.
 	   * @returns {number} the Euclidian distance between the two coordinates.
 	   */
 	  this.displayDistance = function (coord1, gcs1, coord2, gcs2) {
-	    var map = this.map();
+	    var map = m_this.map();
 	    if (gcs1 !== 'display') {
 	      gcs1 = (gcs1 === null ? map.gcs() : (
 	              gcs1 === undefined ? map.ingcs() : gcs1));
@@ -55055,21 +55193,21 @@
 	        annotation: annotation
 	      });
 	      m_annotations.push(annotation);
-	      annotation.layer(this);
-	      var map = this.map();
+	      annotation.layer(m_this);
+	      var map = m_this.map();
 	      gcs = (gcs === null ? map.gcs() : (
 	             gcs === undefined ? map.ingcs() : gcs));
 	      if (gcs !== map.gcs()) {
 	        annotation._coordinates(transform.transformCoordinates(
 	            gcs, map.gcs(), annotation._coordinates()));
 	      }
-	      this.modified();
-	      this.draw();
+	      m_this.modified();
+	      m_this.draw();
 	      m_this.geoTrigger(geo_event.annotation.add, {
 	        annotation: annotation
 	      });
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -55083,14 +55221,14 @@
 	  this.removeAnnotation = function (annotation, update) {
 	    var pos = $.inArray(annotation, m_annotations);
 	    if (pos >= 0) {
-	      if (annotation === this.currentAnnotation) {
-	        this.currentAnnotation = null;
+	      if (annotation === m_this.currentAnnotation) {
+	        m_this.currentAnnotation = null;
 	      }
 	      annotation._exit();
 	      m_annotations.splice(pos, 1);
 	      if (update !== false) {
-	        this.modified();
-	        this.draw();
+	        m_this.modified();
+	        m_this.draw();
 	      }
 	      m_this.geoTrigger(geo_event.annotation.remove, {
 	        annotation: annotation
@@ -55116,12 +55254,12 @@
 	        pos += 1;
 	        continue;
 	      }
-	      this.removeAnnotation(annotation, false);
+	      m_this.removeAnnotation(annotation, false);
 	      removed += 1;
 	    }
 	    if (removed && update !== false) {
-	      this.modified();
-	      this.draw();
+	      m_this.modified();
+	      m_this.draw();
 	    }
 	    return removed;
 	  };
@@ -55155,11 +55293,10 @@
 	  };
 	
 	  /**
-	   * Get or set the current mode.  The mode is either `null` for nothing being
-	   * created, or the name of the type of annotation that is being created.
+	   * Get or set the current mode.
 	   *
-	   * @param {string|null} [arg] The new mode or `undefined` to get the current
-	   *    mode.
+	   * @param {string|null} [arg] `undefined` to get the current mode, `null` to
+	   *    stop creating/editing, or the name of the type of annotation to create.
 	   * @returns {string|null|this} The current mode or the layer.
 	   */
 	  this.mode = function (arg) {
@@ -55176,13 +55313,13 @@
 	      } else {
 	        Mousetrap(mapNode[0]).unbind('esc');
 	      }
-	      if (this.currentAnnotation) {
-	        switch (this.currentAnnotation.state()) {
+	      if (m_this.currentAnnotation) {
+	        switch (m_this.currentAnnotation.state()) {
 	          case geo_annotation.state.create:
-	            this.removeAnnotation(this.currentAnnotation);
+	            m_this.removeAnnotation(m_this.currentAnnotation);
 	            break;
 	        }
-	        this.currentAnnotation = null;
+	        m_this.currentAnnotation = null;
 	      }
 	      switch (m_mode) {
 	        case 'line':
@@ -55201,12 +55338,12 @@
 	      m_this.map().interactor().removeAction(
 	        undefined, undefined, geo_annotation.actionOwner);
 	      if (createAnnotation) {
-	        this.currentAnnotation = createAnnotation({
+	        m_this.currentAnnotation = createAnnotation({
 	          state: geo_annotation.state.create,
 	          layer: this
 	        });
-	        this.addAnnotation(m_this.currentAnnotation, null);
-	        actions = this.currentAnnotation.actions(geo_annotation.state.create);
+	        m_this.addAnnotation(m_this.currentAnnotation, null);
+	        actions = m_this.currentAnnotation.actions(geo_annotation.state.create);
 	        $.each(actions, function (idx, action) {
 	          m_this.map().interactor().addAction(action);
 	        });
@@ -55214,7 +55351,7 @@
 	      m_this.geoTrigger(geo_event.annotation.mode, {
 	        mode: m_mode, oldMode: oldMode});
 	    }
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -55241,15 +55378,15 @@
 	   */
 	  this.geojson = function (geojson, clear, gcs, includeCrs) {
 	    if (geojson !== undefined) {
-	      var reader = registry.createFileReader('jsonReader', {layer: this});
+	      var reader = registry.createFileReader('jsonReader', {layer: m_this});
 	      if (!reader.canRead(geojson)) {
 	        return;
 	      }
 	      if (clear === true) {
-	        this.removeAllAnnotations(true, false);
+	        m_this.removeAllAnnotations(true, false);
 	      }
 	      if (clear === 'update') {
-	        $.each(this.annotations(), function (idx, annotation) {
+	        $.each(m_this.annotations(), function (idx, annotation) {
 	          annotation.options('updated', false);
 	        });
 	      }
@@ -55260,15 +55397,15 @@
 	        });
 	      });
 	      if (clear === 'update') {
-	        $.each(this.annotations(), function (idx, annotation) {
+	        $.each(m_this.annotations(), function (idx, annotation) {
 	          if (annotation.options('updated') === false &&
 	              annotation.state() === geo_annotation.state.done) {
 	            m_this.removeAnnotation(annotation, false);
 	          }
 	        });
 	      }
-	      this.modified();
-	      this.draw();
+	      m_this.modified();
+	      m_this.draw();
 	      return m_annotations.length;
 	    }
 	    geojson = null;
@@ -55534,7 +55671,7 @@
 	   */
 	  this._update = function () {
 	    if (m_this.getMTime() > m_buildTime.getMTime()) {
-	      var labels = this.options('showLabels') ? [] : null;
+	      var labels = m_this.options('showLabels') ? [] : null;
 	      /* Interally, we have a set of feature levels (to provide z-index
 	       * support), each of which can have data from multiple annotations.  We
 	       * clear the data on each of these features, then build it up from each
@@ -55632,7 +55769,7 @@
 	      m_buildTime.modified();
 	    }
 	    s_update.call(m_this, arguments);
-	    return this;
+	    return m_this;
 	  };
 	
 	  /**
@@ -57847,13 +57984,15 @@
 	      m_boundKeys = bound;
 	    }
 	    $node.toggleClass('highlight-focus',
-	      m_boundKeys && m_boundKeys.length && m_options.keyboard.focusHighlight);
-	
+	      !!(m_boundKeys && m_boundKeys.length && m_options.keyboard.focusHighlight));
 	    // bind touch events
 	    if ((m_this.hasTouchSupport() || m_options.alwaysTouch) &&
-	        (usedInputs.pan || usedInputs.rotate) &&
-	        __webpack_require__.m[/*require.resolve*/(4)]) { // eslint-disable-line
-	      var Hammer = __webpack_require__(4);
+	        (usedInputs.pan || usedInputs.rotate)) {
+	      // webpack expects optional dependencies to be wrapped in a try-catch
+	      var Hammer;
+	      try {
+	        Hammer = __webpack_require__(4);
+	      } catch (_error) {}
 	      if (Hammer !== undefined) {
 	        var recog = [],
 	            touchEvents = ['hammer.input'];
@@ -57893,7 +58032,7 @@
 	  this._disconnectEvents = function () {
 	    if (m_boundKeys) {
 	      if (m_keyHandler) {
-	        m_boundKeys.every(m_keyHandler.unbind, m_keyHandler);
+	        m_keyHandler.unbind(m_boundKeys);
 	      }
 	      m_boundKeys = null;
 	      m_keyHandler = null;
@@ -59384,8 +59523,8 @@
 	   * Point search method for selection api.  Returns markers containing the
 	   * given point.
 	   *
-	   * @param {object} coordinate Coordinate in input gcs to check if it is
-	   *    located in any quad.
+	   * @param {geo.geoPosition} coordinate Coordinate in input gcs to check if it
+	   *    is located in any quad in map interface gcs.
 	   * @returns {object} An object with `index`: a list of quad indices, and
 	   *    `found`: a list of quads that contain the specified coordinate.
 	   */
@@ -60000,7 +60139,7 @@
 	  /**
 	   * @private
 	   */
-	  var d3 = __webpack_require__(2),
+	  var d3 = __webpack_require__(231).d3,
 	      m_this = this,
 	      s_init = this._init,
 	      m_choropleth = $.extend({},
@@ -60265,6 +60404,818 @@
 
 /***/ }),
 /* 231 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var inherit = __webpack_require__(14);
+	var registerRenderer = __webpack_require__(207).registerRenderer;
+	var renderer = __webpack_require__(208);
+	
+	/**
+	 * Create a new instance of class d3Renderer.
+	 *
+	 * @class geo.d3.renderer
+	 * @extends geo.renderer
+	 * @param {object} arg Options for the renderer.
+	 * @param {geo.layer} [arg.layer] Layer associated with the renderer.
+	 * @param {HTMLElement} [arg.canvas] Canvas element associated with the
+	 *   renderer.
+	 * @param {boolean} [arg.widget=false] Set to `true` if this is a stand-alone
+	 *   widget.  If it is not a widget, svg elements are wrapped in a parent
+	 *   group.
+	 * @param {HTMLElement} [arg.d3Parent] If specified, the parent for any
+	 *   rendered objects; otherwise the renderer's layer's main node is used.
+	 * @returns {geo.d3.d3Renderer}
+	 */
+	var d3Renderer = function (arg) {
+	  'use strict';
+	
+	  var d3 = d3Renderer.d3;
+	  var object = __webpack_require__(232);
+	  var util = __webpack_require__(89);
+	  var geo_event = __webpack_require__(15);
+	  var d3Rescale = __webpack_require__(234);
+	
+	  if (!(this instanceof d3Renderer)) {
+	    return new d3Renderer(arg);
+	  }
+	  renderer.call(this, arg);
+	
+	  var s_exit = this._exit;
+	
+	  object.call(this, arg);
+	
+	  arg = arg || {};
+	
+	  var m_this = this,
+	      m_sticky = null,
+	      m_features = {},
+	      m_corners = null,
+	      m_width = null,
+	      m_height = null,
+	      m_diagonal = null,
+	      m_scale = 1,
+	      m_transform = {dx: 0, dy: 0, rx: 0, ry: 0, rotation: 0},
+	      m_renderIds = {},
+	      m_removeIds = {},
+	      m_svg = null,
+	      m_defs = null;
+	
+	  /**
+	   * Set attributes to a d3 selection.
+	   * @private
+	   * @param {d3Selector} select The d3 selector with the elements to change.
+	   * @param {object} attrs A map of attributes to set on the elements.
+	   */
+	  function setAttrs(select, attrs) {
+	    var key;
+	    for (key in attrs) {
+	      if (attrs.hasOwnProperty(key)) {
+	        select.attr(key, attrs[key]);
+	      }
+	    }
+	  }
+	
+	  /**
+	   * Meta functions for converting from geojs styles to d3.
+	   * @private
+	   * @param {function|object} f The style value or function to convert.
+	   * @param {function} [g] An optional function that returns a boolean; if it
+	   *    returns false, the style is set to `'none'`.
+	   * @returns {function} A function for converting styles.
+	   */
+	  this._convertColor = function (f, g) {
+	    f = util.ensureFunction(f);
+	    g = g || function () { return true; };
+	    return function () {
+	      var c = 'none';
+	      if (g.apply(m_this, arguments)) {
+	        c = f.apply(m_this, arguments);
+	        if (c.hasOwnProperty('r') &&
+	            c.hasOwnProperty('g') &&
+	            c.hasOwnProperty('b')) {
+	          c = d3.rgb(255 * c.r, 255 * c.g, 255 * c.b);
+	        }
+	      }
+	      return c;
+	    };
+	  };
+	
+	  /**
+	   * Return a function for converting a size in pixels to an appropriate
+	   * d3 scale.
+	   * @private
+	   * @param {function|object} f The style value or function to convert.
+	   * @returns {function} A function for converting scale.
+	   */
+	  this._convertScale = function (f) {
+	    f = util.ensureFunction(f);
+	    return function () {
+	      return f.apply(m_this, arguments) / m_scale;
+	    };
+	  };
+	
+	  /**
+	   * Set styles to a d3 selection. Ignores unknown style keys.
+	   * @private
+	   * @param {d3Selector} select The d3 selector with the elements to change.
+	   * @param {object} styles Style object associated with a feature.
+	   */
+	  function setStyles(select, styles) {
+	    var key, k, f;
+	    /**
+	     * Check if the fill parameter is truthy.
+	     *
+	     * @returns {null|'none'} `null` to fill the element, `'none'` to skip
+	     *  filling it.
+	     */
+	    function fillFunc() {
+	      if (styles.fill.apply(m_this, arguments)) {
+	        return null;
+	      } else {
+	        return 'none';
+	      }
+	    }
+	    /**
+	     * Check if the stroke parameter is truthy.
+	     *
+	     * @returns {null|'none'} `null` to fill the element, `'none'` to skip
+	     *  filling it.
+	     */
+	    function strokeFunc() {
+	      if (styles.stroke.apply(m_this, arguments)) {
+	        return null;
+	      } else {
+	        return 'none';
+	      }
+	    }
+	    for (key in styles) {
+	      if (styles.hasOwnProperty(key)) {
+	        f = null;
+	        k = null;
+	        if (key === 'strokeColor') {
+	          k = 'stroke';
+	          f = m_this._convertColor(styles[key], styles.stroke);
+	        } else if (key === 'stroke' && styles[key] &&
+	                   !styles.hasOwnProperty('strokeColor')) {
+	          k = 'stroke';
+	          f = strokeFunc;
+	        } else if (key === 'strokeWidth') {
+	          k = 'stroke-width';
+	          f = m_this._convertScale(styles[key]);
+	        } else if (key === 'strokeOpacity') {
+	          k = 'stroke-opacity';
+	          f = styles[key];
+	        } else if (key === 'fillColor') {
+	          k = 'fill';
+	          f = m_this._convertColor(styles[key], styles.fill);
+	        } else if (key === 'fill' && !styles.hasOwnProperty('fillColor')) {
+	          k = 'fill';
+	          f = fillFunc;
+	        } else if (key === 'fillOpacity') {
+	          k = 'fill-opacity';
+	          f = styles[key];
+	        } else if (key === 'lineCap') {
+	          k = 'stroke-linecap';
+	          f = styles[key];
+	        } else if (key === 'lineJoin') {
+	          k = 'stroke-linejoin';
+	          f = styles[key];
+	        } else if (key === 'miterLimit') {
+	          k = 'stroke-miterlimit';
+	          f = styles[key];
+	        }
+	        if (k) {
+	          select.style(k, f);
+	        }
+	      }
+	    }
+	  }
+	
+	  /**
+	   * Get the svg group element associated with this renderer instance, or of a
+	   * group within the render instance.
+	   *
+	   * @private
+	   * @param {string} [parentId] Optional parent ID name.
+	   * @returns {d3Selector} Selector with the d3 group.
+	   */
+	  function getGroup(parentId) {
+	    if (parentId) {
+	      return m_svg.select('.group-' + parentId);
+	    }
+	    return m_svg.select('.group-' + m_this._d3id());
+	  }
+	
+	  /**
+	   * Set the initial lat-lon coordinates of the map view.
+	   * @private
+	   */
+	  function initCorners() {
+	    var layer = m_this.layer(),
+	        map = layer.map(),
+	        width = map.size().width,
+	        height = map.size().height;
+	
+	    m_width = width;
+	    m_height = height;
+	    if (!m_width || !m_height) {
+	      throw new Error('Map layer has size 0');
+	    }
+	    m_diagonal = Math.pow(width * width + height * height, 0.5);
+	    m_corners = {
+	      upperLeft: map.displayToGcs({x: 0, y: 0}, null),
+	      lowerRight: map.displayToGcs({x: width, y: height}, null),
+	      center: map.displayToGcs({x: width / 2, y: height / 2}, null)
+	    };
+	  }
+	
+	  /**
+	   * Set the translation, scale, and zoom for the current view.
+	   * @note rotation not yet supported
+	   * @private
+	   */
+	  this._setTransform = function () {
+	    if (!m_corners) {
+	      initCorners();
+	    }
+	
+	    if (!m_sticky) {
+	      return;
+	    }
+	
+	    var layer = m_this.layer();
+	
+	    var map = layer.map(),
+	        upperLeft = map.gcsToDisplay(m_corners.upperLeft, null),
+	        lowerRight = map.gcsToDisplay(m_corners.lowerRight, null),
+	        center = map.gcsToDisplay(m_corners.center, null),
+	        group = getGroup(),
+	        dx, dy, scale, rotation, rx, ry;
+	
+	    scale = Math.sqrt(
+	      Math.pow(lowerRight.y - upperLeft.y, 2) +
+	      Math.pow(lowerRight.x - upperLeft.x, 2)) / m_diagonal;
+	    // calculate the translation
+	    rotation = map.rotation();
+	    rx = -m_width / 2;
+	    ry = -m_height / 2;
+	    dx = scale * rx + center.x;
+	    dy = scale * ry + center.y;
+	
+	    // set the group transform property
+	    if (!rotation) {
+	      dx = Math.round(dx);
+	      dy = Math.round(dy);
+	    }
+	    var transform = 'matrix(' + [scale, 0, 0, scale, dx, dy].join() + ')';
+	    if (rotation) {
+	      transform += ' rotate(' + [
+	        rotation * 180 / Math.PI, -rx, -ry].join() + ')';
+	    }
+	    group.attr('transform', transform);
+	
+	    // set internal variables
+	    m_scale = scale;
+	    m_transform.dx = dx;
+	    m_transform.dy = dy;
+	    m_transform.rx = rx;
+	    m_transform.ry = ry;
+	    m_transform.rotation = rotation;
+	  };
+	
+	  /**
+	   * Convert from screen pixel coordinates to the local coordinate system
+	   * in the SVG group element taking into account the transform.
+	   * @private
+	   * @param {geo.screenPosition} pt The coordinates to convert.
+	   * @returns {geo.geoPosition} The converted coordinates.
+	   */
+	  this.baseToLocal = function (pt) {
+	    pt = {
+	      x: (pt.x - m_transform.dx) / m_scale,
+	      y: (pt.y - m_transform.dy) / m_scale
+	    };
+	    if (m_transform.rotation) {
+	      var sinr = Math.sin(-m_transform.rotation),
+	          cosr = Math.cos(-m_transform.rotation);
+	      var x = pt.x + m_transform.rx, y = pt.y + m_transform.ry;
+	      pt = {
+	        x: x * cosr - y * sinr - m_transform.rx,
+	        y: x * sinr + y * cosr - m_transform.ry
+	      };
+	    }
+	    return pt;
+	  };
+	
+	  /**
+	   * Convert from the local coordinate system in the SVG group element
+	   * to screen pixel coordinates.
+	   * @private
+	   * @param {geo.geoPosition} pt The coordinates to convert.
+	   * @returns {geo.screenPosition} The converted coordinates.
+	   */
+	  this.localToBase = function (pt) {
+	    if (m_transform.rotation) {
+	      var sinr = Math.sin(m_transform.rotation),
+	          cosr = Math.cos(m_transform.rotation);
+	      var x = pt.x + m_transform.rx, y = pt.y + m_transform.ry;
+	      pt = {
+	        x: x * cosr - y * sinr - m_transform.rx,
+	        y: x * sinr + y * cosr - m_transform.ry
+	      };
+	    }
+	    pt = {
+	      x: pt.x * m_scale + m_transform.dx,
+	      y: pt.y * m_scale + m_transform.dy
+	    };
+	    return pt;
+	  };
+	
+	  /**
+	   * Initialize.
+	   *
+	   * @param {object} arg The options used to create the renderer.
+	   * @param {boolean} [arg.widget=false] Set to `true` if this is a stand-alone
+	   *   widget.  If it is not a widget, svg elements are wrapped in a parent
+	   *   group.
+	   * @param {HTMLElement} [arg.d3Parent] If specified, the parent for any
+	   *   rendered objects; otherwise the renderer's layer's main node is used.
+	   * @returns {this}
+	   */
+	  this._init = function (arg) {
+	    if (!m_this.canvas()) {
+	      var canvas;
+	      arg.widget = arg.widget || false;
+	
+	      if ('d3Parent' in arg) {
+	        m_svg = d3.select(arg.d3Parent).append('svg');
+	      } else {
+	        m_svg = d3.select(m_this.layer().node().get(0)).append('svg');
+	      }
+	      m_svg.attr('display', 'block');
+	
+	      // create a global svg definitions element
+	      m_defs = m_svg.append('defs');
+	
+	      var shadow = m_defs
+	        .append('filter')
+	          .attr('id', 'geo-highlight')
+	          .attr('x', '-100%')
+	          .attr('y', '-100%')
+	          .attr('width', '300%')
+	          .attr('height', '300%');
+	      shadow
+	        .append('feMorphology')
+	          .attr('operator', 'dilate')
+	          .attr('radius', 2)
+	          .attr('in', 'SourceAlpha')
+	          .attr('result', 'dilateOut');
+	      shadow
+	        .append('feGaussianBlur')
+	          .attr('stdDeviation', 5)
+	          .attr('in', 'dilateOut')
+	          .attr('result', 'blurOut');
+	      shadow
+	        .append('feColorMatrix')
+	          .attr('type', 'matrix')
+	          .attr('values', '-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0')
+	          .attr('in', 'blurOut')
+	          .attr('result', 'invertOut');
+	      shadow
+	        .append('feBlend')
+	          .attr('in', 'SourceGraphic')
+	          .attr('in2', 'invertOut')
+	          .attr('mode', 'normal');
+	
+	      if (!arg.widget) {
+	        canvas = m_svg.append('g');
+	      }
+	
+	      shadow = m_defs.append('filter')
+	          .attr('id', 'geo-blur')
+	          .attr('x', '-100%')
+	          .attr('y', '-100%')
+	          .attr('width', '300%')
+	          .attr('height', '300%');
+	
+	      shadow
+	        .append('feGaussianBlur')
+	          .attr('stdDeviation', 20)
+	          .attr('in', 'SourceGraphic');
+	
+	      m_sticky = m_this.layer().sticky();
+	      m_svg.attr('class', m_this._d3id());
+	      m_svg.attr('width', m_this.layer().node().width());
+	      m_svg.attr('height', m_this.layer().node().height());
+	
+	      if (!arg.widget) {
+	        canvas.attr('class', 'group-' + m_this._d3id());
+	
+	        m_this.canvas(canvas);
+	      } else {
+	        m_this.canvas(m_svg);
+	      }
+	    }
+	    m_this._setTransform();
+	    return m_this;
+	  };
+	
+	  /**
+	   * Get API used by the renderer.
+	   *
+	   * @returns {string} 'd3'.
+	   */
+	  this.api = function () {
+	    return 'd3';
+	  };
+	
+	  /**
+	   * Return the current scaling factor to build features that shouldn't
+	   * change size during zooms.  For example:
+	   *
+	   *  selection.append('circle')
+	   *    .attr('r', r0 / renderer.scaleFactor());
+	   *
+	   * This will create a circle element with radius r0 independent of the
+	   * current zoom level.
+	   *
+	   * @returns {number} The current scale factor.
+	   */
+	  this.scaleFactor = function () {
+	    return m_scale;
+	  };
+	
+	  /**
+	   * Handle resize event.
+	   *
+	   * @param {number} x Ignored.
+	   * @param {number} y Ignored.
+	   * @param {number} w New width in pixels.
+	   * @param {number} h New height in pixels.
+	   * @returns {this}
+	   */
+	  this._resize = function (x, y, w, h) {
+	    if (!m_corners) {
+	      initCorners();
+	    }
+	    m_svg.attr('width', w);
+	    m_svg.attr('height', h);
+	    m_this._setTransform();
+	    m_this.layer().geoTrigger(d3Rescale, { scale: m_scale }, true);
+	    return m_this;
+	  };
+	
+	  /**
+	   * Exit.
+	   */
+	  this._exit = function () {
+	    m_features = {};
+	    m_this.canvas().remove();
+	    m_svg.remove();
+	    m_svg = undefined;
+	    m_defs.remove();
+	    m_defs = undefined;
+	    m_renderIds = {};
+	    m_removeIds = {};
+	    s_exit();
+	  };
+	
+	  /**
+	   * Get the definitions DOM element for the layer.
+	   * @protected
+	   * @returns {HTMLElement} The definitions DOM element.
+	   */
+	  this._definitions = function () {
+	    return m_defs;
+	  };
+	
+	  /**
+	   * Create a new feature element from an object that describes the feature
+	   * attributes.  To be called from feature classes only.
+	   *
+	   * @param {object} arg Options for the features.
+	   * @param {string} arg.id A unique string identifying the feature.
+	   * @param {array} arg.data Array of data objects used in a d3 data method.
+	   * @param {function} [aeg.dataIndex] A function that returns a unique id for
+	   *    each data element.  This is passed to the data access function.
+	   * @param {object} arg.style An object with style values or functions.
+	   * @param {object} arg.attributes An object containing element attributes.
+	   *    The keys are the attribute names, and the values are either constants
+	   *    or functions that get passed a data element and a data index.
+	   * @param {string[]} arg.classes An array of classes to add to the elements.
+	   * @param {string} arg.append The element type as used in d3 append methods.
+	   *    This is something like `'path'`, `'circle'`, or `'line'`.
+	   * @param {boolean} [arg.onlyRenderNew] If truthy, features only get
+	   *    attributes and styles set when new.  If falsy, features always have
+	   *    attributes and styles updated.
+	   * @param {boolean} [arg.sortByZ] If truthy, sort features by the `d.zIndex`.
+	   * @param {string} [parentId] If set, the group ID of the parent element.
+	   * @returns {this}
+	   */
+	  this._drawFeatures = function (arg) {
+	    m_features[arg.id] = {
+	      data: arg.data,
+	      index: arg.dataIndex,
+	      style: arg.style,
+	      visible: arg.visible,
+	      attributes: arg.attributes,
+	      classes: arg.classes,
+	      append: arg.append,
+	      onlyRenderNew: arg.onlyRenderNew,
+	      sortByZ: arg.sortByZ,
+	      parentId: arg.parentId
+	    };
+	    return m_this.__render(arg.id, arg.parentId);
+	  };
+	
+	  /**
+	   * Updates a feature by performing a d3 data join.  If no input id is
+	   * provided then this method will update all features.
+	   *
+	   * @param {string} [id] The id of the feature to update.  `undefined` to
+	   *    update all features.
+	   * @param {string} [parentId] The parent of the feature(s).  If not
+	   *    specified, features are rendered on the next animation frame.
+	   * @returns {this}
+	   */
+	  this.__render = function (id, parentId) {
+	    var key;
+	    if (id === undefined) {
+	      for (key in m_features) {
+	        if (m_features.hasOwnProperty(key)) {
+	          m_this.__render(key);
+	        }
+	      }
+	      return m_this;
+	    }
+	    if (parentId) {
+	      m_this._renderFeature(id, parentId);
+	    } else {
+	      m_renderIds[id] = true;
+	      m_this.layer().map().scheduleAnimationFrame(m_this._renderFrame);
+	    }
+	    return m_this;
+	  };
+	
+	  /**
+	   * Render all features that are marked as needing an update.  This should
+	   * only be called duration an animation frame.
+	   */
+	  this._renderFrame = function () {
+	    var id;
+	    for (id in m_removeIds) {
+	      m_this.select(id).remove();
+	      m_defs.selectAll('.' + id).remove();
+	    }
+	    m_removeIds = {};
+	    var ids = m_renderIds;
+	    m_renderIds = {};
+	    for (id in ids) {
+	      if (ids.hasOwnProperty(id)) {
+	        m_this._renderFeature(id);
+	      }
+	    }
+	  };
+	
+	  /**
+	   * Render a single feature.
+	   *
+	   * @param {string} id The id of the feature to update.
+	   * @param {string} [parentId] The parent of the feature.  This is used to
+	   *    select the feature.
+	   * @returns {this}
+	   */
+	  this._renderFeature = function (id, parentId) {
+	    if (!m_features[id]) {
+	      return m_this;
+	    }
+	    var data = m_features[id].data,
+	        index = m_features[id].index,
+	        style = m_features[id].style,
+	        visible = m_features[id].visible,
+	        attributes = m_features[id].attributes,
+	        classes = m_features[id].classes,
+	        append = m_features[id].append,
+	        selection = m_this.select(id, parentId).data(data, index),
+	        entries, rendersel;
+	    entries = selection.enter().append(append);
+	    selection.exit().remove();
+	    rendersel = m_features[id].onlyRenderNew ? entries : selection;
+	    setAttrs(rendersel, attributes);
+	    rendersel.attr('class', classes.concat([id]).join(' '));
+	    setStyles(rendersel, style);
+	    if (visible) {
+	      rendersel.style('visibility', visible() ? 'visible' : 'hidden');
+	    }
+	    if (entries.size() && m_features[id].sortByZ) {
+	      selection.sort(function (a, b) {
+	        return (a.zIndex || 0) - (b.zIndex || 0);
+	      });
+	    }
+	    return m_this;
+	  };
+	
+	  /**
+	   * Returns a d3 selection for the given feature id.
+	   *
+	   * @param {string} id The id of the feature to select.
+	   * @param {string} [parentId] The parent of the feature.  This is used to
+	   *    determine the feature's group.
+	   * @returns {d3Selector}
+	   */
+	  this.select = function (id, parentId) {
+	    return getGroup(parentId).selectAll('.' + id);
+	  };
+	
+	  /**
+	   * Removes a feature from the layer.
+	   *
+	   * @param {string} id The id of the feature to remove.
+	   * @returns {this}
+	   */
+	  this._removeFeature = function (id) {
+	    m_removeIds[id] = true;
+	    m_this.layer().map().scheduleAnimationFrame(m_this._renderFrame);
+	    delete m_features[id];
+	    if (m_renderIds[id]) {
+	      delete m_renderIds[id];
+	    }
+	    return m_this;
+	  };
+	
+	  /**
+	   * Override draw method to do nothing.
+	   */
+	  this.draw = function () {
+	  };
+	
+	  // connect to pan event
+	  this.layer().geoOn(geo_event.pan, m_this._setTransform);
+	
+	  // connect to rotate event
+	  this.layer().geoOn(geo_event.rotate, m_this._setTransform);
+	
+	  // connect to zoom event
+	  this.layer().geoOn(geo_event.zoom, function () {
+	    m_this._setTransform();
+	    m_this.__render();
+	    m_this.layer().geoTrigger(d3Rescale, { scale: m_scale }, true);
+	  });
+	
+	  this.layer().geoOn(geo_event.resize, function (event) {
+	    m_this._resize(event.x, event.y, event.width, event.height);
+	  });
+	
+	  this._init(arg);
+	  return this;
+	};
+	
+	inherit(d3Renderer, renderer);
+	
+	registerRenderer('d3', d3Renderer);
+	
+	(function () {
+	  'use strict';
+	
+	  /**
+	   * Report if the d3 renderer is supported.  This is just a check if d3 is
+	   * available.
+	   *
+	   * @returns {boolean} true if available.
+	   */
+	  d3Renderer.supported = function () {
+	    delete d3Renderer.d3;
+	    // webpack expects optional dependencies to be wrapped in a try-catch
+	    try {
+	      d3Renderer.d3 = __webpack_require__(2);
+	    } catch (_error) {}
+	    return d3Renderer.d3 !== undefined;
+	  };
+	
+	  /**
+	   * If the d3 renderer is not supported, supply the name of a renderer that
+	   * should be used instead.  This asks for the null renderer.
+	   *
+	   * @returns {null} `null` for the null renderer.
+	   */
+	  d3Renderer.fallback = function () {
+	    return null;
+	  };
+	
+	  d3Renderer.supported();  // cache reference to d3 if it is available
+	})();
+	
+	module.exports = d3Renderer;
+
+
+/***/ }),
+/* 232 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var inherit = __webpack_require__(14);
+	var sceneObject = __webpack_require__(214);
+	
+	/**
+	 * D3 specific subclass of object which adds an id property for d3 selections
+	 * on groups of objects by class id.
+	 *
+	 * @class
+	 * @alias geo.d3.object
+	 * @extends geo.sceneObject
+	 * @param {object} arg Options for the object.
+	 * @returns {geo.d3.object}
+	 */
+	var d3_object = function (arg) {
+	  'use strict';
+	
+	  var object = __webpack_require__(209);
+	  var uniqueID = __webpack_require__(233);
+	
+	  // this is used to extend other geojs classes, so only generate
+	  // a new object when that is not the case... like if this === window
+	  if (!(this instanceof object)) {
+	    return new d3_object(arg);
+	  }
+	  sceneObject.call(this);
+	
+	  var m_id = 'd3-' + uniqueID(),
+	      s_exit = this._exit,
+	      m_this = this,
+	      s_draw = this.draw;
+	
+	  this._d3id = function () {
+	    return m_id;
+	  };
+	
+	  /**
+	   * Returns a d3 selection for the feature elements.
+	   *
+	   * @returns {d3.selector} A d3 selector of the features in this object.
+	   */
+	  this.select = function () {
+	    return m_this.renderer().select(m_this._d3id());
+	  };
+	
+	  /**
+	   * Redraw the object.
+	   *
+	   * @returns {this}
+	   */
+	  this.draw = function () {
+	    m_this._update();
+	    s_draw();
+	    return m_this;
+	  };
+	
+	  /**
+	   * Removes the element from the svg and the renderer.
+	   */
+	  this._exit = function () {
+	    m_this.renderer()._removeFeature(m_this._d3id());
+	    s_exit();
+	  };
+	
+	  return this;
+	};
+	
+	inherit(d3_object, sceneObject);
+	module.exports = d3_object;
+
+
+/***/ }),
+/* 233 */
+/***/ (function(module, exports) {
+
+	var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
+	    strLength = 8;
+	
+	/**
+	 * Get a random string to use as a div ID
+	 * @function geo.d3.uniqueID
+	 * @returns {string}
+	 */
+	var uniqueID = function () {
+	  var strArray = [],
+	      i;
+	  strArray.length = strLength;
+	  for (i = 0; i < strLength; i += 1) {
+	    strArray[i] = chars.charAt(Math.floor(Math.random() * chars.length));
+	  }
+	  return strArray.join('');
+	};
+	
+	module.exports = uniqueID;
+
+
+/***/ }),
+/* 234 */
+/***/ (function(module, exports) {
+
+	module.exports = 'geo_d3_rescale';
+
+
+/***/ }),
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -60824,7 +61775,7 @@
 
 
 /***/ }),
-/* 232 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -60890,7 +61841,7 @@
 
 
 /***/ }),
-/* 233 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = (function () {
@@ -60991,9 +61942,9 @@
 	      }
 	      var wait = $.Deferred();
 	      var process = $.Deferred();
-	      wait.then(function () {
+	      wait.done(function () {
 	        $.when(callback.call(defer)).always(process.resolve);
-	      }, process.resolve);
+	      }).fail(process.resolve);
 	      defer.__fetchQueue = wait;
 	      this._addToQueue(defer, atEnd);
 	      $.when(wait, process).always(function () {
@@ -61119,7 +62070,7 @@
 
 
 /***/ }),
-/* 234 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -61219,7 +62170,7 @@
 
 
 /***/ }),
-/* 235 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -61434,7 +62385,7 @@
 
 
 /***/ }),
-/* 236 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(7);
@@ -61702,11 +62653,11 @@
 
 
 /***/ }),
-/* 237 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
-	var tile = __webpack_require__(238);
+	var tile = __webpack_require__(242);
 	
 	module.exports = (function () {
 	  'use strict';
@@ -61786,7 +62737,7 @@
 	        this._image.src = this._url;
 	
 	        // attach a promise interface to `this`
-	        defer.then(function () {
+	        defer.done(function () {
 	          this._fetched = true;
 	        }.bind(this)).promise(this);
 	      }
@@ -61803,7 +62754,7 @@
 	    this.fadeIn = function (duration) {
 	      var promise = this.fetch(), defer = $.Deferred();
 	      $(this._image).css('display', 'none');
-	      promise.then(function () {
+	      promise.done(function () {
 	        $(this._image).fadeIn(duration, function () {
 	          defer.resolve();
 	        });
@@ -61820,7 +62771,7 @@
 
 
 /***/ }),
-/* 238 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = (function () {
@@ -61898,7 +62849,7 @@
 	     */
 	    this.fetch = function () {
 	      if (!this._fetched) {
-	        $.get(this._url).then(function () {
+	        $.get(this._url).done(function () {
 	          this._fetched = true;
 	        }.bind(this)).promise(this);
 	      }
@@ -61932,7 +62883,11 @@
 	        this.fetch();
 	      }
 	      // Call then on the new promise
-	      this.then(onSuccess, onFailure);
+	      if (this.done && this.fail) {
+	        this.done(onSuccess).fail(onFailure);
+	      } else {
+	        this.then(onSuccess, onFailure);
+	      }
 	      return this;
 	    };
 	
@@ -62047,12 +63002,12 @@
 
 
 /***/ }),
-/* 239 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
 	var registerFileReader = __webpack_require__(207).registerFileReader;
-	var fileReader = __webpack_require__(234);
+	var fileReader = __webpack_require__(238);
 	
 	/**
 	* Create a new instance of class jsonReader
@@ -62355,7 +63310,7 @@
 
 
 /***/ }),
-/* 240 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(7);
@@ -62445,7 +63400,7 @@
 	  var registry = __webpack_require__(207);
 	  var geo_event = __webpack_require__(15);
 	  var mapInteractor = __webpack_require__(228);
-	  var uiLayer = __webpack_require__(241);
+	  var uiLayer = __webpack_require__(245);
 	
 	  /**
 	   * Private member variables
@@ -63075,12 +64030,16 @@
 	  /**
 	   * Convert from gcs coordinates to map world coordinates.
 	   *
-	   * @param {geo.geoPosition} c The input coordinate to convert.
+	   * @param {geo.geoPosition|geo.geoPosition[]} c The input coordinate to
+	   *    convert.
 	   * @param {string|geo.transform|null} [gcs] Input gcs.  `undefined` to use
 	   *    the interface gcs, `null` to use the map gcs, or any other transform.
-	   * @returns {geo.worldPosition} World space coordinates.
+	   * @returns {geo.worldPosition|geo.worldPosition[]} World space coordinates.
 	   */
 	  this.gcsToWorld = function (c, gcs) {
+	    if (Array.isArray(c)) {
+	      return c.map(function (pt) { return m_this.gcsToWorld(pt, gcs); });
+	    }
 	    gcs = (gcs === null ? m_gcs : (gcs === undefined ? m_ingcs : gcs));
 	    if (gcs !== m_gcs) {
 	      c = transform.transformCoordinates(gcs, m_gcs, c);
@@ -63099,12 +64058,16 @@
 	  /**
 	   * Convert from map world coordinates to gcs coordinates.
 	   *
-	   * @param {geo.worldPosition} c The input coordinate to convert.
+	   * @param {geo.worldPosition|geo.worldPosition[]} c The input coordinate to
+	   *    convert.
 	   * @param {string|geo.transform|null} [gcs] output gcs.  `undefined` to use
 	   *    the interface gcs, `null` to use the map gcs, or any other transform.
-	   * @returns {geo.geoPosition} GCS space coordinates.
+	   * @returns {geo.geoPosition|geo.geoPosition[]} GCS space coordinates.
 	   */
 	  this.worldToGcs = function (c, gcs) {
+	    if (Array.isArray(c)) {
+	      return c.map(function (pt) { return m_this.worldToGcs(pt, gcs); });
+	    }
 	    if (m_origin.x || m_origin.y || m_origin.z) {
 	      c = transform.affineInverse(
 	        {origin: m_origin},
@@ -63124,10 +64087,12 @@
 	   * Convert from gcs coordinates to display coordinates.  This is identical to
 	   * calling `gcsToWorld` and then `worldToDisplay`.
 	   *
-	   * @param {geo.geoPosition} c The input coordinate to convert.
+	   * @param {geo.geoPosition|geo.geoPosition[]} c The input coordinate to
+	   *    convert.
 	   * @param {string|geo.transform|null} [gcs] Input gcs.  `undefined` to use
 	   *    the interface gcs, `null` to use the map gcs, or any other transform.
-	   * @returns {geo.screenPosition} Display space coordinates.
+	   * @returns {geo.screenPosition|geo.screenPosition[]} Display space
+	   *    coordinates.
 	   */
 	  this.gcsToDisplay = function (c, gcs) {
 	    c = m_this.gcsToWorld(c, gcs);
@@ -63138,10 +64103,15 @@
 	   * Convert from world coordinates to display coordinates using the attached
 	   * camera.
 	   *
-	   * @param {geo.worldPosition} c The input coordinate to convert.
-	   * @returns {geo.screenPosition} Display space coordinates.
+	   * @param {geo.worldPosition|geo.worldPosition[]} c The input coordinate to
+	   *    convert.
+	   * @returns {geo.screenPosition|geo.screenPosition[]} Display space
+	   *    coordinates.
 	   */
 	  this.worldToDisplay = function (c) {
+	    if (Array.isArray(c)) {
+	      return c.map(function (pt) { return m_camera.worldToDisplay(pt); });
+	    }
 	    return m_camera.worldToDisplay(c);
 	  };
 	
@@ -63149,10 +64119,11 @@
 	   * Convert from display to gcs coordinates.  This is identical to calling
 	   * `displayToWorld` and then `worldToGcs`.
 	   *
-	   * @param {geo.screenPosition} c The input display coordinate to convert.
+	   * @param {geo.screenPosition|geo.screenPosition[]} c The input display
+	   *    coordinate to convert.
 	   * @param {string|geo.transform|null} [gcs] Output gcs.  `undefined` to use
 	   *    the interface gcs, `null` to use the map gcs, or any other transform.
-	   * @returns {geo.geoPosition} GCS space coordinates.
+	   * @returns {geo.geoPosition|geoPosition[]} GCS space coordinates.
 	   */
 	  this.displayToGcs = function (c, gcs) {
 	    c = m_this.displayToWorld(c); // done via camera
@@ -63163,10 +64134,14 @@
 	   * Convert from display coordinates to world coordinates using the attached
 	   * camera.
 	   *
-	   * @param {geo.screenPosition} c The input coordinate to convert.
-	   * @returns {geo.worldPosition} World space coordinates.
+	   * @param {geo.screenPosition|geo.screenPosition[]} c The input coordinate to
+	   *    convert.
+	   * @returns {geo.worldPosition|geo.worldPosition[]} World space coordinates.
 	   */
 	  this.displayToWorld = function (c) {
+	    if (Array.isArray(c)) {
+	      return c.map(function (pt) { return m_camera.displayToWorld(pt); });
+	    }
 	    return m_camera.displayToWorld(c);
 	  };
 	
@@ -63842,7 +64817,9 @@
 	      if (m_discreteZoom) {
 	        m_this.zoom(Math.round(m_this.zoom()));
 	      }
-	      m_this.interactor().options({discreteZoom: m_discreteZoom});
+	      if (m_this.interactor()) {
+	        m_this.interactor().options({discreteZoom: m_discreteZoom});
+	      }
 	    }
 	    return m_this;
 	  };
@@ -64616,7 +65593,7 @@
 
 
 /***/ }),
-/* 241 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -64701,7 +65678,7 @@
 
 
 /***/ }),
-/* 242 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = (function () {
@@ -64709,7 +65686,7 @@
 	
 	  var $ = __webpack_require__(7);
 	  var inherit = __webpack_require__(14);
-	  var tileLayer = __webpack_require__(243);
+	  var tileLayer = __webpack_require__(247);
 	  var registry = __webpack_require__(207);
 	  var quadFeature = __webpack_require__(229);
 	
@@ -64725,7 +65702,7 @@
 	   */
 	  var osmLayer = function (arg) {
 	
-	    var imageTile = __webpack_require__(237);
+	    var imageTile = __webpack_require__(241);
 	
 	    if (!(this instanceof osmLayer)) {
 	      return new osmLayer(arg);
@@ -64798,7 +65775,7 @@
 
 
 /***/ }),
-/* 243 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = (function () {
@@ -64985,10 +65962,10 @@
 	    var $ = __webpack_require__(7);
 	    var geo_event = __webpack_require__(15);
 	    var transform = __webpack_require__(17);
-	    var tileCache = __webpack_require__(244);
-	    var fetchQueue = __webpack_require__(233);
+	    var tileCache = __webpack_require__(248);
+	    var fetchQueue = __webpack_require__(237);
 	    var adjustLayerForRenderer = __webpack_require__(207).adjustLayerForRenderer;
-	    var Tile = __webpack_require__(238);
+	    var Tile = __webpack_require__(242);
 	
 	    options = $.extend(true, {}, this.constructor.defaults, options || {});
 	    if (!options.cacheSize) {
@@ -66394,7 +67371,7 @@
 
 
 /***/ }),
-/* 244 */
+/* 248 */
 /***/ (function(module, exports) {
 
 	module.exports = (function () {
@@ -66546,7 +67523,7 @@
 
 
 /***/ }),
-/* 245 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(7);
@@ -66622,7 +67599,7 @@
 
 
 /***/ }),
-/* 246 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(7);
@@ -66753,6 +67730,9 @@
 	   * If the specified coordinates are in the rendered quad, use the basis
 	   * information from the quad to determine the pixelmap index value so that it
 	   * can be included in the found results.
+	   *
+	   * @param {geo.geoPosition} coordinate point to search for in map interface
+	   *    gcs.
 	   */
 	  this.pointSearch = function (coordinate) {
 	    if (m_quadFeature && m_info) {
@@ -67059,7 +68039,7 @@
 
 
 /***/ }),
-/* 247 */
+/* 251 */
 /***/ (function(module, exports) {
 
 	/*
@@ -67338,7 +68318,7 @@
 
 
 /***/ }),
-/* 248 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -67436,59 +68416,52 @@
 
 
 /***/ }),
-/* 249 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = ("0.13.0");
+	module.exports = ("0.14.0");
 
 
 /***/ }),
-/* 250 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = ("0ec9d4ed2037fb68143bb9d816cf679ee099b2bd");
+	module.exports = ("6e069c26facbe3f4d86f1d41d2f2a2f40ee99490");
 
 
 /***/ }),
-/* 251 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var geo_event = __webpack_require__(15);
 	geo_event.d3 = {
-	  rescale: __webpack_require__(252)
+	  rescale: __webpack_require__(234)
 	};
 	
 	/**
 	 * @namespace geo.d3
 	 */
 	module.exports = {
-	  graphFeature: __webpack_require__(253),
-	  lineFeature: __webpack_require__(254),
-	  object: __webpack_require__(255),
-	  pathFeature: __webpack_require__(257),
-	  pointFeature: __webpack_require__(258),
-	  quadFeature: __webpack_require__(259),
-	  renderer: __webpack_require__(260),
+	  graphFeature: __webpack_require__(256),
+	  lineFeature: __webpack_require__(257),
+	  object: __webpack_require__(232),
+	  pathFeature: __webpack_require__(258),
+	  pointFeature: __webpack_require__(259),
+	  quadFeature: __webpack_require__(260),
+	  renderer: __webpack_require__(231),
 	  tileLayer: __webpack_require__(261),
-	  uniqueID: __webpack_require__(256),
+	  uniqueID: __webpack_require__(233),
 	  vectorFeature: __webpack_require__(262)
 	};
 
 
 /***/ }),
-/* 252 */
-/***/ (function(module, exports) {
-
-	module.exports = 'geo_d3_rescale';
-
-
-/***/ }),
-/* 253 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
 	var registerFeature = __webpack_require__(207).registerFeature;
-	var graphFeature = __webpack_require__(235);
+	var graphFeature = __webpack_require__(239);
 	
 	/**
 	 * @class geo.d3.graphFeature
@@ -67530,7 +68503,7 @@
 
 
 /***/ }),
-/* 254 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -67551,8 +68524,8 @@
 	    return new d3_lineFeature(arg);
 	  }
 	
-	  var d3 = __webpack_require__(2);
-	  var object = __webpack_require__(255);
+	  var d3 = __webpack_require__(231).d3;
+	  var object = __webpack_require__(232);
 	  var timestamp = __webpack_require__(215);
 	  var util = __webpack_require__(89);
 	
@@ -67675,111 +68648,12 @@
 
 
 /***/ }),
-/* 255 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var inherit = __webpack_require__(14);
-	var sceneObject = __webpack_require__(214);
-	
-	/**
-	 * D3 specific subclass of object which adds an id property for d3 selections
-	 * on groups of objects by class id.
-	 *
-	 * @class
-	 * @alias geo.d3.object
-	 * @extends geo.sceneObject
-	 * @param {object} arg Options for the object.
-	 * @returns {geo.d3.object}
-	 */
-	var d3_object = function (arg) {
-	  'use strict';
-	
-	  var object = __webpack_require__(209);
-	  var uniqueID = __webpack_require__(256);
-	
-	  // this is used to extend other geojs classes, so only generate
-	  // a new object when that is not the case... like if this === window
-	  if (!(this instanceof object)) {
-	    return new d3_object(arg);
-	  }
-	  sceneObject.call(this);
-	
-	  var m_id = 'd3-' + uniqueID(),
-	      s_exit = this._exit,
-	      m_this = this,
-	      s_draw = this.draw;
-	
-	  this._d3id = function () {
-	    return m_id;
-	  };
-	
-	  /**
-	   * Returns a d3 selection for the feature elements.
-	   *
-	   * @returns {d3.selector} A d3 selector of the features in this object.
-	   */
-	  this.select = function () {
-	    return m_this.renderer().select(m_this._d3id());
-	  };
-	
-	  /**
-	   * Redraw the object.
-	   *
-	   * @returns {this}
-	   */
-	  this.draw = function () {
-	    m_this._update();
-	    s_draw();
-	    return m_this;
-	  };
-	
-	  /**
-	   * Removes the element from the svg and the renderer.
-	   */
-	  this._exit = function () {
-	    m_this.renderer()._removeFeature(m_this._d3id());
-	    s_exit();
-	  };
-	
-	  return this;
-	};
-	
-	inherit(d3_object, sceneObject);
-	module.exports = d3_object;
-
-
-/***/ }),
-/* 256 */
-/***/ (function(module, exports) {
-
-	var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
-	    strLength = 8;
-	
-	/**
-	 * Get a random string to use as a div ID
-	 * @function geo.d3.uniqueID
-	 * @returns {string}
-	 */
-	var uniqueID = function () {
-	  var strArray = [],
-	      i;
-	  strArray.length = strLength;
-	  for (i = 0; i < strLength; i += 1) {
-	    strArray[i] = chars.charAt(Math.floor(Math.random() * chars.length));
-	  }
-	  return strArray.join('');
-	};
-	
-	module.exports = uniqueID;
-
-
-/***/ }),
-/* 257 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
 	var registerFeature = __webpack_require__(207).registerFeature;
-	var pathFeature = __webpack_require__(245);
+	var pathFeature = __webpack_require__(249);
 	
 	/**
 	 * Create a new instance of class pathFeature
@@ -67796,8 +68670,8 @@
 	  }
 	
 	  var $ = __webpack_require__(7);
-	  var d3 = __webpack_require__(2);
-	  var object = __webpack_require__(255);
+	  var d3 = __webpack_require__(231).d3;
+	  var object = __webpack_require__(232);
 	  var timestamp = __webpack_require__(215);
 	
 	  arg = arg || {};
@@ -67901,7 +68775,7 @@
 
 
 /***/ }),
-/* 258 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -67923,7 +68797,7 @@
 	    return new d3_pointFeature(arg);
 	  }
 	
-	  var d3_object = __webpack_require__(255);
+	  var d3_object = __webpack_require__(232);
 	  var timestamp = __webpack_require__(215);
 	
 	  arg = arg || {};
@@ -68018,7 +68892,7 @@
 
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var inherit = __webpack_require__(14);
@@ -68040,8 +68914,8 @@
 	  }
 	
 	  var $ = __webpack_require__(7);
-	  var d3 = __webpack_require__(2);
-	  var object = __webpack_require__(255);
+	  var d3 = __webpack_require__(231).d3;
+	  var object = __webpack_require__(232);
 	
 	  quadFeature.call(this, arg);
 	  object.call(this);
@@ -68258,709 +69132,6 @@
 
 
 /***/ }),
-/* 260 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var inherit = __webpack_require__(14);
-	var registerRenderer = __webpack_require__(207).registerRenderer;
-	var renderer = __webpack_require__(208);
-	
-	/**
-	 * Create a new instance of class d3Renderer.
-	 *
-	 * @class geo.d3.renderer
-	 * @extends geo.renderer
-	 * @param {object} arg Options for the renderer.
-	 * @param {geo.layer} [arg.layer] Layer associated with the renderer.
-	 * @param {HTMLElement} [arg.canvas] Canvas element associated with the
-	 *   renderer.
-	 * @param {boolean} [arg.widget=false] Set to `true` if this is a stand-alone
-	 *   widget.  If it is not a widget, svg elements are wrapped in a parent
-	 *   group.
-	 * @param {HTMLElement} [arg.d3Parent] If specified, the parent for any
-	 *   rendered objects; otherwise the renderer's layer's main node is used.
-	 * @returns {geo.d3.d3Renderer}
-	 */
-	var d3Renderer = function (arg) {
-	  'use strict';
-	
-	  var d3 = __webpack_require__(2);
-	  var object = __webpack_require__(255);
-	  var util = __webpack_require__(89);
-	  var geo_event = __webpack_require__(15);
-	  var d3Rescale = __webpack_require__(252);
-	
-	  if (!(this instanceof d3Renderer)) {
-	    return new d3Renderer(arg);
-	  }
-	  renderer.call(this, arg);
-	
-	  var s_exit = this._exit;
-	
-	  object.call(this, arg);
-	
-	  arg = arg || {};
-	
-	  var m_this = this,
-	      m_sticky = null,
-	      m_features = {},
-	      m_corners = null,
-	      m_width = null,
-	      m_height = null,
-	      m_diagonal = null,
-	      m_scale = 1,
-	      m_transform = {dx: 0, dy: 0, rx: 0, ry: 0, rotation: 0},
-	      m_renderIds = {},
-	      m_removeIds = {},
-	      m_svg = null,
-	      m_defs = null;
-	
-	  /**
-	   * Set attributes to a d3 selection.
-	   * @private
-	   * @param {d3Selector} select The d3 selector with the elements to change.
-	   * @param {object} attrs A map of attributes to set on the elements.
-	   */
-	  function setAttrs(select, attrs) {
-	    var key;
-	    for (key in attrs) {
-	      if (attrs.hasOwnProperty(key)) {
-	        select.attr(key, attrs[key]);
-	      }
-	    }
-	  }
-	
-	  /**
-	   * Meta functions for converting from geojs styles to d3.
-	   * @private
-	   * @param {function|object} f The style value or function to convert.
-	   * @param {function} [g] An optional function that returns a boolean; if it
-	   *    returns false, the style is set to `'none'`.
-	   * @returns {function} A function for converting styles.
-	   */
-	  this._convertColor = function (f, g) {
-	    f = util.ensureFunction(f);
-	    g = g || function () { return true; };
-	    return function () {
-	      var c = 'none';
-	      if (g.apply(m_this, arguments)) {
-	        c = f.apply(m_this, arguments);
-	        if (c.hasOwnProperty('r') &&
-	            c.hasOwnProperty('g') &&
-	            c.hasOwnProperty('b')) {
-	          c = d3.rgb(255 * c.r, 255 * c.g, 255 * c.b);
-	        }
-	      }
-	      return c;
-	    };
-	  };
-	
-	  /**
-	   * Return a function for converting a size in pixels to an appropriate
-	   * d3 scale.
-	   * @private
-	   * @param {function|object} f The style value or function to convert.
-	   * @returns {function} A function for converting scale.
-	   */
-	  this._convertScale = function (f) {
-	    f = util.ensureFunction(f);
-	    return function () {
-	      return f.apply(m_this, arguments) / m_scale;
-	    };
-	  };
-	
-	  /**
-	   * Set styles to a d3 selection. Ignores unknown style keys.
-	   * @private
-	   * @param {d3Selector} select The d3 selector with the elements to change.
-	   * @param {object} styles Style object associated with a feature.
-	   */
-	  function setStyles(select, styles) {
-	    var key, k, f;
-	    /**
-	     * Check if the fill parameter is truthy.
-	     *
-	     * @returns {null|'none'} `null` to fill the element, `'none'` to skip
-	     *  filling it.
-	     */
-	    function fillFunc() {
-	      if (styles.fill.apply(m_this, arguments)) {
-	        return null;
-	      } else {
-	        return 'none';
-	      }
-	    }
-	    /**
-	     * Check if the stroke parameter is truthy.
-	     *
-	     * @returns {null|'none'} `null` to fill the element, `'none'` to skip
-	     *  filling it.
-	     */
-	    function strokeFunc() {
-	      if (styles.stroke.apply(m_this, arguments)) {
-	        return null;
-	      } else {
-	        return 'none';
-	      }
-	    }
-	    for (key in styles) {
-	      if (styles.hasOwnProperty(key)) {
-	        f = null;
-	        k = null;
-	        if (key === 'strokeColor') {
-	          k = 'stroke';
-	          f = m_this._convertColor(styles[key], styles.stroke);
-	        } else if (key === 'stroke' && styles[key] &&
-	                   !styles.hasOwnProperty('strokeColor')) {
-	          k = 'stroke';
-	          f = strokeFunc;
-	        } else if (key === 'strokeWidth') {
-	          k = 'stroke-width';
-	          f = m_this._convertScale(styles[key]);
-	        } else if (key === 'strokeOpacity') {
-	          k = 'stroke-opacity';
-	          f = styles[key];
-	        } else if (key === 'fillColor') {
-	          k = 'fill';
-	          f = m_this._convertColor(styles[key], styles.fill);
-	        } else if (key === 'fill' && !styles.hasOwnProperty('fillColor')) {
-	          k = 'fill';
-	          f = fillFunc;
-	        } else if (key === 'fillOpacity') {
-	          k = 'fill-opacity';
-	          f = styles[key];
-	        } else if (key === 'lineCap') {
-	          k = 'stroke-linecap';
-	          f = styles[key];
-	        } else if (key === 'lineJoin') {
-	          k = 'stroke-linejoin';
-	          f = styles[key];
-	        } else if (key === 'miterLimit') {
-	          k = 'stroke-miterlimit';
-	          f = styles[key];
-	        }
-	        if (k) {
-	          select.style(k, f);
-	        }
-	      }
-	    }
-	  }
-	
-	  /**
-	   * Get the svg group element associated with this renderer instance, or of a
-	   * group within the render instance.
-	   *
-	   * @private
-	   * @param {string} [parentId] Optional parent ID name.
-	   * @returns {d3Selector} Selector with the d3 group.
-	   */
-	  function getGroup(parentId) {
-	    if (parentId) {
-	      return m_svg.select('.group-' + parentId);
-	    }
-	    return m_svg.select('.group-' + m_this._d3id());
-	  }
-	
-	  /**
-	   * Set the initial lat-lon coordinates of the map view.
-	   * @private
-	   */
-	  function initCorners() {
-	    var layer = m_this.layer(),
-	        map = layer.map(),
-	        width = map.size().width,
-	        height = map.size().height;
-	
-	    m_width = width;
-	    m_height = height;
-	    if (!m_width || !m_height) {
-	      throw new Error('Map layer has size 0');
-	    }
-	    m_diagonal = Math.pow(width * width + height * height, 0.5);
-	    m_corners = {
-	      upperLeft: map.displayToGcs({x: 0, y: 0}, null),
-	      lowerRight: map.displayToGcs({x: width, y: height}, null),
-	      center: map.displayToGcs({x: width / 2, y: height / 2}, null)
-	    };
-	  }
-	
-	  /**
-	   * Set the translation, scale, and zoom for the current view.
-	   * @note rotation not yet supported
-	   * @private
-	   */
-	  this._setTransform = function () {
-	    if (!m_corners) {
-	      initCorners();
-	    }
-	
-	    if (!m_sticky) {
-	      return;
-	    }
-	
-	    var layer = m_this.layer();
-	
-	    var map = layer.map(),
-	        upperLeft = map.gcsToDisplay(m_corners.upperLeft, null),
-	        lowerRight = map.gcsToDisplay(m_corners.lowerRight, null),
-	        center = map.gcsToDisplay(m_corners.center, null),
-	        group = getGroup(),
-	        dx, dy, scale, rotation, rx, ry;
-	
-	    scale = Math.sqrt(
-	      Math.pow(lowerRight.y - upperLeft.y, 2) +
-	      Math.pow(lowerRight.x - upperLeft.x, 2)) / m_diagonal;
-	    // calculate the translation
-	    rotation = map.rotation();
-	    rx = -m_width / 2;
-	    ry = -m_height / 2;
-	    dx = scale * rx + center.x;
-	    dy = scale * ry + center.y;
-	
-	    // set the group transform property
-	    if (!rotation) {
-	      dx = Math.round(dx);
-	      dy = Math.round(dy);
-	    }
-	    var transform = 'matrix(' + [scale, 0, 0, scale, dx, dy].join() + ')';
-	    if (rotation) {
-	      transform += ' rotate(' + [
-	        rotation * 180 / Math.PI, -rx, -ry].join() + ')';
-	    }
-	    group.attr('transform', transform);
-	
-	    // set internal variables
-	    m_scale = scale;
-	    m_transform.dx = dx;
-	    m_transform.dy = dy;
-	    m_transform.rx = rx;
-	    m_transform.ry = ry;
-	    m_transform.rotation = rotation;
-	  };
-	
-	  /**
-	   * Convert from screen pixel coordinates to the local coordinate system
-	   * in the SVG group element taking into account the transform.
-	   * @private
-	   * @param {geo.screenPosition} pt The coordinates to convert.
-	   * @returns {geo.geoPosition} The converted coordinates.
-	   */
-	  this.baseToLocal = function (pt) {
-	    pt = {
-	      x: (pt.x - m_transform.dx) / m_scale,
-	      y: (pt.y - m_transform.dy) / m_scale
-	    };
-	    if (m_transform.rotation) {
-	      var sinr = Math.sin(-m_transform.rotation),
-	          cosr = Math.cos(-m_transform.rotation);
-	      var x = pt.x + m_transform.rx, y = pt.y + m_transform.ry;
-	      pt = {
-	        x: x * cosr - y * sinr - m_transform.rx,
-	        y: x * sinr + y * cosr - m_transform.ry
-	      };
-	    }
-	    return pt;
-	  };
-	
-	  /**
-	   * Convert from the local coordinate system in the SVG group element
-	   * to screen pixel coordinates.
-	   * @private
-	   * @param {geo.geoPosition} pt The coordinates to convert.
-	   * @returns {geo.screenPosition} The converted coordinates.
-	   */
-	  this.localToBase = function (pt) {
-	    if (m_transform.rotation) {
-	      var sinr = Math.sin(m_transform.rotation),
-	          cosr = Math.cos(m_transform.rotation);
-	      var x = pt.x + m_transform.rx, y = pt.y + m_transform.ry;
-	      pt = {
-	        x: x * cosr - y * sinr - m_transform.rx,
-	        y: x * sinr + y * cosr - m_transform.ry
-	      };
-	    }
-	    pt = {
-	      x: pt.x * m_scale + m_transform.dx,
-	      y: pt.y * m_scale + m_transform.dy
-	    };
-	    return pt;
-	  };
-	
-	  /**
-	   * Initialize.
-	   *
-	   * @param {object} arg The options used to create the renderer.
-	   * @param {boolean} [arg.widget=false] Set to `true` if this is a stand-alone
-	   *   widget.  If it is not a widget, svg elements are wrapped in a parent
-	   *   group.
-	   * @param {HTMLElement} [arg.d3Parent] If specified, the parent for any
-	   *   rendered objects; otherwise the renderer's layer's main node is used.
-	   * @returns {this}
-	   */
-	  this._init = function (arg) {
-	    if (!m_this.canvas()) {
-	      var canvas;
-	      arg.widget = arg.widget || false;
-	
-	      if ('d3Parent' in arg) {
-	        m_svg = d3.select(arg.d3Parent).append('svg');
-	      } else {
-	        m_svg = d3.select(m_this.layer().node().get(0)).append('svg');
-	      }
-	      m_svg.attr('display', 'block');
-	
-	      // create a global svg definitions element
-	      m_defs = m_svg.append('defs');
-	
-	      var shadow = m_defs
-	        .append('filter')
-	          .attr('id', 'geo-highlight')
-	          .attr('x', '-100%')
-	          .attr('y', '-100%')
-	          .attr('width', '300%')
-	          .attr('height', '300%');
-	      shadow
-	        .append('feMorphology')
-	          .attr('operator', 'dilate')
-	          .attr('radius', 2)
-	          .attr('in', 'SourceAlpha')
-	          .attr('result', 'dilateOut');
-	      shadow
-	        .append('feGaussianBlur')
-	          .attr('stdDeviation', 5)
-	          .attr('in', 'dilateOut')
-	          .attr('result', 'blurOut');
-	      shadow
-	        .append('feColorMatrix')
-	          .attr('type', 'matrix')
-	          .attr('values', '-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0')
-	          .attr('in', 'blurOut')
-	          .attr('result', 'invertOut');
-	      shadow
-	        .append('feBlend')
-	          .attr('in', 'SourceGraphic')
-	          .attr('in2', 'invertOut')
-	          .attr('mode', 'normal');
-	
-	      if (!arg.widget) {
-	        canvas = m_svg.append('g');
-	      }
-	
-	      shadow = m_defs.append('filter')
-	          .attr('id', 'geo-blur')
-	          .attr('x', '-100%')
-	          .attr('y', '-100%')
-	          .attr('width', '300%')
-	          .attr('height', '300%');
-	
-	      shadow
-	        .append('feGaussianBlur')
-	          .attr('stdDeviation', 20)
-	          .attr('in', 'SourceGraphic');
-	
-	      m_sticky = m_this.layer().sticky();
-	      m_svg.attr('class', m_this._d3id());
-	      m_svg.attr('width', m_this.layer().node().width());
-	      m_svg.attr('height', m_this.layer().node().height());
-	
-	      if (!arg.widget) {
-	        canvas.attr('class', 'group-' + m_this._d3id());
-	
-	        m_this.canvas(canvas);
-	      } else {
-	        m_this.canvas(m_svg);
-	      }
-	    }
-	    m_this._setTransform();
-	    return m_this;
-	  };
-	
-	  /**
-	   * Get API used by the renderer.
-	   *
-	   * @returns {string} 'd3'.
-	   */
-	  this.api = function () {
-	    return 'd3';
-	  };
-	
-	  /**
-	   * Return the current scaling factor to build features that shouldn't
-	   * change size during zooms.  For example:
-	   *
-	   *  selection.append('circle')
-	   *    .attr('r', r0 / renderer.scaleFactor());
-	   *
-	   * This will create a circle element with radius r0 independent of the
-	   * current zoom level.
-	   *
-	   * @returns {number} The current scale factor.
-	   */
-	  this.scaleFactor = function () {
-	    return m_scale;
-	  };
-	
-	  /**
-	   * Handle resize event.
-	   *
-	   * @param {number} x Ignored.
-	   * @param {number} y Ignored.
-	   * @param {number} w New width in pixels.
-	   * @param {number} h New height in pixels.
-	   * @returns {this}
-	   */
-	  this._resize = function (x, y, w, h) {
-	    if (!m_corners) {
-	      initCorners();
-	    }
-	    m_svg.attr('width', w);
-	    m_svg.attr('height', h);
-	    m_this._setTransform();
-	    m_this.layer().geoTrigger(d3Rescale, { scale: m_scale }, true);
-	    return m_this;
-	  };
-	
-	  /**
-	   * Exit.
-	   */
-	  this._exit = function () {
-	    m_features = {};
-	    m_this.canvas().remove();
-	    m_svg.remove();
-	    m_svg = undefined;
-	    m_defs.remove();
-	    m_defs = undefined;
-	    m_renderIds = {};
-	    m_removeIds = {};
-	    s_exit();
-	  };
-	
-	  /**
-	   * Get the definitions DOM element for the layer.
-	   * @protected
-	   * @returns {HTMLElement} The definitions DOM element.
-	   */
-	  this._definitions = function () {
-	    return m_defs;
-	  };
-	
-	  /**
-	   * Create a new feature element from an object that describes the feature
-	   * attributes.  To be called from feature classes only.
-	   *
-	   * @param {object} arg Options for the features.
-	   * @param {string} arg.id A unique string identifying the feature.
-	   * @param {array} arg.data Array of data objects used in a d3 data method.
-	   * @param {function} [aeg.dataIndex] A function that returns a unique id for
-	   *    each data element.  This is passed to the data access function.
-	   * @param {object} arg.style An object with style values or functions.
-	   * @param {object} arg.attributes An object containing element attributes.
-	   *    The keys are the attribute names, and the values are either constants
-	   *    or functions that get passed a data element and a data index.
-	   * @param {string[]} arg.classes An array of classes to add to the elements.
-	   * @param {string} arg.append The element type as used in d3 append methods.
-	   *    This is something like `'path'`, `'circle'`, or `'line'`.
-	   * @param {boolean} [arg.onlyRenderNew] If truthy, features only get
-	   *    attributes and styles set when new.  If falsy, features always have
-	   *    attributes and styles updated.
-	   * @param {boolean} [arg.sortByZ] If truthy, sort features by the `d.zIndex`.
-	   * @param {string} [parentId] If set, the group ID of the parent element.
-	   * @returns {this}
-	   */
-	  this._drawFeatures = function (arg) {
-	    m_features[arg.id] = {
-	      data: arg.data,
-	      index: arg.dataIndex,
-	      style: arg.style,
-	      visible: arg.visible,
-	      attributes: arg.attributes,
-	      classes: arg.classes,
-	      append: arg.append,
-	      onlyRenderNew: arg.onlyRenderNew,
-	      sortByZ: arg.sortByZ,
-	      parentId: arg.parentId
-	    };
-	    return m_this.__render(arg.id, arg.parentId);
-	  };
-	
-	  /**
-	   * Updates a feature by performing a d3 data join.  If no input id is
-	   * provided then this method will update all features.
-	   *
-	   * @param {string} [id] The id of the feature to update.  `undefined` to
-	   *    update all features.
-	   * @param {string} [parentId] The parent of the feature(s).  If not
-	   *    specified, features are rendered on the next animation frame.
-	   * @returns {this}
-	   */
-	  this.__render = function (id, parentId) {
-	    var key;
-	    if (id === undefined) {
-	      for (key in m_features) {
-	        if (m_features.hasOwnProperty(key)) {
-	          m_this.__render(key);
-	        }
-	      }
-	      return m_this;
-	    }
-	    if (parentId) {
-	      m_this._renderFeature(id, parentId);
-	    } else {
-	      m_renderIds[id] = true;
-	      m_this.layer().map().scheduleAnimationFrame(m_this._renderFrame);
-	    }
-	    return m_this;
-	  };
-	
-	  /**
-	   * Render all features that are marked as needing an update.  This should
-	   * only be called duration an animation frame.
-	   */
-	  this._renderFrame = function () {
-	    var id;
-	    for (id in m_removeIds) {
-	      m_this.select(id).remove();
-	      m_defs.selectAll('.' + id).remove();
-	    }
-	    m_removeIds = {};
-	    var ids = m_renderIds;
-	    m_renderIds = {};
-	    for (id in ids) {
-	      if (ids.hasOwnProperty(id)) {
-	        m_this._renderFeature(id);
-	      }
-	    }
-	  };
-	
-	  /**
-	   * Render a single feature.
-	   *
-	   * @param {string} id The id of the feature to update.
-	   * @param {string} [parentId] The parent of the feature.  This is used to
-	   *    select the feature.
-	   * @returns {this}
-	   */
-	  this._renderFeature = function (id, parentId) {
-	    if (!m_features[id]) {
-	      return m_this;
-	    }
-	    var data = m_features[id].data,
-	        index = m_features[id].index,
-	        style = m_features[id].style,
-	        visible = m_features[id].visible,
-	        attributes = m_features[id].attributes,
-	        classes = m_features[id].classes,
-	        append = m_features[id].append,
-	        selection = m_this.select(id, parentId).data(data, index),
-	        entries, rendersel;
-	    entries = selection.enter().append(append);
-	    selection.exit().remove();
-	    rendersel = m_features[id].onlyRenderNew ? entries : selection;
-	    setAttrs(rendersel, attributes);
-	    rendersel.attr('class', classes.concat([id]).join(' '));
-	    setStyles(rendersel, style);
-	    if (visible) {
-	      rendersel.style('visibility', visible() ? 'visible' : 'hidden');
-	    }
-	    if (entries.size() && m_features[id].sortByZ) {
-	      selection.sort(function (a, b) {
-	        return (a.zIndex || 0) - (b.zIndex || 0);
-	      });
-	    }
-	    return m_this;
-	  };
-	
-	  /**
-	   * Returns a d3 selection for the given feature id.
-	   *
-	   * @param {string} id The id of the feature to select.
-	   * @param {string} [parentId] The parent of the feature.  This is used to
-	   *    determine the feature's group.
-	   * @returns {d3Selector}
-	   */
-	  this.select = function (id, parentId) {
-	    return getGroup(parentId).selectAll('.' + id);
-	  };
-	
-	  /**
-	   * Removes a feature from the layer.
-	   *
-	   * @param {string} id The id of the feature to remove.
-	   * @returns {this}
-	   */
-	  this._removeFeature = function (id) {
-	    m_removeIds[id] = true;
-	    m_this.layer().map().scheduleAnimationFrame(m_this._renderFrame);
-	    delete m_features[id];
-	    if (m_renderIds[id]) {
-	      delete m_renderIds[id];
-	    }
-	    return m_this;
-	  };
-	
-	  /**
-	   * Override draw method to do nothing.
-	   */
-	  this.draw = function () {
-	  };
-	
-	  // connect to pan event
-	  this.layer().geoOn(geo_event.pan, m_this._setTransform);
-	
-	  // connect to rotate event
-	  this.layer().geoOn(geo_event.rotate, m_this._setTransform);
-	
-	  // connect to zoom event
-	  this.layer().geoOn(geo_event.zoom, function () {
-	    m_this._setTransform();
-	    m_this.__render();
-	    m_this.layer().geoTrigger(d3Rescale, { scale: m_scale }, true);
-	  });
-	
-	  this.layer().geoOn(geo_event.resize, function (event) {
-	    m_this._resize(event.x, event.y, event.width, event.height);
-	  });
-	
-	  this._init(arg);
-	  return this;
-	};
-	
-	inherit(d3Renderer, renderer);
-	
-	registerRenderer('d3', d3Renderer);
-	
-	(function () {
-	  'use strict';
-	
-	  /**
-	   * Report if the d3 renderer is supported.  This is just a check if d3 is
-	   * available.
-	   *
-	   * @returns {boolean} true if available.
-	   */
-	  d3Renderer.supported = function () {
-	    if (!__webpack_require__.m[/*require.resolve*/(2)]) {  // eslint-disable-line
-	      return false;
-	    }
-	    var d3 = __webpack_require__(2);
-	    return d3 !== undefined;
-	  };
-	
-	  /**
-	   * If the d3 renderer is not supported, supply the name of a renderer that
-	   * should be used instead.  This asks for the null renderer.
-	   *
-	   * @returns {null} `null` for the null renderer.
-	   */
-	  d3Renderer.fallback = function () {
-	    return null;
-	  };
-	})();
-	
-	module.exports = d3Renderer;
-
-
-/***/ }),
 /* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -69061,7 +69232,7 @@
 
 	var inherit = __webpack_require__(14);
 	var registerFeature = __webpack_require__(207).registerFeature;
-	var vectorFeature = __webpack_require__(248);
+	var vectorFeature = __webpack_require__(252);
 	
 	/**
 	 * Create a new instance of vectorFeature
@@ -69077,9 +69248,9 @@
 	    return new d3_vectorFeature(arg);
 	  }
 	
-	  var object = __webpack_require__(255);
+	  var object = __webpack_require__(232);
 	  var timestamp = __webpack_require__(215);
-	  var d3 = __webpack_require__(2);
+	  var d3 = __webpack_require__(231).d3;
 	
 	  arg = arg || {};
 	  vectorFeature.call(this, arg);
@@ -69489,7 +69660,7 @@
 
 	var inherit = __webpack_require__(14);
 	var registerFeature = __webpack_require__(207).registerFeature;
-	var contourFeature = __webpack_require__(231);
+	var contourFeature = __webpack_require__(235);
 	
 	/**
 	 * Create a new instance of contourFeature
@@ -71315,7 +71486,7 @@
 	          });
 	        }
 	
-	        // tranform to map gcs
+	        // transform to map gcs
 	        geometry.vertices = transform.transformCoordinates(
 	          target_gcs,
 	          map_gcs,
@@ -72326,7 +72497,7 @@
 	   * Build this feature.
 	   */
 	  this._build = function () {
-	    var mapper, mat, prog, srctex, unicrop, geom;
+	    var mapper, mat, prog, srctex, unicrop, geom, context;
 	
 	    if (!m_this.position()) {
 	      return;
@@ -72353,10 +72524,11 @@
 	      unicrop = new vgl.uniform(vgl.GL.FLOAT_VEC2, 'crop');
 	      unicrop.set([1.0, 1.0]);
 	      prog.addUniform(unicrop);
+	      context = m_this.renderer()._glContext();
 	      prog.addShader(vgl.getCachedShader(
-	          vgl.GL.VERTEX_SHADER, vgl.GL, vertexShaderImageSource));
+	          vgl.GL.VERTEX_SHADER, context, vertexShaderImageSource));
 	      prog.addShader(vgl.getCachedShader(
-	          vgl.GL.FRAGMENT_SHADER, vgl.GL, fragmentShaderImageSource));
+	          vgl.GL.FRAGMENT_SHADER, context, fragmentShaderImageSource));
 	      mat.addAttribute(prog);
 	      mat.addAttribute(new vgl.blend());
 	      /* This is similar to vgl.planeSource */
@@ -72393,9 +72565,10 @@
 	      prog.addUniform(new vgl.projectionUniform('projectionMatrix'));
 	      prog.addUniform(new vgl.floatUniform('opacity', 1.0));
 	      prog.addUniform(new vgl.uniform(vgl.GL.FLOAT_VEC3, 'vertexColor'));
+	      context = m_this.renderer()._glContext();
 	      prog.addShader(vgl.getCachedShader(
-	          vgl.GL.VERTEX_SHADER, vgl.GL, vertexShaderColorSource));
-	      prog.addShader(vgl.utils.createFragmentShader(vgl.GL));
+	          vgl.GL.VERTEX_SHADER, context, vertexShaderColorSource));
+	      prog.addShader(vgl.utils.createFragmentShader(context));
 	      mat.addAttribute(prog);
 	      mat.addAttribute(new vgl.blend());
 	      /* This is similar to vgl.planeSource */
@@ -72927,7 +73100,7 @@
 
 	var inherit = __webpack_require__(14);
 	var registerFeature = __webpack_require__(207).registerFeature;
-	var heatmapFeature = __webpack_require__(236);
+	var heatmapFeature = __webpack_require__(240);
 	var timestamp = __webpack_require__(215);
 	
 	/**
@@ -73321,7 +73494,9 @@
 	   * @protected
 	   */
 	  this._setTransform = function () {
-	    m_this.layer().canvas()[0].style.transform = m_heatMapTransform;
+	    if (m_this.layer() && m_this.layer().canvas() && m_this.layer().canvas()[0]) {
+	      m_this.layer().canvas()[0].style.transform = m_heatMapTransform;
+	    }
 	  };
 	
 	  /**
@@ -73609,7 +73784,7 @@
 
 	var inherit = __webpack_require__(14);
 	var registerFeature = __webpack_require__(207).registerFeature;
-	var pixelmapFeature = __webpack_require__(246);
+	var pixelmapFeature = __webpack_require__(250);
 	
 	/**
 	 * Create a new instance of class pixelmapFeature
@@ -74893,7 +75068,7 @@
 	  colorLegendWidget: __webpack_require__(306),
 	  sliderWidget: __webpack_require__(309),
 	  svgWidget: __webpack_require__(305),
-	  uiLayer: __webpack_require__(241),
+	  uiLayer: __webpack_require__(245),
 	  widget: __webpack_require__(303)
 	};
 
@@ -74976,9 +75151,14 @@
 	 */
 	
 	/**
-	 * Create a new instance of class widget
+	 * Create a new instance of class widget.
 	 *
-	 * @class geo.gui.widget
+	 * @class
+	 * @alias geo.gui.widget
+	 * @param {object} [arg] Options for the widget.
+	 * @param {geo.layer} [arg.layer] Layer associated with the widget.
+	 * @param {geo.gui.widget.position} [arg.position] Location of the widget.
+	 * @param {geo.gui.widget} [arg.parent] Optional parent widget.
 	 * @extends {geo.sceneObject}
 	 * @returns {geo.gui.widget}
 	 */
@@ -74995,18 +75175,27 @@
 	  var m_this = this,
 	      s_exit = this._exit,
 	      m_layer = arg.layer,
-	      m_canvas = null;
-	
-	  arg.position = arg.position === undefined ? { left: 0, top: 0 } : arg.position;
+	      m_canvas = null,
+	      m_position = arg.position === undefined ? { left: 0, top: 0 } : arg.position;
 	
 	  if (arg.parent !== undefined && !(arg.parent instanceof widget)) {
 	    throw new Error('Parent must be of type geo.gui.widget');
 	  }
 	
+	  /**
+	   * Initialize the widget.
+	   *
+	   * @returns {this}
+	   */
 	  this._init = function () {
 	    m_this.modified();
+	    return m_this;
 	  };
 	
+	  /**
+	   * Clean up the widget.
+	   *
+	   */
 	  this._exit = function () {
 	    m_this.children().forEach(function (child) {
 	      m_this._deleteFeature(child);
@@ -75018,9 +75207,11 @@
 	  };
 	
 	  /**
-	   * Create feature give a name
+	   * Create a new feature.
 	   *
-	   * @returns {geo.Feature} Will return a new feature
+	   * @param {string} featureName Name of the feature to create.
+	   * @param {object} arg Options for the new feature.
+	   * @returns {geo.feature} The new feature.
 	   */
 	  this._createFeature = function (featureName, arg) {
 	
@@ -75033,7 +75224,10 @@
 	  };
 	
 	  /**
-	   * Delete feature
+	   * Delete feature.
+	   *
+	   * @param {geo.feature} feature The feature to delete.
+	   * @returns {this}
 	   */
 	  this._deleteFeature = function (feature) {
 	    m_this.removeChild(feature);
@@ -75043,6 +75237,8 @@
 	
 	  /**
 	   * Return the layer associated with this widget.
+	   *
+	   * @returns {geo.layer}
 	   */
 	  this.layer = function () {
 	    return m_layer;
@@ -75056,54 +75252,67 @@
 	  };
 	
 	  /**
-	   * Get/Set the canvas for the widget
+	   * Get/Set the canvas for the widget.
+	   *
+	   * @param {HTMLElement} [val] If specified, set the canvas, otherwise get
+	   *    the canvas.
+	   * @returns {HTMLElement|this} If getting the canvas, return the current
+	   *    value; otherwise, return this widget.
 	   */
 	  this.canvas = function (val) {
 	    if (val === undefined) {
 	      return m_canvas;
-	    } else {
-	      m_canvas = val;
 	    }
+	    m_canvas = val;
+	    return m_this;
 	  };
 	
 	  /**
-	   * Appends a child to the widget
-	   * The widget determines how to append itself to a parent, the parent can either
-	   * be another widget, or the UI Layer.
+	   * Appends a child to the widget.
+	   * The widget determines how to append itself to a parent, the parent can
+	   * either be another widget, or the UI Layer.
 	   */
 	  this._appendChild = function () {
 	    m_this.parentCanvas().appendChild(m_this.canvas());
 	  };
 	
 	  /**
-	   * Get the parent canvas (top level widgets define their layer as their parent canvas)
+	   * Get the parent canvas (top level widgets define their layer as their
+	   * parent canvas).
+	   *
+	   * @returns {HTMLElement} The canvas of the widget's parent.
 	   */
 	  this.parentCanvas = function () {
 	    if (m_this.parent === undefined) {
 	      return m_this.layer().canvas();
-	    } else {
-	      return m_this.parent().canvas();
 	    }
+	    return m_this.parent().canvas();
 	  };
 	
 	  /**
-	   * Gets the CSS positioning that a widget should be placed at.
-	   * { top: 0, left: 0 } by default.
+	   * Get or set the CSS positioning that a widget should be placed at.
+	   *
+	   * @param {geo.gui.widget.position} [pos] If unspecified, return the current
+	   *    position.  Otherwise, set the current position.
+	   * @param {boolean} [actualValue] If getting the position, if this is truthy,
+	   *    always return the stored value, not a value adjusted for display.
+	   * @returns {geo.gui.widget.position|this} Either the position or the widget
+	   *    instance.  If this is the position and `actualValue` is falsy,
+	   *    positions that specify an explicit `x` and `y` parameter will be
+	   *    converted to a value that can be used by the display css.
 	   */
-	  this.position = function (pos) {
+	  this.position = function (pos, actualValue) {
 	    if (pos !== undefined) {
-	      arg.position = pos;
+	      this.layer().geoOff(geo_event.pan, m_this.repositionEvent);
+	      m_position = pos;
+	      if (m_position.hasOwnProperty('x') && m_position.hasOwnProperty('y')) {
+	        this.layer().geoOn(geo_event.pan, m_this.repositionEvent);
+	      }
 	      this.reposition();
 	      return this;
 	    }
-	    var position;
-	
-	    if (arg &&
-	        arg.hasOwnProperty('position') &&
-	        arg.position.hasOwnProperty('x') &&
-	        arg.position.hasOwnProperty('y')) {
-	
-	      position = m_this.layer().map().gcsToDisplay(arg.position);
+	    if (m_position.hasOwnProperty('x') && m_position.hasOwnProperty('y') && !actualValue) {
+	      var position = m_this.layer().map().gcsToDisplay(m_position);
 	
 	      return {
 	        left: position.x,
@@ -75113,14 +75322,15 @@
 	      };
 	    }
 	
-	    return arg.position;
+	    return m_position;
 	  };
 	
 	  /**
-	   * Repositions a widget based on the argument passed, or calling position on
-	   * the widget itself.
-	   * @param {object} position A position with the form:
-	   * { top: m, left: n }
+	   * Repositions a widget.
+	   *
+	   * @param {geo.gui.widget.position} [position] The new position for the
+	   *    widget.  `undefined` uses the stored position value.
+	   * @returns {this}
 	   */
 	  this.reposition = function (position) {
 	    position = position || m_this.position();
@@ -75131,21 +75341,30 @@
 	        // if the property is a number, add px to it, otherwise set it to the
 	        // specified value.  Setting a property to null clears it.  Setting to
 	        // undefined doesn't alter it.
-	        if (/^\s*(\-|\+)?(\d+(\.\d*)?|\d*\.\d+)([eE](\-|\+)?\d+)?\s*$/.test(position[cssAttr])) {
+	        if (/^\s*(-|\+)?(\d+(\.\d*)?|\d*\.\d+)([eE](-|\+)?\d+)?\s*$/.test(position[cssAttr])) {
 	          m_this.canvas().style[cssAttr] = ('' + position[cssAttr]).trim() + 'px';
 	        } else {
 	          m_this.canvas().style[cssAttr] = position[cssAttr];
 	        }
 	      }
 	    }
+	    return m_this;
 	  };
 	
+	  /**
+	   * If the position is based on map coordinates, this gets called when the
+	   * map is panned to resposition the widget.
+	   *
+	   * @returns {this}
+	   */
 	  this.repositionEvent = function () {
 	    return m_this.reposition();
 	  };
 	
 	  /**
-	   * Determines whether or not the widget is completely within the viewport.
+	   * Report if the widget is completely within the viewport.
+	   *
+	   * @returns {boolean} True if the widget is completely within the viewport.
 	   */
 	  this.isInViewport = function () {
 	    var position = m_this.position();
@@ -75155,10 +75374,7 @@
 	            (position.left <= layer.width() && position.top <= layer.height()));
 	  };
 	
-	  if (arg &&
-	      arg.hasOwnProperty('position') &&
-	      arg.position.hasOwnProperty('x') &&
-	      arg.position.hasOwnProperty('y')) {
+	  if (m_position.hasOwnProperty('x') && m_position.hasOwnProperty('y')) {
 	    this.layer().geoOn(geo_event.pan, m_this.repositionEvent);
 	  }
 	};
@@ -75188,7 +75404,7 @@
 	  }
 	  svgWidget.call(this, arg);
 	
-	  var d3 = __webpack_require__(2);
+	  var d3 = __webpack_require__(231).d3;
 	  var geo_event = __webpack_require__(15);
 	
 	  /** @private */
@@ -75478,7 +75694,7 @@
 	
 	  domWidget.call(this, arg);
 	
-	  var d3Renderer = __webpack_require__(260);
+	  var d3Renderer = __webpack_require__(231);
 	
 	  var m_this = this,
 	      m_renderer = null;
@@ -75537,12 +75753,12 @@
 /* 306 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var d3 = __webpack_require__(2);
+	var d3 = __webpack_require__(231).d3;
 	var domWidget = __webpack_require__(302);
 	var inherit = __webpack_require__(14);
 	var registerWidget = __webpack_require__(207).registerWidget;
 	var util = __webpack_require__(89);
-	var uniqueID = __webpack_require__(256);
+	var uniqueID = __webpack_require__(233);
 	
 	__webpack_require__(307);
 	
@@ -76034,7 +76250,7 @@
 	  }
 	  svgWidget.call(this, arg);
 	
-	  var d3 = __webpack_require__(2);
+	  var d3 = __webpack_require__(231).d3;
 	  var geo_event = __webpack_require__(15);
 	
 	  var m_this = this,
@@ -76304,9 +76520,7 @@
 	      .on('mouseout', mouseOut);
 	
 	    // Update the nub position on zoom
-	    m_this.layer().geoOn(geo_event.zoom, function () {
-	      m_this._update();
-	    });
+	    m_this.geoOn(geo_event.zoom, m_this._update);
 	
 	    mouseOut();
 	    m_this._update();
@@ -76320,8 +76534,8 @@
 	   * @private
 	   */
 	  this._exit = function () {
+	    m_this.geoOff(geo_event.zoom, m_this._update);
 	    m_group.remove();
-	    m_this.layer().geoOff(geo_event.zoom);
 	    s_exit();
 	  };
 	
@@ -89307,7 +89521,7 @@
 	
 	
 	// module
-	exports.push([module.id, "html, body {\n  height: 100%;\n  width: 100%;\n  color: black;\n}\n\n.navbar {\n  margin: 0;\n}\n\n#maincontent {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n}\n.navbar #maincontent {\n  height: calc(100% - 60px);\n}\n#tutorial, #workframe {\n  width: 50%;\n  height: 100%;\n  display: inline-block;\n  border: none;\n  float: left;\n}\n#tutorial {\n  overflow-x: hidden;\n  overflow-y: auto;\n  padding: 0.5em;\n  background: ivory;\n  resize: horizontal;\n  min-width: 10em;\n}\n#workframe {\n  overflow: hidden;\n  flex-grow: 100;\n}\n.codeblock .codeblock_entry {\n  width: calc(100% - 6em);\n  font-family: monospace;\n  margin-bottom: 1em;\n  opacity: 0.5;\n  font-size: 0.9em;\n  line-height: 1.3em;\n  background: inherit;\n  display: inline-block;\n}\n.codeblock.active .codeblock_entry {\n  opacity: 1;\n  background: white;\n  resize: vertical;\n}\n.codeblock .codeblock_entry textarea {\n  width: 100%;\n}\n.codeblock .CodeMirror {\n  height: inherit;\n  border: 1px solid rgba(0, 0, 0, 0.5);\n}\n.codeblock_controls {\n  display: inline-block;\n  vertical-align: top;\n  text-align: center;\n  width: 5em;\n}\n.codeblock_controls>button{\n  display: block;\n  margin: 0.125em auto;\n}\n.codeblock_controls>button.codeblock_reset {\n  font-size: 0.67em;\n}\n.codeblock .codeblock_active {\n  display: none;\n}\n.codeblock.active .codeblock_active {\n  display: inherit;\n}\n.codeblock.active .codeblock_inactive {\n  display: none;\n}\n.codeblock_test {\n  display: none;\n}\n\n", ""]);
+	exports.push([module.id, "html, body {\n  height: 100%;\n  width: 100%;\n  color: black;\n}\n\n.navbar {\n  margin: 0;\n}\n\n#maincontent {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n}\n.navbar #maincontent {\n  height: calc(100% - 60px);\n}\n#tutorial, #workframe {\n  width: 50%;\n  height: 100%;\n  display: inline-block;\n  border: none;\n  float: left;\n}\n#tutorial {\n  overflow-x: hidden;\n  overflow-y: auto;\n  padding: 1em;\n  padding-right: 0.5em;\n  background: #f9f9f9;\n  resize: horizontal;\n  min-width: 10em;\n}\n#workframe {\n  overflow: hidden;\n  flex-grow: 100;\n}\n.codeblock .codeblock_entry {\n  width: calc(100% - 6em);\n  font-family: monospace;\n  margin-bottom: 1em;\n  opacity: 0.5;\n  font-size: 0.9em;\n  line-height: 1.3em;\n  background: inherit;\n  display: inline-block;\n}\n.codeblock.active .codeblock_entry {\n  opacity: 1;\n  background: white;\n  resize: vertical;\n}\n.codeblock .codeblock_entry textarea {\n  width: 100%;\n}\n.codeblock .CodeMirror {\n  height: inherit;\n  border: 1px solid rgba(0, 0, 0, 0.5);\n}\n.codeblock_controls {\n  display: inline-block;\n  vertical-align: top;\n  text-align: center;\n  width: 5em;\n}\n.codeblock_controls>button{\n  display: block;\n  margin: 0.125em auto;\n}\n.codeblock_controls>button.codeblock_reset {\n  font-size: 0.67em;\n}\n.codeblock .codeblock_active {\n  display: none;\n}\n.codeblock.active .codeblock_active {\n  display: inherit;\n}\n.codeblock.active .codeblock_inactive {\n  display: none;\n}\n.codeblock_test {\n  display: none;\n}\n", ""]);
 	
 	// exports
 
@@ -89396,6 +89610,7 @@
 	 *      process.
 	 */
 	function process_block(selector) {
+	  processBlockInfo.lastelem = null;
 	  var elem = $(selector).closest('.codeblock'),
 	      target = elem.attr('target'),
 	      targetelem = $('#' + target),
@@ -89452,11 +89667,10 @@
 	           js +
 	           '\ngeo.util.restoreVGLRenderer();\n';
 	    }
-	    /* If we are in a test environment, redirect the console to the parent
-	     * window to make debugging easier. */
+	    /* If we are in a test environment, redirect the tutorial's console to the
+	     * test's parent window to make debugging easier. */
 	    if (window.parent && window.parent !== window) {
 	      js = 'window.console = window.parent.parent.console;\n' +
-	           'window.parent.console = window.parent.parent.console;\n' +
 	           'console.log("Testing " + window.parent.document.title);\n' +
 	           js;
 	    }
@@ -89471,6 +89685,7 @@
 	     * Although (a) is the most compatible, it doesn't allow access to local
 	     * urls from within the iframe.  (c) solves this, but requires extra work
 	     * for browsers that don't support srcdoc. */
+	    processBlockInfo.lastsrc = html;
 	    targetelem.attr('srcdoc', html);
 	    if (!processBlockInfo.srcdocSupport) {
 	      jsurl = 'javascript: window.frameElement.getAttribute("srcdoc");';
@@ -89479,7 +89694,6 @@
 	      }
 	      targetelem.attr('src', jsurl);
 	    }
-	    processBlockInfo.lastsrc = html;
 	    /* Expose the frame's global variables in the 'tutorial' variable.  If
 	     * there are multiple tutorials (multiple iframes), then this is the last
 	     * one executed.  All of them will be accessible in the 'tutorials'
@@ -89504,7 +89718,7 @@
 	    processBlockInfo.timer = null;
 	  }
 	  if (!selector.is(processBlockInfo.lastelem) || !debounce) {
-	    if (processBlockInfo.lastelem) {
+	    if (processBlockInfo.lastelem && !selector.is(processBlockInfo.lastelem)) {
 	      process_block(processBlockInfo.lastelem);
 	    }
 	    processBlockInfo.lastelem = selector;
@@ -89614,6 +89828,11 @@
 	 *      parameter is not specified.
 	 */
 	function start_tutorial(useCodeMirror, alwaysKeep) {
+	  /* If we are in a test environment, redirect the test's console to the parent
+	   * window to make debugging easier. */
+	  if (window.parent && window.parent !== window) {
+	    window.console = window.parent.console;
+	  }
 	  /* clean up whitespace and store a default value for each code block */
 	  $('.codeblock').each(function () {
 	    var elem = $('textarea', this),
@@ -89645,6 +89864,13 @@
 	  }
 	  /* Check if iframe srcdoc support is present */
 	  processBlockInfo.srcdocSupport = !!('srcdoc' in document.createElement('iframe'));
+	  /* Chrome 64 introduced a change which removes some srcdoc support, so
+	   * mark it as unavailable in Chrome.  It would be nicer to not have user
+	   * agent testings, but doing this generically causes problems in Firefox
+	   * headless tests. */
+	  if (/Chrome\//.test(navigator.userAgent)) {
+	    processBlockInfo.srcdocSupport = false;
+	  }
 	  start_keeper(alwaysKeep);
 	  run_tutorial();
 	}

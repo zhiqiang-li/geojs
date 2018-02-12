@@ -129,7 +129,7 @@ quads.data([{
   lr: {x: videoWidth, y: videoHeight},
   video: '../../data/earthquakes-video.webm'
 }]);
-quads.draw();</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has a single feature layer" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.featureLayer&quot;,&quot;map.layers()[0].features().length === 1&quot;,&quot;map.layers()[0].features()[0] instanceof geo.quadFeature&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>Start or stop the video when the user clicks.  The video may not be loaded
+quads.draw();</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><div class="codeblock_test" data-description="map has a single feature layer" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.featureLayer&quot;,&quot;map.layers()[0].features().length === 1&quot;,&quot;map.layers()[0].features()[0] instanceof geo.quadFeature&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>Start or stop the video when the user clicks.  The video may not be loaded
 yet, so make sure we do nothing in that case.</p>
 <div class="codeblock" format="javascript" step="2" parentstep="1" initial="true" stepname="Step 2" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">map.node().on('click.tutorial', function () {
   // get the HTML Video Element of the first (and only) quad
@@ -146,7 +146,7 @@ yet, so make sure we do nothing in that case.</p>
   } else {
     video.pause();
   }
-});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><p>Add another layer with a polygon feature that will appear on top of the
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><p>Add another layer with a polygon feature that will appear on top of the
 video.  These polygons don't have any meaning; they are just to demonstrate
 that the video is visible beneath them.</p>
 <div class="codeblock" webgl="webgl" format="javascript" step="3" parentstep="2" stepname="Step 3" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">var polygonLayer = map.createLayer('feature', {
@@ -175,7 +175,7 @@ polygons.style({
   fillColor: 'yellow',
   fillOpacity: 0.2
 });
-polygons.draw();</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 3</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has two feature layers" data-tests="[&quot;map.layers().length === 2&quot;,&quot;map.layers()[0] instanceof geo.featureLayer&quot;,&quot;map.layers()[1] instanceof geo.featureLayer&quot;,&quot;map.layers()[1].features().length &gt;= 1&quot;,&quot;map.layers()[1].features()[0] instanceof geo.polygonFeature&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div></div><iframe id="workframe"></iframe></div>
+polygons.draw();</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 3</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><div class="codeblock_test" data-description="map has two feature layers" data-tests="[&quot;map.layers().length === 2&quot;,&quot;map.layers()[0] instanceof geo.featureLayer&quot;,&quot;map.layers()[1] instanceof geo.featureLayer&quot;,&quot;map.layers()[1].features().length &gt;= 1&quot;,&quot;map.layers()[1].features()[0] instanceof geo.polygonFeature&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div></div><iframe id="workframe"></iframe></div>
 </div>
     </div>
     

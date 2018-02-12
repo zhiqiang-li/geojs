@@ -113,8 +113,8 @@
   zoom: 6
 });
 // place a base tile layer on the map
-map.createLayer('osm');</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has an osm layer" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>The video requires a feature layer that supports video quads.</p>
-<div class="codeblock" format="javascript" step="2" parentstep="1" stepname="Step 2" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">var layer = map.createLayer('feature', {
+map.createLayer('osm');</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 1</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><div class="codeblock_test" data-description="map has an osm layer" data-tests="[&quot;map.layers().length === 1&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>The video requires a feature layer that supports video quads.</p>
+<div class="codeblock" htmlvideo="htmlvideo" format="javascript" step="2" parentstep="1" stepname="Step 2" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">var layer = map.createLayer('feature', {
   features: ['quad.video']
 });
 // create a quad feature
@@ -127,7 +127,7 @@ quads.data([{
   // specify a url for the video source
   video: '../../data/earthquakes-video.webm'
 }]);
-quads.draw();</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div><div class="codeblock_test" data-description="map has an osm layer and a feature layer" data-tests="[&quot;map.layers().length === 2&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;map.layers()[1] instanceof geo.featureLayer&quot;,&quot;map.layers()[1].features().length === 1&quot;,&quot;map.layers()[1].features()[0] instanceof geo.quadFeature&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>Start or stop the video when the user clicks.  The video may not be loaded
+quads.draw();</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 2</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div><div class="codeblock_test" data-description="map has an osm layer and a feature layer" data-tests="[&quot;map.layers().length === 2&quot;,&quot;map.layers()[0] instanceof geo.osmLayer&quot;,&quot;map.layers()[1] instanceof geo.featureLayer&quot;,&quot;map.layers()[1].features().length === 1&quot;,&quot;map.layers()[1].features()[0] instanceof geo.quadFeature&quot;]" data-idlefuncs="[&quot;map.onIdle&quot;]"></div><p>Start or stop the video when the user clicks.  The video may not be loaded
 yet, so make sure we do nothing in that case.</p>
 <div class="codeblock" format="javascript" step="3" parentstep="2" initial="true" stepname="Step 3" target="workframe"><div class="codeblock_entry"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">$('#map').on('click.tutorial', function () {
   // get the HTML Video Element of the first (and only) quad
@@ -144,7 +144,7 @@ yet, so make sure we do nothing in that case.</p>
   } else {
     video.pause();
   }
-});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 3</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run">Run</button><button class="codeblock_reset">Reset</button></div></div></div><iframe id="workframe"></iframe></div>
+});</textarea></div><div class="codeblock_controls"><div class="codeblock_step">Step 3</div><div class="codeblock_active">Active</div><div class="codeblock_inactive">Inactive</div><button class="codeblock_run btn btn-primary btn-sm">Run</button><button class="codeblock_reset btn btn-link btn-sm">Reset</button></div></div></div><iframe id="workframe"></iframe></div>
 </div>
     </div>
     
