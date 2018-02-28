@@ -22640,10 +22640,44 @@
 	var annotationState = {
 	  create: 'create',
 	  done: 'done',
+	  highlight: 'highlight',
 	  edit: 'edit'
 	};
 	
 	var annotationActionOwner = 'annotationAction';
+	
+	var defaultEditHandleStyle = {
+	  fill: true,
+	  fillColor: function (d) {
+	    return d.selected ? {r: 0, g: 1, b: 1} : {r: 0.3, g: 0.3, b: 0.3};
+	  },
+	  fillOpacity: function (d) {
+	    return d.selected ? 0.5 : 0.25;
+	  },
+	  radius: function (d) {
+	    return d.type === 'edge' || d.type === 'rotate' ? 8 : 10;
+	  },
+	  scaled: false,
+	  stroke: true,
+	  strokeColor: {r: 0, g: 0, b: 1},
+	  strokeOpacity: 1,
+	  strokeWidth: function (d) {
+	    return d.type === 'edge' || d.type === 'rotate' ? 2 : 3;
+	  },
+	  rotateHandleOffset: 24, // should be roughly twice radius + strokeWidth
+	  rotateHandleRotation: -Math.PI / 4,
+	  resizeHandleOffset: 48, // should be roughly twice radius + strokeWidth + rotateHandleOffset
+	  resizeHandleRotation: -Math.PI / 4,
+	  // handles may be a function to dynamically generate the results
+	  handles: {  // if `false`, the handle won't be created for editing
+	    vertex: true,
+	    edge: true,
+	    center: true,
+	    rotate: true,
+	    resize: true
+	  }
+	};
+	var editHandleFeatureLevel = 3;
 	
 	/**
 	 * Base annotation class.
@@ -22767,6 +22801,38 @@
 	  };
 	
 	  /**
+	   * Return the coordinate associated with the rotation handle for the
+	   * annotation.
+	   *
+	   * @param {number} [offset] An additional offset from cetner to apply to the
+	   *    handle.
+	   * @param {number} [rotation] An additional rotation to apply to the handle.
+	   * @returns {geo.geoPosition|undefined} The map gcs position for the handle,
+	   *    or `undefined` if no such position exists.
+	   */
+	  this._rotateHandlePosition = function (offset, rotation) {
+	    var map = m_this.layer().map(),
+	        coor = m_this._coordinates(),
+	        center = util.centerFromPerimeter(m_this._coordinates()),
+	        dispCenter = center ? map.gcsToDisplay(center, null) : undefined,
+	        i, pos, maxr2 = 0, r;
+	    if (!center) {
+	      return;
+	    }
+	    offset = offset || 0;
+	    rotation = rotation || 0;
+	    for (i = 0; i < coor.length; i += 1) {
+	      pos = map.gcsToDisplay(coor[i], null);
+	      maxr2 = Math.max(maxr2, Math.pow(pos.x - dispCenter.x, 2) + Math.pow(pos.y - dispCenter.y, 2));
+	    }
+	    r = Math.sqrt(maxr2) + offset;
+	    pos = map.displayToGcs({
+	      x: dispCenter.x + r * Math.cos(rotation),
+	      y: dispCenter.y - r * Math.sin(rotation)}, null);
+	    return pos;
+	  };
+	
+	  /**
 	   * If the label should be shown, get a record of the label that can be used
 	   * in a `geo.textFeature`.
 	   *
@@ -22783,7 +22849,7 @@
 	        (show !== true && show.indexOf(state) < 0)) {
 	      return;
 	    }
-	    var style = m_this.options('labelStyle');
+	    var style = m_this.labelStyle();
 	    var labelRecord = {
 	      text: m_this.label(),
 	      position: m_this._labelPosition()
@@ -22860,12 +22926,30 @@
 	   *    the current state.
 	   * @returns {geo.actionRecord[]} A list of actions.
 	   */
-	  this.actions = function () {
-	    return [];
+	  this.actions = function (state) {
+	    if (!state) {
+	      state = m_this.state();
+	    }
+	    switch (state) {
+	      case annotationState.edit:
+	        return [{
+	          action: geo_action.annotation_edit_handle,
+	          name: 'annotation edit',
+	          owner: annotationActionOwner,
+	          input: 'left'
+	        }, {
+	          action: geo_action.annotation_edit_handle,
+	          name: 'annotation edit',
+	          owner: annotationActionOwner,
+	          input: 'pan'
+	        }];
+	      default:
+	        return [];
+	    }
 	  };
 	
 	  /**
-	   * Process any actions for this annotation.
+	   * Process any non-edit actions for this annotation.
 	   *
 	   * @param {geo.event} evt The action event.
 	   * @returns {boolean|string} `true` to update the annotation, `'done'` if the
@@ -22875,6 +22959,61 @@
 	   */
 	  this.processAction = function () {
 	    return undefined;
+	  };
+	
+	  /**
+	   * Process any edit actions for this annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean} `true` to update the annotation, falsy to not update
+	   *    anything.
+	   */
+	  this.processEditAction = function (evt) {
+	    if (!evt || !m_this._editHandle || !m_this._editHandle.handle) {
+	      return;
+	    }
+	    switch (m_this._editHandle.handle.type) {
+	      case 'vertex':
+	        return m_this._processEditActionVertex(evt);
+	      case 'edge':
+	        return m_this._processEditActionEdge(evt);
+	      case 'center':
+	        return m_this._processEditActionCenter(evt);
+	      case 'rotate':
+	        return m_this._processEditActionRotate(evt);
+	      case 'resize':
+	        return m_this._processEditActionResize(evt);
+	    }
+	  };
+	
+	  /**
+	   * When an edit handle is selected or deselected (for instance, by moving the
+	   * mouse on or off of it), mark if it is selected and record the current
+	   * coordinates.
+	   *
+	   * @param {object} handle The data for the edit handle.
+	   * @param {boolean} enable True to enable the handle, false to disable.
+	   * @returns {this}
+	   */
+	  this.selectEditHandle = function (handle, enable) {
+	    if (enable && m_this._editHandle && m_this._editHandle.handle &&
+	        m_this._editHandle.handle.selected) {
+	      m_this._editHandle.handle.selected = false;
+	    }
+	    handle.selected = enable;
+	    var amountRotated = (m_this._editHandle || {}).amountRotated || 0;
+	    m_this._editHandle = {
+	      handle: handle,
+	      startCoordinates: m_this._coordinates().slice(),
+	      center: util.centerFromPerimeter(m_this._coordinates()),
+	      rotatePosition: m_this._rotateHandlePosition(
+	        handle.style.rotateHandleOffset, handle.style.rotateHandleRotation + amountRotated),
+	      startAmountRotated: amountRotated,
+	      amountRotated: amountRotated,
+	      resizePosition: m_this._rotateHandlePosition(
+	        handle.style.resizeHandleOffset, handle.style.resizeHandleRotation)
+	    };
+	    return m_this;
 	  };
 	
 	  /**
@@ -22899,7 +23038,9 @@
 	      m_options = $.extend(true, m_options, arg1);
 	      /* For style objects, re-extend them without recursion.  This allows
 	       * setting colors without an opacity field, for instance. */
-	      ['style', 'editStyle', 'labelStyle'].forEach(function (key) {
+	      ['style', 'createStyle', 'editStyle', 'editHandleStyle', 'labelStyle',
+	        'highlightStyle'
+	      ].forEach(function (key) {
 	        if (arg1[key] !== undefined) {
 	          $.extend(m_options[key], arg1[key]);
 	        }
@@ -22940,51 +23081,70 @@
 	   *    set the named style to the specified value.  Otherwise, extend the
 	   *    current style with the values in the specified object.
 	   * @param {*} [arg2] If `arg1` is a string, the new value for that style.
+	   * @param {string} [styleType='style'] The name of the style type, such as
+	   *    `createStyle', `editStyle`, `editHandleStyle`, `labelStyle`, or
+	   *    `highlightStyle`.
 	   * @returns {object|this} Either the entire style object, the value of a
 	   *    specific style, or the current class instance.
 	   */
-	  this.style = function (arg1, arg2) {
+	  this.style = function (arg1, arg2, styleType) {
+	    styleType = styleType || 'style';
 	    if (arg1 === undefined) {
-	      return m_options.style;
+	      return m_options[styleType];
 	    }
 	    if (typeof arg1 === 'string' && arg2 === undefined) {
-	      return m_options.style[arg1];
+	      return (m_options[styleType] || {})[arg1];
+	    }
+	    if (m_options[styleType] === undefined) {
+	      m_options[styleType] = {};
 	    }
 	    if (arg2 === undefined) {
-	      m_options.style = $.extend(true, m_options.style, arg1);
+	      m_options[styleType] = $.extend(true, m_options[styleType], arg1);
 	    } else {
-	      m_options.style[arg1] = arg2;
+	      m_options[styleType][arg1] = arg2;
 	    }
 	    m_this.modified();
 	    return m_this;
 	  };
 	
+	  ['createStyle', 'editStyle', 'editHandleStyle', 'labelStyle', 'highlightStyle'
+	  ].forEach(function (styleType) {
+	    /**
+	     * Set or get a specific style type.
+	     *
+	     * @param {string|object} [arg1] If `undefined`, return the current style
+	     *    object.  If a string and `arg2` is undefined, return the style
+	     *    associated with the specified key.  If a string and `arg2` is defined,
+	     *    set the named style to the specified value.  Otherwise, extend the
+	     *    current style with the values in the specified object.
+	     * @param {*} [arg2] If `arg1` is a string, the new value for that style.
+	     * @returns {object|this} Either the entire style object, the value of a
+	     *    specific style, or the current class instance.
+	     */
+	    m_this[styleType] = function (arg1, arg2) {
+	      return m_this.style(arg1, arg2, styleType);
+	    };
+	  });
+	
 	  /**
-	   * Set or get edit style.  These are the styles used in edit and create mode.
-	   *
-	   * @param {string|object} [arg1] If `undefined`, return the current style
-	   *    object.  If a string and `arg2` is undefined, return the style
-	   *    associated with the specified key.  If a string and `arg2` is defined,
-	   *    set the named style to the specified value.  Otherwise, extend the
-	   *    current style with the values in the specified object.
-	   * @param {*} [arg2] If `arg1` is a string, the new value for that style.
-	   * @returns {object|this} Either the entire style object, the value of a
-	   *    specific style, or the current class instance.
+	   * Return the style dictionary for a particular state.
+	   * @param {string} [state] The state to return styles for.  Defaults to the
+	   *    current state.
+	   * @returns {object} The style object for the state.  If there is no such
+	   *    style defined, the default style is used.
 	   */
-	  this.editStyle = function (arg1, arg2) {
-	    if (arg1 === undefined) {
-	      return m_options.editStyle;
+	  this.styleForState = function (state) {
+	    state = state || m_this.state();
+	    /* for some states, fall back to the general style if they don't specify a
+	     * value explicitly. */
+	    if (state === annotationState.edit || state === annotationState.highlight) {
+	      return $.extend({}, m_options.style, m_options[state + 'Style']);
 	    }
-	    if (typeof arg1 === 'string' && arg2 === undefined) {
-	      return m_options.editStyle[arg1];
+	    if (state === annotationState.create) {
+	      return $.extend({}, m_options.style, m_options.editStyle,
+	                      m_options[state + 'Style']);
 	    }
-	    if (arg2 === undefined) {
-	      m_options.editStyle = $.extend(true, m_options.editStyle, arg1);
-	    } else {
-	      m_options.editStyle[arg1] = arg2;
-	    }
-	    m_this.modified();
-	    return m_this;
+	    return m_options[state + 'Style'] || m_options.style || {};
 	  };
 	
 	  /**
@@ -23024,6 +23184,21 @@
 	  };
 	
 	  /**
+	   * Handle a mouse click on this annotation when in edit mode.  If the event
+	   * is processed, evt.handled should be set to `true` to prevent further
+	   * processing.
+	   *
+	   * @param {geo.event} evt The mouse click event.
+	   * @returns {boolean|string} `true` to update the annotation, `'done'` if
+	   *    the annotation was completed (changed from create to done state),
+	   *    `'remove'` if the annotation should be removed, falsy to not update
+	   *    anything.
+	   */
+	  this.mouseClickEdit = function (evt) {
+	    return undefined;
+	  };
+	
+	  /**
 	   * Handle a mouse move on this annotation.
 	   *
 	   * @param {geo.event} evt The mouse move event.
@@ -23035,8 +23210,8 @@
 	  };
 	
 	  /**
-	   * Get coordinates associated with this annotation in the map gcs coordinate
-	   * system.
+	   * Get or set coordinates associated with this annotation in the map gcs
+	   * coordinate system.
 	   *
 	   * @param {geo.geoPosition[]} [coordinates] An optional array of coordinates
 	   *  to set.
@@ -23140,7 +23315,7 @@
 	        geotype = m_this._geojsonGeometryType(),
 	        styles = m_this._geojsonStyles(),
 	        objStyle = m_this.options('style') || {},
-	        objLabelStyle = m_this.options('labelStyle') || {},
+	        objLabelStyle = m_this.labelStyle() || {},
 	        i, key, value;
 	    if (!coor || !coor.length || !geotype) {
 	      return;
@@ -23200,6 +23375,270 @@
 	    }
 	    return obj;
 	  };
+	
+	  /**
+	   * Add edit handles to the feature list.
+	   *
+	   * @param {array} features The array of features to modify.
+	   * @param {geo.geoPosition[]} vertices An array of vertices in map gcs
+	   *    coordinates.
+	   * @param {object} [opts] If specified, the keys are the types of the
+	   *    handles.  This matches the `editHandleStyle.handle` object.  Any type
+	   *    that is set to `false` in either `opts` or `editHandleStyle.handle`
+	   *    will prevent those handles from being created.
+	   * @param {boolean} [isOpen=false] If true, no edge handle will be created
+	   *    between the last and first vertices.
+	   */
+	  this._addEditHandles = function (features, vertices, opts, isOpen) {
+	    var editPoints,
+	        style = $.extend({}, defaultEditHandleStyle, m_this.editHandleStyle()),
+	        handles = util.ensureFunction(style.handles)() || {},
+	        selected = (m_this._editHandle && m_this._editHandle.handle &&
+	                    m_this._editHandle.handle.selected ?
+	                    m_this._editHandle.handle : undefined);
+	    /* opts specify which handles are allowed.  They must be allowed by the
+	     * original opts object and by the editHandleStyle.handle object. */
+	    opts = $.extend({}, opts);
+	    Object.keys(handles).forEach(function (key) {
+	      if (handles[key] === false) {
+	        opts[key] = false;
+	      }
+	    });
+	    if (!features[editHandleFeatureLevel]) {
+	      features[editHandleFeatureLevel] = {point: []};
+	    }
+	    editPoints = features[editHandleFeatureLevel].point;
+	    vertices.forEach(function (pt, idx) {
+	      if (opts.vertex !== false) {
+	        editPoints.push($.extend({}, pt, {type: 'vertex', index: idx, style: style, editHandle: true}));
+	      }
+	      if (opts.edge !== false && idx !== vertices.length - 1 && (pt.x !== vertices[idx + 1].x || pt.y !== vertices[idx + 1].y)) {
+	        editPoints.push($.extend({
+	          x: (pt.x + vertices[idx + 1].x) / 2,
+	          y: (pt.y + vertices[idx + 1].y) / 2
+	        }, {type: 'edge', index: idx, style: style, editHandle: true}));
+	      }
+	      if (opts.edge !== false && !isOpen && idx === vertices.length - 1 && (pt.x !== vertices[0].x || pt.y !== vertices[0].y)) {
+	        editPoints.push($.extend({
+	          x: (pt.x + vertices[0].x) / 2,
+	          y: (pt.y + vertices[0].y) / 2
+	        }, {type: 'edge', index: idx, style: style, editHandle: true}));
+	      }
+	    });
+	    if (opts.center !== false) {
+	      editPoints.push($.extend({}, util.centerFromPerimeter(m_this._coordinates()), {type: 'center', style: style, editHandle: true}));
+	    }
+	    if (opts.rotate !== false) {
+	      editPoints.push($.extend(m_this._rotateHandlePosition(
+	        style.rotateHandleOffset,
+	        style.rotateHandleRotation + (selected && selected.type === 'rotate' ? m_this._editHandle.amountRotated : 0)
+	      ), {type: 'rotate', style: style, editHandle: true}));
+	      if (m_this._editHandle && (!selected || selected.type !== 'rotate')) {
+	        m_this._editHandle.amountRotated = 0;
+	      }
+	    }
+	    if (opts.resize !== false) {
+	      editPoints.push($.extend(m_this._rotateHandlePosition(
+	        style.resizeHandleOffset,
+	        style.resizeHandleRotation
+	      ), {type: 'resize', style: style, editHandle: true}));
+	    }
+	    if (selected) {
+	      editPoints.forEach(function (pt) {
+	        if (pt.type === selected.type && pt.index === selected.index) {
+	          pt.selected = true;
+	        }
+	      });
+	    }
+	  };
+	
+	  /**
+	   * Process the edit center action for a general annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean|string} `true` to update the annotation, falsy to not
+	   *    update anything.
+	   */
+	  this._processEditActionCenter = function (evt) {
+	    var start = m_this._editHandle.startCoordinates,
+	        delta = {
+	          x: evt.mouse.mapgcs.x - evt.state.origin.mapgcs.x,
+	          y: evt.mouse.mapgcs.y - evt.state.origin.mapgcs.y
+	        },
+	        curPts = m_this._coordinates();
+	    var pts = start.map(function (elem) {
+	      return {x: elem.x + delta.x, y: elem.y + delta.y};
+	    });
+	    if (pts[0].x !== curPts[0].x || pts[0].y !== curPts[0].y) {
+	      m_this._coordinates(pts);
+	      return true;
+	    }
+	    return false;
+	  };
+	
+	  /**
+	   * Process the edit rotate action for a general annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean|string} `true` to update the annotation, falsy to not
+	   *    update anything.
+	   */
+	  this._processEditActionRotate = function (evt) {
+	    var handle = m_this._editHandle,
+	        start = handle.startCoordinates,
+	        delta = {
+	          x: evt.mouse.mapgcs.x - evt.state.origin.mapgcs.x,
+	          y: evt.mouse.mapgcs.y - evt.state.origin.mapgcs.y
+	        },
+	        ang1 = Math.atan2(
+	            handle.rotatePosition.y - handle.center.y,
+	            handle.rotatePosition.x - handle.center.x),
+	        ang2 = Math.atan2(
+	            handle.rotatePosition.y + delta.y - handle.center.y,
+	            handle.rotatePosition.x + delta.x - handle.center.x),
+	        ang = ang2 - ang1,
+	        curPts = m_this._coordinates();
+	    var pts = start.map(function (elem) {
+	      var delta = {x: elem.x - handle.center.x, y: elem.y - handle.center.y};
+	      return {
+	        x: delta.x * Math.cos(ang) - delta.y * Math.sin(ang) + handle.center.x,
+	        y: delta.x * Math.sin(ang) + delta.y * Math.cos(ang) + handle.center.y
+	      };
+	    });
+	    if (pts[0].x !== curPts[0].x || pts[0].y !== curPts[0].y) {
+	      m_this._coordinates(pts);
+	      handle.amountRotated = handle.startAmountRotated + ang;
+	      return true;
+	    }
+	    return false;
+	  };
+	
+	  /**
+	   * Process the edit resize action for a general annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean|string} `true` to update the annotation, falsy to not
+	   *    update anything.
+	   */
+	  this._processEditActionResize = function (evt) {
+	    var handle = m_this._editHandle,
+	        start = handle.startCoordinates,
+	        delta = {
+	          x: evt.mouse.mapgcs.x - evt.state.origin.mapgcs.x,
+	          y: evt.mouse.mapgcs.y - evt.state.origin.mapgcs.y
+	        },
+	        map = m_this.layer().map(),
+	        p0 = map.gcsToDisplay(handle.center, null),
+	        p1 = map.gcsToDisplay(handle.resizePosition, null),
+	        p2 = map.gcsToDisplay({
+	          x: handle.resizePosition.x + delta.x,
+	          y: handle.resizePosition.y + delta.y
+	        }, null),
+	        d01 = Math.pow(Math.pow(p1.y - p0.y, 2) +
+	                       Math.pow(p1.x - p0.x, 2), 0.5) -
+	              handle.handle.style.resizeHandleOffset,
+	        d02 = Math.pow(Math.pow(p2.y - p0.y, 2) +
+	                       Math.pow(p2.x - p0.x, 2), 0.5) -
+	              handle.handle.style.resizeHandleOffset,
+	        curPts = m_this._coordinates();
+	    if (d02 && d01) {
+	      var scale = d02 / d01;
+	      var pts = start.map(function (elem) {
+	        return {
+	          x: (elem.x - handle.center.x) * scale + handle.center.x,
+	          y: (elem.y - handle.center.y) * scale + handle.center.y
+	        };
+	      });
+	      if (pts[0].x !== curPts[0].x || pts[0].y !== curPts[0].y) {
+	        m_this._coordinates(pts);
+	        return true;
+	      }
+	    }
+	    return false;
+	  };
+	
+	  /**
+	   * Process the edit edge action for a general annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean|string} `true` to update the annotation, falsy to not
+	   *    update anything.
+	   */
+	  this._processEditActionEdge = function (evt) {
+	    var handle = m_this._editHandle,
+	        index = handle.handle.index,
+	        curPts = m_this._coordinates();
+	    curPts.splice(index + 1, 0, {x: handle.handle.x, y: handle.handle.y});
+	    handle.handle.type = 'vertex';
+	    handle.handle.index += 1;
+	    handle.startCoordinates = curPts.slice();
+	    m_this.modified();
+	    return true;
+	  };
+	
+	  /**
+	   * Process the edit vertex action for a general annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @param {boolean} [canClose] if True, this annotation has a closed style
+	   *    that indicates if the first and last vertices are joined.  If falsy, is
+	   *    allowed to be changed to true.
+	   * @returns {boolean|string} `true` to update the annotation, `false` to
+	   *    prevent closure, any other falsy to not update anything.
+	   */
+	  this._processEditActionVertex = function (evt, canClose) {
+	    var handle = m_this._editHandle,
+	        index = handle.handle.index,
+	        start = handle.startCoordinates,
+	        curPts = m_this._coordinates(),
+	        origLen = curPts.length,
+	        origPt = curPts[index],
+	        delta = {
+	          x: evt.mouse.mapgcs.x - evt.state.origin.mapgcs.x,
+	          y: evt.mouse.mapgcs.y - evt.state.origin.mapgcs.y
+	        },
+	        layer = m_this.layer(),
+	        aPP = layer.options('adjacentPointProximity'),
+	        near, atEnd;
+	
+	    curPts[index] = {
+	      x: start[index].x + delta.x,
+	      y: start[index].y + delta.y
+	    };
+	    if (layer.displayDistance(curPts[index], null, start[index], null) <= aPP) {
+	      /* if we haven't moved at least aPP from where the vertex started, don't
+	       * allow it to be merged into another vertex.  This prevents small scale
+	       * edits from collapsing immediately. */
+	    } else if (layer.displayDistance(
+	        curPts[index], null,
+	        curPts[(index + 1) % curPts.length], null) <= aPP) {
+	      near = (index + 1) % curPts.length;
+	    } else if (layer.displayDistance(
+	        curPts[index], null,
+	        curPts[(index + curPts.length - 1) % curPts.length], null) <= aPP) {
+	      near = (index + curPts.length - 1) % curPts.length;
+	    }
+	    atEnd = ((near === 0 && index === curPts.length - 1) ||
+	             (near === curPts.length - 1 && index === 0));
+	    if (canClose === false && atEnd) {
+	      near = undefined;
+	    }
+	    if (near !== undefined && curPts.length > (canClose || m_this.options('style').closed ? 3 : 2)) {
+	      curPts[index] = {x: curPts[near].x, y: curPts[near].y};
+	      if (evt.event === geo_event.actionup) {
+	        if (canClose && atEnd) {
+	          m_this.options('style').closed = true;
+	        }
+	        curPts.splice(index, 1);
+	      }
+	    }
+	    if (curPts.length === origLen &&
+	        curPts[index].x === origPt.x && curPts[index].y === origPt.y) {
+	      return false;
+	    }
+	    m_this._coordinates(curPts);
+	    return true;
+	  };
 	};
 	
 	/**
@@ -23253,16 +23692,15 @@
 	      strokeWidth: 3,
 	      uniformPolygon: true
 	    },
-	    editStyle: {
-	      fill: true,
+	    highlightStyle: {
+	      fillColor: {r: 0, g: 1, b: 1},
+	      fillOpacity: 0.5,
+	      strokeWidth: 5
+	    },
+	    createStyle: {
 	      fillColor: {r: 0.3, g: 0.3, b: 0.3},
 	      fillOpacity: 0.25,
-	      polygon: function (d) { return d.polygon; },
-	      stroke: true,
-	      strokeColor: {r: 0, g: 0, b: 1},
-	      strokeOpacity: 1,
-	      strokeWidth: 3,
-	      uniformPolygon: true
+	      strokeColor: {r: 0, g: 0, b: 1}
 	    }
 	  }, args || {});
 	  args.corners = args.corners || args.coordinates || [];
@@ -23270,7 +23708,8 @@
 	  annotation.call(this, 'rectangle', args);
 	
 	  var m_this = this,
-	      s_actions = this.actions;
+	      s_actions = this.actions,
+	      s_processEditAction = this.processEditAction;
 	
 	  /**
 	   * Return actions needed for the specified state of this annotation.
@@ -23348,7 +23787,7 @@
 	          features = [{
 	            polygon: {
 	              polygon: opt.corners,
-	              style: opt.editStyle
+	              style: m_this.styleForState(state)
 	            }
 	          }];
 	        }
@@ -23357,9 +23796,12 @@
 	        features = [{
 	          polygon: {
 	            polygon: opt.corners,
-	            style: opt.style
+	            style: m_this.styleForState(state)
 	          }
 	        }];
+	        if (state === annotationState.edit) {
+	          m_this._addEditHandles(features, opt.corners);
+	        }
 	        break;
 	    }
 	    return features;
@@ -23501,6 +23943,84 @@
 	    }
 	  };
 	
+	  /**
+	   * Process any edit actions for this annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean|string} `true` to update the annotation, falsy to not
+	   *    update anything.
+	   */
+	  this.processEditAction = function (evt) {
+	    var start = m_this._editHandle.startCoordinates,
+	        delta = {
+	          x: evt.mouse.mapgcs.x - evt.state.origin.mapgcs.x,
+	          y: evt.mouse.mapgcs.y - evt.state.origin.mapgcs.y
+	        },
+	        type = m_this._editHandle.handle.type,
+	        index = m_this._editHandle.handle.index,
+	        ang = [
+	          Math.atan2(start[1].y - start[0].y, start[1].x - start[0].x),
+	          Math.atan2(start[2].y - start[1].y, start[2].x - start[1].x),
+	          Math.atan2(start[3].y - start[2].y, start[3].x - start[2].x),
+	          Math.atan2(start[0].y - start[3].y, start[0].x - start[3].x)
+	        ],
+	        corners, delta1, delta2, ang1, ang2;
+	    // an angle can be zero because it is horizontal or undefined.  If opposite
+	    // angles are both zero, this is a degenerate rectangle (a line or a point)
+	    if (!ang[0] && !ang[1] && !ang[2] && !ang[3]) {
+	      ang[1] = Math.PI / 2;
+	      ang[2] = Math.PI;
+	      ang[3] = -Math.PI / 2;
+	    }
+	    if (!ang[0] && !ang[2]) {
+	      ang[0] = ang[1] - Math.PI / 2;
+	      ang[2] = ang[1] + Math.PI / 2;
+	    }
+	    if (!ang[1] && !ang[3]) {
+	      ang[1] = ang[2] - Math.PI / 2;
+	      ang[3] = ang[2] + Math.PI / 2;
+	    }
+	    switch (type) {
+	      case 'vertex':
+	        corners = start.map(function (elem) {
+	          return {x: elem.x, y: elem.y};
+	        });
+	        ang1 = ang[(index + 1) % 4];
+	        delta1 = {
+	          x: (delta.x * Math.cos(ang1) + delta.y * Math.sin(ang1)) * Math.cos(ang1),
+	          y: (delta.y * Math.sin(ang1) + delta.x * Math.cos(ang1)) * Math.sin(ang1)
+	        };
+	        ang2 = ang[index];
+	        delta2 = {
+	          x: (delta.x * Math.cos(ang2) + delta.y * Math.sin(ang2)) * Math.cos(ang2),
+	          y: (delta.y * Math.sin(ang2) + delta.x * Math.cos(ang2)) * Math.sin(ang2)
+	        };
+	        corners[index].x += delta.x;
+	        corners[index].y += delta.y;
+	        corners[(index + 1) % 4].x += delta1.x;
+	        corners[(index + 1) % 4].y += delta1.y;
+	        corners[(index + 3) % 4].x += delta2.x;
+	        corners[(index + 3) % 4].y += delta2.y;
+	        m_this.options('corners', corners);
+	        return true;
+	      case 'edge':
+	        corners = start.map(function (elem) {
+	          return {x: elem.x, y: elem.y};
+	        });
+	        ang1 = ang[(index + 1) % 4];
+	        delta = {
+	          x: (delta.x * Math.cos(ang1) + delta.y * Math.sin(ang1)) * Math.cos(ang1),
+	          y: (delta.y * Math.sin(ang1) + delta.x * Math.cos(ang1)) * Math.sin(ang1)
+	        };
+	        corners[index].x += delta.x;
+	        corners[index].y += delta.y;
+	        corners[(index + 1) % 4].x += delta.x;
+	        corners[(index + 1) % 4].y += delta.y;
+	        m_this.options('corners', corners);
+	        return true;
+	    }
+	    return s_processEditAction.apply(m_this, arguments);
+	  };
 	};
 	inherit(rectangleAnnotation, annotation);
 	
@@ -23558,9 +24078,13 @@
 	      strokeWidth: 3,
 	      uniformPolygon: true
 	    },
-	    editStyle: {
+	    highlightStyle: {
+	      fillColor: {r: 0, g: 1, b: 1},
+	      fillOpacity: 0.5,
+	      strokeWidth: 5
+	    },
+	    createStyle: {
 	      closed: false,
-	      fill: true,
 	      fillColor: {r: 0.3, g: 0.3, b: 0.3},
 	      fillOpacity: 0.25,
 	      line: function (d) {
@@ -23569,15 +24093,11 @@
 	        return Array.apply(null, Array(m_this.options('vertices').length)).map(
 	            function () { return d; });
 	      },
-	      polygon: function (d) { return d.polygon; },
 	      position: function (d, i) {
 	        return m_this.options('vertices')[i];
 	      },
 	      stroke: false,
-	      strokeColor: {r: 0, g: 0, b: 1},
-	      strokeOpacity: 1,
-	      strokeWidth: 3,
-	      uniformPolygon: true
+	      strokeColor: {r: 0, g: 0, b: 1}
 	    }
 	  }, args || {});
 	  args.vertices = args.vertices || args.coordinates || [];
@@ -23596,6 +24116,7 @@
 	  this.features = function () {
 	    var opt = m_this.options(),
 	        state = m_this.state(),
+	        style = m_this.styleForState(state),
 	        features;
 	    switch (state) {
 	      case annotationState.create:
@@ -23604,7 +24125,7 @@
 	          features[1] = {
 	            polygon: {
 	              polygon: opt.vertices,
-	              style: opt.editStyle
+	              style: style
 	            }
 	          };
 	        }
@@ -23612,7 +24133,7 @@
 	          features[2] = {
 	            line: {
 	              line: opt.vertices,
-	              style: opt.editStyle
+	              style: style
 	            }
 	          };
 	        }
@@ -23621,9 +24142,12 @@
 	        features = [{
 	          polygon: {
 	            polygon: opt.vertices,
-	            style: opt.style
+	            style: style
 	          }
 	        }];
+	        if (state === annotationState.edit) {
+	          m_this._addEditHandles(features, opt.vertices);
+	        }
 	        break;
 	    }
 	    return features;
@@ -23822,7 +24346,10 @@
 	      lineCap: 'butt',
 	      lineJoin: 'miter'
 	    },
-	    editStyle: {
+	    highlightStyle: {
+	      strokeWidth: 5
+	    },
+	    createStyle: {
 	      line: function (d) {
 	        /* Return an array that has the same number of items as we have
 	         * vertices. */
@@ -23845,7 +24372,8 @@
 	  annotation.call(this, 'line', args);
 	
 	  var m_this = this,
-	      s_actions = this.actions;
+	      s_actions = this.actions,
+	      s_processEditAction = this.processEditAction;
 	
 	  /**
 	   * Get a list of renderable features for this annotation.
@@ -23861,7 +24389,7 @@
 	        features = [{
 	          line: {
 	            line: opt.vertices,
-	            style: opt.editStyle
+	            style: m_this.styleForState(state)
 	          }
 	        }];
 	        break;
@@ -23869,9 +24397,12 @@
 	        features = [{
 	          line: {
 	            line: opt.vertices,
-	            style: opt.style
+	            style: m_this.styleForState(state)
 	          }
 	        }];
+	        if (state === annotationState.edit) {
+	          m_this._addEditHandles(features, opt.vertices, undefined, !m_this.style('closed'));
+	        }
 	        break;
 	    }
 	    return features;
@@ -24087,6 +24618,63 @@
 	      'closed', 'lineCap', 'lineJoin', 'strokeColor', 'strokeOffset',
 	      'strokeOpacity', 'strokeWidth'];
 	  };
+	
+	  /**
+	   * Process any edit actions for this annotation.
+	   *
+	   * @param {geo.event} evt The action event.
+	   * @returns {boolean|string} `true` to update the annotation, falsy to not
+	   *    update anything.
+	   */
+	  this.processEditAction = function (evt) {
+	    switch (m_this._editHandle.handle.type) {
+	      case 'vertex':
+	        return m_this._processEditActionVertex(evt, true);
+	    }
+	    return s_processEditAction.apply(m_this, arguments);
+	  };
+	
+	  /**
+	   * Handle a mouse click on this annotation when in edit mode.  If the event
+	   * is processed, evt.handled should be set to `true` to prevent further
+	   * processing.
+	   *
+	   * @param {geo.event} evt The mouse click event.
+	   * @returns {boolean|string} `true` to update the annotation, `'done'` if
+	   *    the annotation was completed (changed from create to done state),
+	   *    `'remove'` if the annotation should be removed, falsy to not update
+	   *    anything.
+	   */
+	  this.mouseClickEdit = function (evt) {
+	    // if we get a left double click on an edge on a closed line, break the
+	    // line at that edge
+	    var layer = m_this.layer(),
+	        handle = m_this._editHandle,
+	        split;
+	    // ensure we are in edit mode and this is a left click
+	    if (m_this.state() !== annotationState.edit || !layer || !evt.buttonsDown.left) {
+	      return;
+	    }
+	    // ensure this is an edge on a closed line
+	    if (!handle || !handle.handle.selected || handle.handle.type !== 'edge' || !m_this.options('style').closed) {
+	      return;
+	    }
+	    evt.handled = true;
+	    if (m_this._lastClick && evt.time - m_this._lastClick < layer.options('dblClickTime')) {
+	      split = true;
+	    }
+	    m_this._lastClick = evt.time;
+	    if (split) {
+	      var index = handle.handle.index,
+	          curPts = m_this._coordinates(),
+	          pts = curPts.slice(index + 1).concat(curPts.slice(0, index + 1));
+	      m_this._coordinates(pts);
+	      m_this.options('style').closed = false;
+	      handle.handle.index = undefined;
+	      return true;
+	    }
+	  };
+	
 	};
 	inherit(lineAnnotation, annotation);
 	
@@ -24140,6 +24728,16 @@
 	      strokeColor: {r: 0, g: 0, b: 0},
 	      strokeOpacity: 1,
 	      strokeWidth: 3
+	    },
+	    createStyle: {
+	      fillColor: {r: 0.3, g: 0.3, b: 0.3},
+	      fillOpacity: 0.25,
+	      strokeColor: {r: 0, g: 0, b: 1}
+	    },
+	    highlightStyle: {
+	      fillColor: {r: 0, g: 1, b: 1},
+	      fillOpacity: 0.5,
+	      strokeWidth: 5
 	    }
 	  }, args || {});
 	  args.position = args.position || (args.coordinates ? args.coordinates[0] : undefined);
@@ -24162,7 +24760,7 @@
 	        features = [];
 	        break;
 	      default:
-	        style = opt.style;
+	        style = m_this.styleForState(state);
 	        if (opt.style.scaled || opt.style.scaled === 0) {
 	          if (opt.style.scaled === true) {
 	            opt.style.scaled = m_this.layer().map().zoom();
@@ -24188,6 +24786,11 @@
 	            scaleOnZoom: scaleOnZoom
 	          }
 	        }];
+	        if (state === annotationState.edit) {
+	          m_this._addEditHandles(
+	            features, [opt.position],
+	            {edge: false, center: false, resize: false, rotate: false});
+	        }
 	        break;
 	    }
 	    return features;
@@ -24284,7 +24887,8 @@
 	  lineAnnotation: lineAnnotation,
 	  pointAnnotation: pointAnnotation,
 	  polygonAnnotation: polygonAnnotation,
-	  rectangleAnnotation: rectangleAnnotation
+	  rectangleAnnotation: rectangleAnnotation,
+	  _editHandleFeatureLevel: editHandleFeatureLevel
 	};
 
 
@@ -24829,7 +25433,8 @@
 	  // annotation actions
 	  annotation_line: 'geo_annotation_line',
 	  annotation_polygon: 'geo_annotation_polygon',
-	  annotation_rectangle: 'geo_annotation_rectangle'
+	  annotation_rectangle: 'geo_annotation_rectangle',
+	  annotation_edit_handle: 'geo_annotation_edit_handle'
 	};
 	
 	module.exports = geo_action;
@@ -50687,48 +51292,51 @@
 	var transform = __webpack_require__(17);
 	
 	/**
-	 * Create a new instance of class lineFeature
+	 * Line feature specification.
+	 *
+	 * @typedef {geo.feature.spec} geo.lineFeature.spec
+	 * @param {object|Function} [position] Position of the data.  Default is
+	 *   (data).
+	 * @param {object|Function} [line] Lines from the data.  Default is (data).
+	 *   Typically, the data is an array of lines, each of which is an array of
+	 *   points.  Only lines that have at least two points are rendered.  The
+	 *   position function is called for each point as `position(linePoint,
+	 *   pointIndex, lineEntry, lineEntryIndex)`.
+	 * @param {object} [style] Style object with default style options.
+	 * @param {geo.geoColor|Function} [style.strokeColor] Color to stroke each
+	 *   line.  The color can vary by point.
+	 * @param {number|Function} [style.strokeOpacity] Opacity for each line
+	 *   stroke.  The opacity can vary by point.  Opacity is on a [0-1] scale.
+	 * @param {number|Function} [style.strokeWidth] The weight of the line
+	 *   stroke in pixels.  The width can vary by point.
+	 * @param {number|Function} [style.strokeOffset] This is a value from -1
+	 *   (left) to 1 (right), with 0 being centered.  This can vary by point.
+	 * @param {string|Function} [style.lineCap='butt'] One of 'butt', 'square', or
+	 *   'round'.  This can vary by point.
+	 * @param {string|Function} [style.lineJoin='miter'] One of 'miter', 'bevel',
+	 *   'round', or 'miter-clip'.  This can vary by point.
+	 * @param {boolean|Function} [style.closed=false] If true and the renderer
+	 *   supports it, connect the first and last points of a line if the line has
+	 *   more than two points.  This applies per line (if a function, it is called
+	 *   with `(lineEntry, lineEntryIndex)`.
+	 * @param {number|Function} [style.miterLimit=10] For lines of more than two
+	 *   segments that are mitered, if the miter length exceeds the `strokeWidth`
+	 *   divided by the sine of half the angle between segments, then a bevel join
+	 *   is used instead.  This is a single value that applies to all lines.  If a
+	 *   function, it is called with `(data)`.
+	 * @param {number|Function} [style.antialiasing] Antialiasing distance in
+	 *   pixels.  Values must be non-negative.  A value greater than 1 will produce
+	 *   a visible gradient.  This is a single value that applies to all lines.
+	 * @param {string|Function} [style.debug] If 'debug', render lines in debug
+	 *   mode.  This is a single value that applies to all lines.
+	 */
+	
+	/**
+	 * Create a new instance of class lineFeature.
 	 *
 	 * @class geo.lineFeature
 	 * @extends geo.feature
-	 * @param {Object|Function} [arg.position] Position of the data.  Default is
-	 *   (data).
-	 * @param {Object|Function} [arg.line] Lines from the data.  Default is (data).
-	 *   Typically, the data is an array of lines, each of which is an array of
-	 *   points.  Only lines that have at least two points are rendered.  The
-	 *   position function is called for each point as position(linePoint,
-	 *   pointIndex, lineEntry, lineEntryIndex).
-	 * @param {boolean} [arg.selectionAPI=false] True to send selection events on
-	 *   mouse move, click, etc.
-	 * @param {boolean} [arg.visible=true] True to show this feature.
-	 * @param {Object} [arg.style] Style object with default style options.
-	 * @param {Object|Function} [arg.style.strokeColor] Color to stroke each
-	 *   line.  The color can vary by point.  Colors can be css names or hex
-	 *   values, or an object with r, g, b on a [0-1] scale.
-	 * @param {number|Function} [arg.style.strokeOpacity] Opacity for each line
-	 *   stroke.  The opacity can vary by point.  Opacity is on a [0-1] scale.
-	 * @param {number|Function} [arg.style.strokeWidth] The weight of the line
-	 *   stroke in pixels.  The width can vary by point.
-	 * @param {number|Function} [arg.style.strokeOffset] This is a value from -1
-	 *   (left) to 1 (right), with 0 being centered.  This can vary by point.
-	 * @param {string|Function} [arg.style.lineCap] One of 'butt' (default),
-	 *   'square', or 'round'.  This can vary by point.
-	 * @param {string|Function} [arg.style.lineJoin] One of 'miter' (default),
-	 *   'bevel', 'round', or 'miter-clip'.  This can vary by point.
-	 * @param {number|Function} [arg.style.closed] If true and the renderer
-	 *   supports it, connect the first and last points of a line if the line has
-	 *   more than two points.  This applies per line (if a function, it is called
-	 *   with (lineEntry, lineEntryIndex).
-	 * @param {number|Function} [arg.style.miterLimit] For lines of more than two
-	 *   segments that are mitered, if the miter length exceeds the strokeWidth
-	 *   divided by the sine of half the angle between segments, then a bevel join
-	 *   is used instead.  This is a single value that applies to all lines.  If a
-	 *   function, it is called with (data).
-	 * @param {string|Function} [arg.style.antialiasing] Antialiasing distance in
-	 *   pixels.  Values must be non-negative.  A value greater than 1 will produce
-	 *   a visible gradient.  This is a single value that applies to all lines.
-	 * @param {string|Function} [arg.style.debug] If 'debug', render lines in debug
-	 *   mode.  This is a single value that applies to all lines.
+	 * @param {geo.lineFeature.spec} arg
 	 * @returns {geo.lineFeature}
 	 */
 	var lineFeature = function (arg) {
@@ -50761,9 +51369,11 @@
 	  };
 	
 	  /**
-	   * Get/Set line accessor
+	   * Get/set lineaccessor.
 	   *
-	   * @returns {geo.pointFeature}
+	   * @param {object} [val] if specified, use this for the line accessor
+	   *    and return the feature.  If not specified, return the current line.
+	   * @returns {object|this} The current line or this feature.
 	   */
 	  this.line = function (val) {
 	    if (val === undefined) {
@@ -50777,9 +51387,12 @@
 	  };
 	
 	  /**
-	   * Get/Set position accessor
+	   * Get/Set position accessor.
 	   *
-	   * @returns {geo.pointFeature}
+	   * @param {object} [val] if specified, use this for the position accessor
+	   *    and return the feature.  If not specified, return the current
+	   *    position.
+	   * @returns {object|this} The current position or this feature.
 	   */
 	  this.position = function (val) {
 	    if (val === undefined) {
@@ -50793,12 +51406,19 @@
 	  };
 	
 	  /**
-	   * Cache information needed for point searches.
+	   * Cache information needed for point searches.  The point search
+	   * information record is an array with one entry per line, each entry of
+	   * which is an array with one entry per line segment.  These each contain
+	   * an object with the end coordinates (`u`, `v`) of the segment in map gcs
+	   * coordinates and the square of the maximum half-width that needs to be
+	   * considered for the line (`r2`).
+	   *
+	   * @returns {object} The point search information record.
 	   */
 	  this._updatePointSearchInfo = function () {
 	    if (m_pointSearchTime.getMTime() >= m_this.dataTime().getMTime() &&
 	        m_pointSearchTime.getMTime() >= m_this.getMTime()) {
-	      return;
+	      return m_pointSearchInfo;
 	    }
 	    m_pointSearchTime.modified();
 	    m_pointSearchInfo = [];
@@ -50829,26 +51449,28 @@
 	        if (!first && closed) {
 	          first = {p: p, r2: r2};
 	        }
-	        if (closed && last.x !== first.p.x && last.y !== first.p.y) {
-	          record.push({u: last, v: first.p, r2: lastr2 > first.r2 ? lastr2 : first.r2});
-	        }
 	      });
+	      if (closed && first && (last.x !== first.p.x || last.y !== first.p.y)) {
+	        record.push({u: last, v: first.p, r2: lastr2 > first.r2 ? lastr2 : first.r2});
+	      }
 	      m_pointSearchInfo.push(record);
 	    });
 	    return m_pointSearchInfo;
 	  };
 	
 	  /**
-	   * Returns an array of datum indices that contain the given point.
-	   * This is a slow implementation with runtime order of the number of
-	   * vertices.  A point is considered on a line segment if it is close to the
-	   * line or either end point.  Closeness is based on the maximum width of the
-	   * line segement, and is ceil(maxwidth / 2) + 2 pixels.  This means that
-	   * corner extensions due to mitering may be outside of the selection area and
-	   * that variable width lines will have a greater selection region than their
-	   * visual size at the narrow end.
+	   * Returns an array of datum indices that contain the given point.  This is a
+	   * slow implementation with runtime order of the number of vertices.  A point
+	   * is considered on a line segment if it is close to the line or either end
+	   * point.  Closeness is based on the maximum width of the line segement, and
+	   * is `ceil(maxwidth / 2) + 2` pixels.  This means that corner extensions
+	   * due to mitering may be outside of the selection area and that variable-
+	   * width lines will have a greater selection region than their visual size at
+	   * the narrow end.
 	   *
 	   * @param {geo.geoPosition} p point to search for in map interface gcs.
+	   * @returns {object} An object with `index`: a list of line indices, and
+	   *    `found`: a list of quads that contain the specified coordinate.
 	   */
 	  this.pointSearch = function (p) {
 	    var data = m_this.data(), indices = [], found = [];
@@ -50905,7 +51527,15 @@
 	  };
 	
 	  /**
-	   * Returns an array of line indices that are contained in the given box.
+	   * Search for lines contained within a rectangilar region.
+	   *
+	   * @param {geo.geoPosition} lowerLeft Lower-left corner in gcs coordinates.
+	   * @param {geo.geoPosition} upperRight Upper-right corner in gcs coordinates.
+	   * @param {object} [opts] Additional search options.
+	   * @param {boolean} [opts.partial=false] If truthy, include lines that are
+	   *    partially in the box, otherwise only include lines that are fully
+	   *    within the region.
+	   * @returns {number[]} A list of line indices that are in the box region.
 	   */
 	  this.boxSearch = function (lowerLeft, upperRight, opts) {
 	    var pos = m_this.position(),
@@ -50939,7 +51569,10 @@
 	  };
 	
 	  /**
-	   * Initialize
+	   * Initialize.
+	   *
+	   * @param {geo.lineFeature.spec} arg The feature specification.
+	   * @returns {this}
 	   */
 	  this._init = function (arg) {
 	    arg = arg || {};
@@ -50973,6 +51606,7 @@
 	    m_this.style(defaultStyle);
 	
 	    m_this.dataTime().modified();
+	    return m_this;
 	  };
 	
 	  this._init(arg);
@@ -50980,11 +51614,12 @@
 	};
 	
 	/**
-	 * Create a lineFeature from an object.
+	 * Create a lineFeature.
+	 *
 	 * @see {@link geo.feature.create}
 	 * @param {geo.layer} layer The layer to add the feature to
-	 * @param {geo.lineFeature.spec} spec The object specification
-	 * @returns {geo.lineFeature|null}
+	 * @param {geo.lineFeature.spec} spec The feature specification
+	 * @returns {geo.lineFeature|null} The created feature or `null` for failure.
 	 */
 	lineFeature.create = function (layer, spec) {
 	  'use strict';
@@ -51298,6 +51933,16 @@
 	        }, true);
 	      }
 	    }
+	  };
+	
+	  /**
+	   * Clear our tracked selected features.
+	   *
+	   * @returns {this}
+	   */
+	  this._clearSelectedFeatures = function () {
+	    m_selectedFeatures = [];
+	    return m_this;
 	  };
 	
 	  /**
@@ -54269,16 +54914,14 @@
 	 * @param {object} [style] Style object with default style options.
 	 * @param {boolean|Function} [style.fill] True to fill polygon.  Defaults to
 	 *   true.
-	 * @param {object|Function} [style.fillColor] Color to fill each polygon.  The
-	 *   color can vary by vertex.  Colors can be css names or hex values, or an
-	 *   object with r, g, b on a [0-1] scale.
+	 * @param {geo.geoColor|Function} [style.fillColor] Color to fill each polygon.
+	 *   The color can vary by vertex.
 	 * @param {number|Function} [style.fillOpacity] Opacity for each polygon.  The
 	 *   opacity can vary by vertex.  Opacity is on a [0-1] scale.
 	 * @param {boolean|Function} [style.stroke] True to stroke polygon.  Defaults
 	 *   to false.
-	 * @param {object|Function} [style.strokeColor] Color to stroke each polygon.
-	 *   The color can vary by vertex.  Colors can be css names or hex values, or
-	 *   an object with r, g, b on a [0-1] scale.
+	 * @param {geo.geoColor|Function} [style.strokeColor] Color to stroke each
+	 *   polygon.  The color can vary by vertex.
 	 * @param {number|Function} [style.strokeOpacity] Opacity for each polygon
 	 *   stroke.  The opacity can vary by vertex.  Opacity is on a [0-1] scale.
 	 * @param {number|Function} [style.strokeWidth] The weight of the polygon
@@ -54465,8 +55108,8 @@
 	   *
 	   * @param {geo.geoPosition} coordinate point to search for in map interface
 	   *    gcs.
-	   * @returns {object} An object with `index`: a list of quad indices, and
-	   *    `found`: a list of quads that contain the specified coordinate.
+	   * @returns {object} An object with `index`: a list of polygon indices, and
+	   *    `found`: a list of polygons that contain the specified coordinate.
 	   */
 	  this.pointSearch = function (coordinate) {
 	    var found = [], indices = [], irecord = {}, data = m_this.data(),
@@ -54578,15 +55221,18 @@
 	      strokeStyle: linePolyStyle(polyStyle.strokeStyle),
 	      strokeColor: linePolyStyle(polyStyle.strokeColor),
 	      strokeOffset: linePolyStyle(polyStyle.strokeOffset),
-	      strokeOpacity: function (d) {
-	        return m_this.style.get('stroke')(d[2], d[3]) ? m_this.style.get('strokeOpacity')(d[0], d[1], d[2], d[3]) : 0;
-	      }
+	      strokeOpacity: util.isFunction(polyStyle.stroke) || !polyStyle.stroke ?
+	        function (d) {
+	          return m_this.style.get('stroke')(d[2], d[3]) ? m_this.style.get('strokeOpacity')(d[0], d[1], d[2], d[3]) : 0;
+	        } :
+	        linePolyStyle(polyStyle.strokeOpacity)
 	    });
 	    var data = this.data(),
-	        posFunc = this.style.get('position'),
-	        polyFunc = this.style.get('polygon');
-	    if (data !== m_lineFeature._lastData || posFunc !== m_lineFeature._posFunc) {
-	      var lineData = [], i, polygon, loop;
+	        posVal = this.style('position');
+	    if (data !== m_lineFeature._lastData || posVal !== m_lineFeature._lastPosVal) {
+	      var lineData = [], i, polygon, loop,
+	          posFunc = this.style.get('position'),
+	          polyFunc = this.style.get('polygon');
 	
 	      for (i = 0; i < data.length; i += 1) {
 	        polygon = polyFunc(data[i], i);
@@ -54594,11 +55240,15 @@
 	          continue;
 	        }
 	        loop = polygon.outer || (Array.isArray(polygon) ? polygon : []);
-	        lineData.push(m_this._getLoopData(data[i], i, loop));
-	        if (polygon.inner) {
-	          polygon.inner.forEach(function (loop) {
-	            lineData.push(m_this._getLoopData(data[i], i, loop));
-	          });
+	        if (loop.length >= 2) {
+	          lineData.push(m_this._getLoopData(data[i], i, loop));
+	          if (polygon.inner) {
+	            polygon.inner.forEach(function (loop) {
+	              if (loop.length >= 2) {
+	                lineData.push(m_this._getLoopData(data[i], i, loop));
+	              }
+	            });
+	          }
 	        }
 	      }
 	      m_lineFeature.position(function (d, i, item, itemIndex) {
@@ -54606,7 +55256,7 @@
 	      });
 	      m_lineFeature.data(lineData);
 	      m_lineFeature._lastData = data;
-	      m_lineFeature._lastPosFunc = posFunc;
+	      m_lineFeature._lastPosVal = posVal;
 	    }
 	  };
 	
@@ -54955,7 +55605,8 @@
 	/**
 	 * Layer to handle direct interactions with different features.  Annotations
 	 * (features) can be created by calling mode(<name of feature>) or cancelled
-	 * with mode(null).
+	 * with mode(null).  There is also an "edit" mode which is used when modifying
+	 * an annotation.
 	 *
 	 * @class
 	 * @alias geo.annotationLayer
@@ -54980,6 +55631,8 @@
 	 *    start point.
 	 * @param {boolean} [args.showLabels=true] Truthy to show feature labels that
 	 *    are allowed by the associated feature to be shown.
+	 * @param {boolean} [args.clickToEdit=false] Truthy to allow clicking an
+	 *    annotation to place it in edit mode.
 	 * @param {object} [args.defaultLabelStyle] Default styles for labels.
 	 * @returns {geo.annotationLayer}
 	 */
@@ -55049,7 +55702,8 @@
 	    // being coliner
 	    continuousPointColinearity: 1.0 * Math.PI / 180,
 	    finalPointProximity: 10,  // in pixels, 0 is exact
-	    showLabels: true
+	    showLabels: true,
+	    clickToEdit: false
 	  }, args);
 	
 	  /**
@@ -55063,7 +55717,14 @@
 	    if (evt.state && evt.state.actionRecord &&
 	        evt.state.actionRecord.owner === geo_annotation.actionOwner &&
 	        m_this.currentAnnotation) {
-	      update = m_this.currentAnnotation.processAction(evt);
+	      switch (m_this.mode()) {
+	        case m_this.modes.edit:
+	          update = m_this.currentAnnotation.processEditAction(evt);
+	          break;
+	        default:
+	          update = m_this.currentAnnotation.processAction(evt);
+	          break;
+	      }
 	    }
 	    m_this._updateFromEvent(update);
 	  };
@@ -55109,15 +55770,117 @@
 	  };
 	
 	  /**
+	   * Select or deselect an edit handle.
+	   *
+	   * @param {geo.event} evt The mouse move event.
+	   * @param {boolean} enable Truthy to select the handle, falsy to deselect it.
+	   * @returns {this}
+	   */
+	  this._selectEditHandle = function (evt, enable) {
+	    if (!evt.data || !evt.data.editHandle) {
+	      return;
+	    }
+	    $.each(m_features[geo_annotation._editHandleFeatureLevel], function (type, feature) {
+	      feature.feature.modified();
+	    });
+	    m_this.currentAnnotation.selectEditHandle(evt.data, enable);
+	    m_this.draw();
+	    m_this.map().node().toggleClass('annotation-input', !!enable);
+	    m_this.map().interactor().removeAction(
+	      undefined, undefined, geo_annotation.actionOwner);
+	    if (enable) {
+	      var actions = m_this.currentAnnotation.actions(geo_annotation.state.edit);
+	      $.each(actions, function (idx, action) {
+	        m_this.map().interactor().addAction(action);
+	      });
+	    }
+	    return m_this;
+	  };
+	
+	  /**
+	   * Handle mouse on events.  If there is no current annotation and
+	   * clickToEdit is enabled, any hovered annotation is highlighted.
+	   * event is sent to it.
+	   *
+	   * @param {geo.event} evt The mouse move event.
+	   */
+	  this._handleMouseOn = function (evt) {
+	    if (!evt.data || !evt.data.annotation) {
+	      return;
+	    }
+	    if (m_this.mode() === m_this.modes.edit && m_this.currentAnnotation) {
+	      m_this._selectEditHandle(evt, true);
+	      return;
+	    }
+	    if (m_this.mode() || m_this.currentAnnotation || !m_this.options('clickToEdit')) {
+	      return;
+	    }
+	    evt.data.annotation.state(geo_annotation.state.highlight);
+	    m_this.modified();
+	    m_this.draw();
+	  };
+	
+	  /**
+	   * Handle mouse off events.  If the specific annotation is in the highlight
+	   * state, move it back to the done state.
+	   *
+	   * @param {geo.event} evt The mouse move event.
+	   */
+	  this._handleMouseOff = function (evt) {
+	    if (!evt.data || !evt.data.annotation) {
+	      return;
+	    }
+	    if (m_this.mode() === m_this.modes.edit && evt.data.editHandle && evt.data.selected) {
+	      m_this._selectEditHandle(evt, false);
+	      return;
+	    }
+	    if (evt.data.annotation.state() === geo_annotation.state.highlight) {
+	      evt.data.annotation.state(geo_annotation.state.done);
+	      m_this.modified();
+	      m_this.draw();
+	    }
+	  };
+	
+	  /**
 	   * Handle mouse clicks.  If there is a current annotation, the click event is
 	   * sent to it.
 	   *
 	   * @param {geo.event} evt The mouse click event.
 	   */
 	  this._handleMouseClick = function (evt) {
-	    if (m_this.mode() && m_this.currentAnnotation) {
-	      var update = m_this.currentAnnotation.mouseClick(evt);
+	    var retrigger = false, update;
+	    if (m_this.mode() === m_this.modes.edit) {
+	      if (m_this.map().interactor().hasAction(undefined, undefined, geo_annotation.actionOwner)) {
+	        update = m_this.currentAnnotation.mouseClickEdit(evt);
+	        m_this._updateFromEvent(update);
+	        return;
+	      }
+	      m_this.mode(null);
+	      m_this.draw();
+	      $.each(m_features, function (idx, featureLevel) {
+	        $.each(featureLevel, function (type, feature) {
+	          feature.feature._clearSelectedFeatures();
+	        });
+	      });
+	      retrigger = true;
+	    } else if (m_this.mode() && m_this.currentAnnotation) {
+	      update = m_this.currentAnnotation.mouseClick(evt);
 	      m_this._updateFromEvent(update);
+	      retrigger = !m_this.mode();
+	    } else if (!m_this.mode() && !m_this.currentAnnotation && m_this.options('clickToEdit')) {
+	      var highlighted = m_this.annotations().filter(function (ann) {
+	        return ann.state() === geo_annotation.state.highlight;
+	      });
+	      if (highlighted.length !== 1) {
+	        return;
+	      }
+	      m_this.mode(m_this.modes.edit, highlighted[0]);
+	      m_this.draw();
+	      retrigger = true;
+	    }
+	    if (retrigger) {
+	      // retrigger mouse move to ensure the correct events are attached
+	      m_this.map().interactor().retriggerMouseMove();
 	    }
 	  };
 	
@@ -55292,22 +56055,31 @@
 	    }
 	  };
 	
+	  /* A list of special modes */
+	  this.modes = {
+	    edit: 'edit'
+	  };
+	
 	  /**
 	   * Get or set the current mode.
 	   *
 	   * @param {string|null} [arg] `undefined` to get the current mode, `null` to
-	   *    stop creating/editing, or the name of the type of annotation to create.
+	   *    stop creating/editing, `this.modes.edit` (`'edit'`) plus an annotation
+	   *    to switch to edit mode, or the name of the type of annotation to
+	   *    create.
+	   * @param {geo.annotation} [editAnnotation] If `arg === this.modes.edit`,
+	   *    this is the annotation that should be edited.
 	   * @returns {string|null|this} The current mode or the layer.
 	   */
-	  this.mode = function (arg) {
+	  this.mode = function (arg, editAnnotation) {
 	    if (arg === undefined) {
 	      return m_mode;
 	    }
-	    if (arg !== m_mode) {
+	    if (arg !== m_mode || (arg === m_this.modes.edit && editAnnotation !== m_this.editAnnotation)) {
 	      var createAnnotation, actions,
 	          mapNode = m_this.map().node(), oldMode = m_mode;
 	      m_mode = arg;
-	      mapNode.toggleClass('annotation-input', !!m_mode);
+	      mapNode.toggleClass('annotation-input', !!(m_mode && m_mode !== m_this.modes.edit));
 	      if (m_mode) {
 	        Mousetrap(mapNode[0]).bind('esc', function () { m_this.mode(null); });
 	      } else {
@@ -55318,10 +56090,20 @@
 	          case geo_annotation.state.create:
 	            m_this.removeAnnotation(m_this.currentAnnotation);
 	            break;
+	          case geo_annotation.state.edit:
+	            m_this.currentAnnotation.state(geo_annotation.state.done);
+	            m_this.modified();
+	            m_this.draw();
+	            break;
 	        }
 	        m_this.currentAnnotation = null;
 	      }
 	      switch (m_mode) {
+	        case m_this.modes.edit:
+	          m_this.currentAnnotation = editAnnotation;
+	          m_this.currentAnnotation.state(geo_annotation.state.edit);
+	          m_this.modified();
+	          break;
 	        case 'line':
 	          createAnnotation = geo_annotation.lineAnnotation;
 	          break;
@@ -55350,6 +56132,9 @@
 	      }
 	      m_this.geoTrigger(geo_event.annotation.mode, {
 	        mode: m_mode, oldMode: oldMode});
+	      if (oldMode === m_this.modes.edit) {
+	        m_this.modified();
+	      }
 	    }
 	    return m_this;
 	  };
@@ -55671,7 +56456,8 @@
 	   */
 	  this._update = function () {
 	    if (m_this.getMTime() > m_buildTime.getMTime()) {
-	      var labels = m_this.options('showLabels') ? [] : null;
+	      var labels = m_this.options('showLabels') ? [] : null,
+	          editable = m_this.options('clickToEdit') || m_this.mode() === m_this.modes.edit;
 	      /* Interally, we have a set of feature levels (to provide z-index
 	       * support), each of which can have data from multiple annotations.  We
 	       * clear the data on each of these features, then build it up from each
@@ -55700,7 +56486,8 @@
 	            /* Create features as needed */
 	            if (!m_features[idx][type]) {
 	              var feature = m_this.createFeature(type, {
-	                gcs: m_this.map().gcs()
+	                gcs: m_this.map().gcs(),
+	                selectionAPI: editable
 	              });
 	              if (!feature) {
 	                /* We can't create the desired feature, porbably because of the
@@ -55713,6 +56500,11 @@
 	                }
 	                return;
 	              }
+	              if (editable) {
+	                feature.geoOn(geo_event.feature.mouseon, m_this._handleMouseOn);
+	                feature.geoOn(geo_event.feature.mouseoff, m_this._handleMouseOff);
+	              }
+	
 	              /* Since each annotation can have separate styles, the styles are
 	               * combined together with a meta-style function.  Any style that
 	               * could be used should be in this list.  Color styles may be
@@ -55750,12 +56542,32 @@
 	                style: style,
 	                data: []
 	              };
+	            } else {
+	              feature = m_features[idx][type].feature;
+	              // update whether we check for selections on existing features
+	              if (feature.selectionAPI() !== !!editable) {
+	                feature.selectionAPI(editable);
+	                if (editable) {
+	                  feature.geoOn(geo_event.feature.mouseon, m_this._handleMouseOn);
+	                  feature.geoOn(geo_event.feature.mouseoff, m_this._handleMouseOff);
+	                } else {
+	                  feature.geoOff(geo_event.feature.mouseon, m_this._handleMouseOn);
+	                  feature.geoOff(geo_event.feature.mouseoff, m_this._handleMouseOff);
+	                }
+	              }
 	            }
 	            /* Collect the data for each feature */
-	            m_features[idx][type].data.push(featureSpec.data || featureSpec);
-	            if (featureSpec.scaleOnZoom) {
-	              m_features[idx][type].feature.scaleOnZoom = true;
+	            var dataEntry = featureSpec.data || featureSpec;
+	            if (!Array.isArray(dataEntry)) {
+	              dataEntry = [dataEntry];
 	            }
+	            dataEntry.forEach(function (dataElement) {
+	              dataElement.annotation = annotation;
+	              m_features[idx][type].data.push(dataElement);
+	              if (featureSpec.scaleOnZoom) {
+	                m_features[idx][type].feature.scaleOnZoom = true;
+	              }
+	            });
 	          });
 	        });
 	      });
@@ -55877,6 +56689,7 @@
 	    }
 	    m_this.geoOn(geo_event.actionselection, m_this._processAction);
 	    m_this.geoOn(geo_event.actionmove, m_this._processAction);
+	    m_this.geoOn(geo_event.actionup, m_this._processAction);
 	
 	    m_this.geoOn(geo_event.mouseclick, m_this._handleMouseClick);
 	    m_this.geoOn(geo_event.mousemove, m_this._handleMouseMove);
@@ -57641,14 +58454,10 @@
 	
 	  // default mouse object
 	  m_mouse = {
-	    page: { // mouse position relative to the page
-	      x: 0,
-	      y: 0
-	    },
-	    map: { // mouse position relative to the map
-	      x: 0,
-	      y: 0
-	    },
+	    page: {x: 0, y: 0}, // mouse position relative to the page
+	    map: {x: 0, y: 0}, // mouse position relative to the map
+	    geo: {x: 0, y: 0},  // mouse position in map interface gcs
+	    mapgcs: {x: 0, y: 0},  // mouse position in map gcs
 	    // mouse button status
 	    buttons: {
 	      left: false,
@@ -57927,6 +58736,13 @@
 	  };
 	
 	  /**
+	   * Retrigger a mouse movement with the current mouse state.
+	   */
+	  this.retriggerMouseMove = function () {
+	    m_this.map().geoTrigger(geo_event.mousemove, m_this.mouse());
+	  };
+	
+	  /**
 	   * Connects events to a map.  If the map is not set, then this does nothing.
 	   * @returns {this}
 	   */
@@ -58129,17 +58945,26 @@
 	        m_mouse.buttons[prop] = false;
 	      }
 	    }
-	    if (evt.type !== 'mouseup') {
+	    /* If the event buttons are specified, use them in preference to the
+	     * evt.which for determining which buttons are down.  buttons is a bitfield
+	     * and therefore can represent more than one button at a time. */
+	    if (evt.buttons !== undefined) {
+	      m_mouse.buttons.left = !!(evt.buttons & 1);
+	      m_mouse.buttons.right = !!(evt.buttons & 2);
+	      m_mouse.buttons.middle = !!(evt.buttons & 4);
+	    } else if (evt.type !== 'mouseup') {
+	      /* If we don't evt.buttons, fall back to which, but not on mouseup. */
 	      switch (evt.which) {
 	        case 1: m_mouse.buttons.left = true; break;
 	        case 2: m_mouse.buttons.middle = true; break;
 	        case 3: m_mouse.buttons.right = true; break;
-	        default:
-	          if (evt.which) {
-	            m_mouse.buttons[evt.which] = true;
-	          }
-	          break;
 	      }
+	    }
+	    /* When handling touch events, evt.which can be a string, in which case
+	     * handle a "button" with that name -- a non-integer string will not
+	     * evaluate as being between 1 and 3. */
+	    if (evt.which && !(evt.which >= 1 && evt.which <= 3)) {
+	      m_mouse.buttons[evt.which] = true;
 	    }
 	  };
 	
@@ -59289,7 +60114,7 @@
 	   * @returns {mapInteractor}
 	   */
 	  this.simulateEvent = function (type, options) {
-	    var evt, page, offset, which;
+	    var evt, page, offset, which, buttons;
 	
 	    if (!m_this.map()) {
 	      return m_this;
@@ -59323,10 +60148,13 @@
 	
 	    if (options.button === 'left') {
 	      which = 1;
+	      buttons = 1;
 	    } else if (options.button === 'right') {
 	      which = 3;
+	      buttons = 2;
 	    } else if (options.button === 'middle') {
 	      which = 2;
+	      buttons = 4;
 	    }
 	
 	    options.modifiers = options.modifiers || [];
@@ -59338,11 +60166,11 @@
 	        pageX: page.x,
 	        pageY: page.y,
 	        which: which,
+	        buttons: buttons,
 	        altKey: options.modifiers.indexOf('alt') >= 0,
 	        ctrlKey: options.modifiers.indexOf('ctrl') >= 0,
 	        metaKey: options.modifiers.indexOf('meta') >= 0,
 	        shiftKey: options.modifiers.indexOf('shift') >= 0,
-	
 	        center: options.center,
 	        rotation: options.touch ? options.rotation || 0 : options.rotation,
 	        scale: options.touch ? options.scale || 1 : options.scale,
@@ -68419,14 +69247,14 @@
 /* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = ("0.14.0");
+	module.exports = ("0.15.0");
 
 
 /***/ }),
 /* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = ("6e069c26facbe3f4d86f1d41d2f2a2f40ee99490");
+	module.exports = ("b3f34a0382333b7db2e982fc310a2f125003bf26");
 
 
 /***/ }),
@@ -68511,11 +69339,11 @@
 	var lineFeature = __webpack_require__(212);
 	
 	/**
-	 * Create a new instance of class lineFeature
+	 * Create a new instance of class lineFeature.
 	 *
 	 * @class geo.d3.lineFeature
 	 * @extends geo.lineFeature
-	 * @extends geo.d3.object
+	 * @param {geo.lineFeature.spec} arg
 	 * @returns {geo.d3.lineFeature}
 	 */
 	var d3_lineFeature = function (arg) {
@@ -68543,7 +69371,10 @@
 	      s_update = this._update;
 	
 	  /**
-	   * Initialize
+	   * Initialize.
+	   *
+	   * @param {geo.lineFeature.spec} arg The feature specification.
+	   * @returns {this}
 	   */
 	  this._init = function (arg) {
 	    s_init.call(m_this, arg);
@@ -68551,9 +69382,9 @@
 	  };
 	
 	  /**
-	   * Build
+	   * Build.  Create the necessary elements to render lines.
 	   *
-	   * @override
+	   * @returns {this}
 	   */
 	  this._build = function () {
 	    var data = m_this.data() || [],
@@ -68617,9 +69448,9 @@
 	  };
 	
 	  /**
-	   * Update
+	   * Update.  Rebuild if necessary.
 	   *
-	   * @override
+	   * @returns {this}
 	   */
 	  this._update = function () {
 	    s_update.call(m_this);
@@ -70027,10 +70858,11 @@
 	};
 	
 	/**
-	 * Create a new instance of lineFeature
+	 * Create a new instance of lineFeature.
 	 *
 	 * @class geo.gl.lineFeature
 	 * @extends geo.lineFeature
+	 * @param {geo.lineFeature.spec} arg
 	 * @returns {geo.gl.lineFeature}
 	 */
 	var gl_lineFeature = function (arg) {
@@ -70062,9 +70894,15 @@
 	      m_antialiasingUniform,
 	      m_flagsUniform,
 	      m_dynamicDraw = arg.dynamicDraw === undefined ? false : arg.dynamicDraw,
+	      m_geometry,
 	      s_init = this._init,
 	      s_update = this._update;
 	
+	  /**
+	   * Create the vertex shader for lines.
+	   *
+	   * @returns {vgl.shader}
+	   */
 	  function createVertexShader() {
 	    var vertexShaderSource = [
 	          '#ifdef GL_ES',
@@ -70237,6 +71075,14 @@
 	    return shader;
 	  }
 	
+	  /**
+	   * Create the fragment shader for lines.
+	   *
+	   * @param {boolean} [allowDebug] If truthy, include code that can render
+	   *    in debug mode.  This is mildly less efficient, even if debugging is
+	   *    not turned on.
+	   * @returns {vgl.shader}
+	   */
 	  function createFragmentShader(allowDebug) {
 	    var fragmentShaderSource = [
 	          '#ifdef GL_ES',
@@ -70342,15 +71188,19 @@
 	    return shader;
 	  }
 	
-	  function createGLLines() {
+	 /**
+	   * Create and style the data needed to render the lines.
+	   *
+	   * @param {boolean} onlyStyle if true, use the existing geoemtry and just
+	   *    recalculate the style.
+	   */
+	  function createGLLines(onlyStyle) {
 	    var data = m_this.data(),
 	        i, j, k, v, v2, lidx,
 	        numSegments = 0, len,
-	        lineItem, lineItemData,
+	        lineItemList, lineItem, lineItemData,
 	        vert = [{}, {}], v1 = vert[1],
 	        pos, posIdx3, firstpos, firstPosIdx3,
-	        position = [],
-	        posFunc = m_this.position(),
 	        strokeWidthFunc = m_this.style.get('strokeWidth'), strokeWidthVal,
 	        strokeColorFunc = m_this.style.get('strokeColor'), strokeColorVal,
 	        strokeOpacityFunc = m_this.style.get('strokeOpacity'), strokeOpacityVal,
@@ -70365,13 +71215,14 @@
 	        strokeWidthBuf, strokeColorBuf, strokeOpacityBuf,
 	        dest, dest3,
 	        geom = m_mapper.geometryData(),
-	        closedFunc = m_this.style.get('closed'), closedVal, closed = [];
+	        closedFunc = m_this.style.get('closed'), closedVal, closed = [],
+	        updateFlags = true;
 	
-	    closedVal = util.isFunction(m_this.style('closed')) ? undefined : closedFunc();
-	    lineCapVal = util.isFunction(m_this.style('lineCap')) ? undefined : lineCapFunc();
-	    lineJoinVal = util.isFunction(m_this.style('lineJoin')) ? undefined : lineJoinFunc();
+	    closedVal = util.isFunction(m_this.style('closed')) ? undefined : (closedFunc() || false);
+	    lineCapVal = util.isFunction(m_this.style('lineCap')) ? undefined : (lineCapFunc() || 'butt');
+	    lineJoinVal = util.isFunction(m_this.style('lineJoin')) ? undefined : (lineJoinFunc() || 'miter');
 	    strokeColorVal = util.isFunction(m_this.style('strokeColor')) ? undefined : strokeColorFunc();
-	    strokeOffsetVal = util.isFunction(m_this.style('strokeOffset')) ? undefined : strokeOffsetFunc();
+	    strokeOffsetVal = util.isFunction(m_this.style('strokeOffset')) ? undefined : (strokeOffsetFunc() || 0);
 	    strokeOpacityVal = util.isFunction(m_this.style('strokeOpacity')) ? undefined : strokeOpacityFunc();
 	    strokeWidthVal = util.isFunction(m_this.style('strokeWidth')) ? undefined : strokeWidthFunc();
 	
@@ -70383,54 +71234,80 @@
 	    }
 	    m_flagsUniform.set(fixedFlags);
 	    m_antialiasingUniform.set(antialiasing);
-	    for (i = 0; i < data.length; i += 1) {
-	      lineItem = m_this.line()(data[i], i);
-	      if (lineItem.length < 2) {
-	        continue;
-	      }
-	      numSegments += lineItem.length - 1;
-	      for (j = 0; j < lineItem.length; j += 1) {
-	        pos = posFunc(lineItem[j], j, lineItem, i);
-	        position.push(pos.x);
-	        position.push(pos.y);
-	        position.push(pos.z || 0.0);
-	        if (!j) {
-	          firstpos = pos;
+	
+	    if (!onlyStyle) {
+	      var position = [],
+	          posFunc = m_this.position();
+	      lineItemList = new Array(data.length);
+	      for (i = 0; i < data.length; i += 1) {
+	        lineItem = m_this.line()(data[i], i);
+	        lineItemList[i] = lineItem;
+	        if (lineItem.length < 2) {
+	          continue;
+	        }
+	        numSegments += lineItem.length - 1;
+	        for (j = 0; j < lineItem.length; j += 1) {
+	          pos = posFunc(lineItem[j], j, lineItem, i);
+	          position.push(pos.x);
+	          position.push(pos.y);
+	          position.push(pos.z || 0.0);
+	          if (!j) {
+	            firstpos = pos;
+	          }
+	        }
+	        if (lineItem.length > 2 && (closedVal === undefined ? closedFunc(data[i], i) : closedVal)) {
+	          /* line is closed */
+	          if (pos.x !== firstpos.x || pos.y !== firstpos.y ||
+	              pos.z !== firstpos.z) {
+	            numSegments += 1;
+	            closed[i] = 2;  /* first and last points are distinct */
+	          } else {
+	            closed[i] = 1;  /* first point is repeated as last point */
+	          }
 	        }
 	      }
-	      if (lineItem.length > 2 && (closedVal === undefined ? closedFunc(data[i], i) : closedVal)) {
-	        /* line is closed */
-	        if (pos.x !== firstpos.x || pos.y !== firstpos.y ||
-	            pos.z !== firstpos.z) {
-	          numSegments += 1;
-	          closed[i] = 2;  /* first and last points are distinct */
-	        } else {
-	          closed[i] = 1;  /* first point is repeated as last point */
-	        }
+	
+	      position = transform.transformCoordinates(
+	        m_this.gcs(), m_this.layer().map().gcs(), position, 3);
+	      len = numSegments * order.length;
+	      posBuf = util.getGeomBuffer(geom, 'pos', len * 3);
+	      prevBuf = util.getGeomBuffer(geom, 'prev', len * 3);
+	      nextBuf = util.getGeomBuffer(geom, 'next', len * 3);
+	      farBuf = util.getGeomBuffer(geom, 'far', len * 3);
+	
+	      indicesBuf = geom.primitive(0).indices();
+	      if (!(indicesBuf instanceof Uint16Array) || indicesBuf.length !== len) {
+	        indicesBuf = new Uint16Array(len);
+	        geom.primitive(0).setIndices(indicesBuf);
 	      }
+	      // save some information to be reused when we update only style
+	      m_geometry = {
+	        numSegments: numSegments,
+	        closed: closed,
+	        lineItemList: lineItemList,
+	        lineCapVal: lineCapVal,
+	        lineJoinVal: lineJoinVal,
+	        strokeOffsetVal: strokeOffsetVal
+	      };
+	    } else {
+	      numSegments = m_geometry.numSegments;
+	      closed = m_geometry.closed;
+	      lineItemList = m_geometry.lineItemList;
+	      len = numSegments * order.length;
+	      updateFlags = (
+	        (lineCapVal !== m_geometry.lineCapVal || lineCapVal === undefined) ||
+	        (lineJoinVal !== m_geometry.lineJoinVal || lineJoinVal === undefined) ||
+	        (strokeOffsetVal !== m_geometry.strokeOffsetVal || strokeOffsetVal === undefined)
+	      );
 	    }
 	
-	    position = transform.transformCoordinates(
-	                 m_this.gcs(), m_this.layer().map().gcs(),
-	                 position, 3);
-	
-	    len = numSegments * order.length;
-	    posBuf = util.getGeomBuffer(geom, 'pos', len * 3);
-	    prevBuf = util.getGeomBuffer(geom, 'prev', len * 3);
-	    nextBuf = util.getGeomBuffer(geom, 'next', len * 3);
-	    farBuf = util.getGeomBuffer(geom, 'far', len * 3);
 	    flagsBuf = util.getGeomBuffer(geom, 'flags', len);
 	    strokeWidthBuf = util.getGeomBuffer(geom, 'strokeWidth', len);
 	    strokeColorBuf = util.getGeomBuffer(geom, 'strokeColor', len * 3);
 	    strokeOpacityBuf = util.getGeomBuffer(geom, 'strokeOpacity', len);
-	    indicesBuf = geom.primitive(0).indices();
-	    if (!(indicesBuf instanceof Uint16Array) || indicesBuf.length !== len) {
-	      indicesBuf = new Uint16Array(len);
-	      geom.primitive(0).setIndices(indicesBuf);
-	    }
 	
 	    for (i = posIdx3 = dest = dest3 = 0; i < data.length; i += 1) {
-	      lineItem = m_this.line()(data[i], i);
+	      lineItem = lineItemList[i];
 	      if (lineItem.length < 2) {
 	        continue;
 	      }
@@ -70449,66 +71326,80 @@
 	          vert[0] = vert[1];
 	          vert[1] = v1;
 	        }
-	        v1.pos = j === lidx ? posIdx3 : firstPosIdx3;
-	        v1.prev = lidx ? posIdx3 - 3 : (closed[i] ?
-	            firstPosIdx3 + (lineItem.length - 3 + closed[i]) * 3 : posIdx3);
-	        v1.next = j + 1 < lineItem.length ? posIdx3 + 3 : (closed[i] ?
-	            (j !== lidx ? firstPosIdx3 + 3 : firstPosIdx3 + 6 - closed[i] * 3) :
-	            posIdx3);
+	        if (!onlyStyle) {
+	          v1.pos = j === lidx ? posIdx3 : firstPosIdx3;
+	          v1.prev = lidx ? posIdx3 - 3 : (closed[i] ?
+	              firstPosIdx3 + (lineItem.length - 3 + closed[i]) * 3 : posIdx3);
+	          v1.next = j + 1 < lineItem.length ? posIdx3 + 3 : (closed[i] ?
+	              (j !== lidx ? firstPosIdx3 + 3 : firstPosIdx3 + 6 - closed[i] * 3) :
+	              posIdx3);
+	        }
 	        v1.strokeWidth = strokeWidthVal === undefined ? strokeWidthFunc(lineItemData, lidx, lineItem, i) : strokeWidthVal;
 	        v1.strokeColor = strokeColorVal === undefined ? strokeColorFunc(lineItemData, lidx, lineItem, i) : strokeColorVal;
 	        v1.strokeOpacity = strokeOpacityVal === undefined ? strokeOpacityFunc(lineItemData, lidx, lineItem, i) : strokeOpacityVal;
-	        v1.strokeOffset = (strokeOffsetVal === undefined ? strokeOffsetFunc(lineItemData, lidx, lineItem, i) : strokeOffsetVal) || 0;
-	        if (v1.strokeOffset) {
-	          /* we use 11 bits to store the offset, and we want to store values
-	           * from -1 to 1, so multiply our values by 1023, and use some bit
-	           * manipulation to ensure that it is packed properly */
-	          v1.posStrokeOffset = Math.round(2048 + 1023 * Math.min(1, Math.max(-1, v1.strokeOffset))) & 0x7FF;
-	          v1.negStrokeOffset = Math.round(2048 - 1023 * Math.min(1, Math.max(-1, v1.strokeOffset))) & 0x7FF;
-	        } else {
-	          v1.posStrokeOffset = v1.negStrokeOffset = 0;
-	        }
-	        if (!closed[i] && (!j || j === lineItem.length - 1)) {
-	          v1.flags = flagsLineCap[lineCapVal === undefined ? lineCapFunc(lineItemData, lidx, lineItem, i) : lineCapVal] || flagsLineCap.butt;
-	        } else {
-	          v1.flags = flagsLineJoin[lineJoinVal === undefined ? lineJoinFunc(lineItemData, lidx, lineItem, i) : lineJoinVal] || flagsLineJoin.miter;
+	        if (updateFlags) {
+	          v1.strokeOffset = (strokeOffsetVal === undefined ? strokeOffsetFunc(lineItemData, lidx, lineItem, i) : strokeOffsetVal) || 0;
+	          if (v1.strokeOffset) {
+	            /* we use 11 bits to store the offset, and we want to store values
+	             * from -1 to 1, so multiply our values by 1023, and use some bit
+	             * manipulation to ensure that it is packed properly */
+	            v1.posStrokeOffset = Math.round(2048 + 1023 * Math.min(1, Math.max(-1, v1.strokeOffset))) & 0x7FF;
+	            v1.negStrokeOffset = Math.round(2048 - 1023 * Math.min(1, Math.max(-1, v1.strokeOffset))) & 0x7FF;
+	          } else {
+	            v1.posStrokeOffset = v1.negStrokeOffset = 0;
+	          }
+	          if (!closed[i] && (!j || j === lineItem.length - 1)) {
+	            v1.flags = flagsLineCap[lineCapVal === undefined ? lineCapFunc(lineItemData, lidx, lineItem, i) : lineCapVal] || flagsLineCap.butt;
+	          } else {
+	            v1.flags = flagsLineJoin[lineJoinVal === undefined ? lineJoinFunc(lineItemData, lidx, lineItem, i) : lineJoinVal] || flagsLineJoin.miter;
+	          }
 	        }
 	
 	        if (j) {
 	          for (k = 0; k < order.length; k += 1, dest += 1, dest3 += 3) {
 	            v = vert[order[k][0]];
 	            v2 = vert[1 - order[k][0]];
-	            posBuf[dest3] = position[v.pos];
-	            posBuf[dest3 + 1] = position[v.pos + 1];
-	            posBuf[dest3 + 2] = position[v.pos + 2];
+	            if (!onlyStyle) {
+	              posBuf[dest3] = position[v.pos];
+	              posBuf[dest3 + 1] = position[v.pos + 1];
+	              posBuf[dest3 + 2] = position[v.pos + 2];
+	            }
 	            if (!order[k][0]) {
-	              prevBuf[dest3] = position[v.prev];
-	              prevBuf[dest3 + 1] = position[v.prev + 1];
-	              prevBuf[dest3 + 2] = position[v.prev + 2];
-	              nextBuf[dest3] = position[v.next];
-	              nextBuf[dest3 + 1] = position[v.next + 1];
-	              nextBuf[dest3 + 2] = position[v.next + 2];
-	              farBuf[dest3] = position[v2.next];
-	              farBuf[dest3 + 1] = position[v2.next + 1];
-	              farBuf[dest3 + 2] = position[v2.next + 2];
-	              flagsBuf[dest] = (flagsVertex[order[k][1]] |
-	                (v.flags << flagsNearLineShift) |
-	                (v2.flags << flagsFarLineShift) |
-	                (v.negStrokeOffset << flagsNearOffsetShift));
+	              if (!onlyStyle) {
+	                prevBuf[dest3] = position[v.prev];
+	                prevBuf[dest3 + 1] = position[v.prev + 1];
+	                prevBuf[dest3 + 2] = position[v.prev + 2];
+	                nextBuf[dest3] = position[v.next];
+	                nextBuf[dest3 + 1] = position[v.next + 1];
+	                nextBuf[dest3 + 2] = position[v.next + 2];
+	                farBuf[dest3] = position[v2.next];
+	                farBuf[dest3 + 1] = position[v2.next + 1];
+	                farBuf[dest3 + 2] = position[v2.next + 2];
+	              }
+	              if (updateFlags) {
+	                flagsBuf[dest] = (flagsVertex[order[k][1]] |
+	                  (v.flags << flagsNearLineShift) |
+	                  (v2.flags << flagsFarLineShift) |
+	                  (v.negStrokeOffset << flagsNearOffsetShift));
+	              }
 	            } else {
-	              prevBuf[dest3] = position[v.next];
-	              prevBuf[dest3 + 1] = position[v.next + 1];
-	              prevBuf[dest3 + 2] = position[v.next + 2];
-	              nextBuf[dest3] = position[v.prev];
-	              nextBuf[dest3 + 1] = position[v.prev + 1];
-	              nextBuf[dest3 + 2] = position[v.prev + 2];
-	              farBuf[dest3] = position[v2.prev];
-	              farBuf[dest3 + 1] = position[v2.prev + 1];
-	              farBuf[dest3 + 2] = position[v2.prev + 2];
-	              flagsBuf[dest] = (flagsVertex[order[k][1]] |
-	                (v.flags << flagsNearLineShift) |
-	                (v2.flags << flagsFarLineShift) |
-	                (v.posStrokeOffset << flagsNearOffsetShift));
+	              if (!onlyStyle) {
+	                prevBuf[dest3] = position[v.next];
+	                prevBuf[dest3 + 1] = position[v.next + 1];
+	                prevBuf[dest3 + 2] = position[v.next + 2];
+	                nextBuf[dest3] = position[v.prev];
+	                nextBuf[dest3 + 1] = position[v.prev + 1];
+	                nextBuf[dest3 + 2] = position[v.prev + 2];
+	                farBuf[dest3] = position[v2.prev];
+	                farBuf[dest3 + 1] = position[v2.prev + 1];
+	                farBuf[dest3 + 2] = position[v2.prev + 2];
+	              }
+	              if (updateFlags) {
+	                flagsBuf[dest] = (flagsVertex[order[k][1]] |
+	                  (v.flags << flagsNearLineShift) |
+	                  (v2.flags << flagsFarLineShift) |
+	                  (v.posStrokeOffset << flagsNearOffsetShift));
+	              }
 	            }
 	            strokeWidthBuf[dest] = v.strokeWidth;
 	            strokeColorBuf[dest3] = v.strokeColor.r;
@@ -70520,18 +71411,22 @@
 	      }
 	    }
 	
-	    geom.boundsDirty(true);
 	    m_mapper.modified();
-	    m_mapper.boundsDirtyTimestamp().modified();
+	    if (!onlyStyle) {
+	      geom.boundsDirty(true);
+	      m_mapper.boundsDirtyTimestamp().modified();
+	    }
 	  }
 	
 	  /**
-	   * Return the arrangement of vertices used for each line segment.
+	   * Return the arrangement of vertices used for each line segment.  Each line
+	   * is rendered by two triangles.  This reports how the vertices of those
+	   * triangles are arranged.  Each entry is a triple: the line-end number, the
+	   * vertex use, and the side of the line that the vertex is on.
 	   *
-	   * @returns {Number}
+	   * @returns {array[]}
 	   */
 	  this.featureVertices = function () {
-	    // return [[0, -1], [0, 1], [1, -1], [1, 1], [1, -1], [0, 1]];
 	    return [[0, 'corner', -1], [0, 'near', 1], [1, 'far', -1],
 	            [1, 'corner', 1], [1, 'near', -1], [0, 'far', 1]];
 	  };
@@ -70539,14 +71434,17 @@
 	  /**
 	   * Return the number of vertices used for each line segment.
 	   *
-	   * @returns {Number}
+	   * @returns {number}
 	   */
 	  this.verticesPerFeature = function () {
 	    return m_this.featureVertices().length;
 	  };
 	
 	  /**
-	   * Initialize
+	   * Initialize.
+	   *
+	   * @param {geo.lineFeature.spec} arg The feature specification.
+	   * @returns {this}
 	   */
 	  this._init = function (arg) {
 	    var prog = vgl.shaderProgram(),
@@ -70633,10 +71531,11 @@
 	    geom.addSource(flagsData);
 	    geom.addPrimitive(triangles);
 	    m_mapper.setGeometryData(geom);
+	    return m_this;
 	  };
 	
 	  /**
-	   * Return list of actors
+	   * Return list of vgl actorss used for rendering.
 	   *
 	   * @returns {vgl.actor[]}
 	   */
@@ -70648,23 +71547,32 @@
 	  };
 	
 	  /**
-	   * Build
+	   * Build.  Create the necessary elements to render lines.
 	   *
-	   * @override
+	   * There are several optimizations to do less work when possible.  If only
+	   * styles have changed, the geometry is not re-transformed.  If styles use
+	   * static values (rather than functions), they are only calculated once.  If
+	   * styles have not changed that would affect flags (lineCap, lineJoin, and
+	   * strokeOffset), the vertex flags are not recomputed -- this helps, as it is
+	   * a slow step due to most javascript interpreters not optimizing bit
+	   * operations.
+	   *
+	   * @returns {this}
 	   */
 	  this._build = function () {
-	    createGLLines();
+	    createGLLines(m_this.dataTime().getMTime() < m_this.buildTime().getMTime() && m_geometry);
 	
 	    if (!m_this.renderer().contextRenderer().hasActor(m_actor)) {
 	      m_this.renderer().contextRenderer().addActor(m_actor);
 	    }
 	    m_this.buildTime().modified();
+	    return m_this;
 	  };
 	
 	  /**
-	   * Update
+	   * Update.  Rebuild if necessary.
 	   *
-	   * @override
+	   * @returns {this}
 	   */
 	  this._update = function () {
 	    s_update.call(m_this);
@@ -70680,10 +71588,11 @@
 	    m_actor.setVisible(m_this.visible());
 	    m_actor.material().setBinNumber(m_this.bin());
 	    m_this.updateTime().modified();
+	    return m_this;
 	  };
 	
 	  /**
-	   * Destroy
+	   * Destroy.  Free used resources.
 	   */
 	  this._exit = function () {
 	    m_this.renderer().contextRenderer().removeActor(m_actor);
@@ -70697,7 +71606,6 @@
 	
 	inherit(gl_lineFeature, lineFeature);
 	
-	// Now register it
 	var capabilities = {};
 	capabilities[lineFeature.capabilities.basic] = true;
 	capabilities[lineFeature.capabilities.multicolor] = true;
@@ -71411,7 +72319,7 @@
 	  }
 	
 	  /**
-	   * Create and style the triangles need to render the polygons.
+	   * Create and style the triangles needed to render the polygons.
 	   *
 	   * There are several optimizations to do less work when possible.  If only
 	   * styles have changed, the triangulation is not recomputed, nor is the
@@ -71646,7 +72554,6 @@
 	   * @override
 	   */
 	  this._build = function () {
-	
 	    createGLPolygons(m_this.dataTime().getMTime() < m_this.buildTime().getMTime() && m_geometry);
 	
 	    if (!m_this.renderer().contextRenderer().hasActor(m_actor)) {
@@ -73671,11 +74578,11 @@
 	var lineFeature = __webpack_require__(212);
 	
 	/**
-	 * Create a new instance of class lineFeature
+	 * Create a new instance of class lineFeature.
 	 *
 	 * @class geo.canvas.lineFeature
 	 * @extends geo.lineFeature
-	 * @extends geo.canvas.object
+	 * @param {geo.lineFeature.spec} arg
 	 * @returns {geo.canvas.lineFeature}
 	 */
 	var canvas_lineFeature = function (arg) {
@@ -73697,9 +74604,10 @@
 	
 	  /**
 	   * Render the data on the canvas.
+	   *
 	   * @protected
 	   * @param {object} context2d the canvas context to draw in.
-	   * @param {object} map the parent map object.
+	   * @param {geo.map} map the parent map object.
 	   */
 	  this._renderOnCanvas = function (context2d, map) {
 	    var data = m_this.data(),

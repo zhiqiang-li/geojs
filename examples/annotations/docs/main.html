@@ -66,7 +66,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> query = utils.getQuery();
-  $(<span class="hljs-string">'#clickadd'</span>).prop(<span class="hljs-string">'checked'</span>, query.clickadd !== <span class="hljs-string">'false'</span>);
+  $(<span class="hljs-string">'#clickmode'</span>).val(query.clickmode || <span class="hljs-string">'edit'</span>);
   $(<span class="hljs-string">'#keepadding'</span>).prop(<span class="hljs-string">'checked'</span>, query.keepadding === <span class="hljs-string">'true'</span>);
   $(<span class="hljs-string">'#showLabels'</span>).prop(<span class="hljs-string">'checked'</span>, query.labels !== <span class="hljs-string">'false'</span>);
   <span class="hljs-keyword">if</span> (query.lastannotation) {
@@ -173,7 +173,8 @@ geojson.  This can become too long for some browsers.</p>
             <div class="content"><div class='highlight'><pre>  layer = map.createLayer(<span class="hljs-string">'annotation'</span>, {
     <span class="hljs-attr">renderer</span>: query.renderer ? (query.renderer === <span class="hljs-string">'html'</span> ? <span class="hljs-literal">null</span> : query.renderer) : <span class="hljs-literal">undefined</span>,
     <span class="hljs-attr">annotations</span>: query.renderer ? <span class="hljs-literal">undefined</span> : geo.listAnnotations(),
-    <span class="hljs-attr">showLabels</span>: query.labels !== <span class="hljs-string">'false'</span>
+    <span class="hljs-attr">showLabels</span>: query.labels !== <span class="hljs-string">'false'</span>,
+    <span class="hljs-attr">clickToEdit</span>: !query.clickmode || query.clickmode === <span class="hljs-string">'edit'</span>
   });</pre></div></div>
             
         </li>
@@ -260,7 +261,7 @@ geojson.  This can become too long for some browsers.</p>
    * @param {geo.event} evt geojs event.
    */</span>
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mouseClickToStart</span>(<span class="hljs-params">evt</span>) </span>{
-    <span class="hljs-keyword">if</span> (evt.handled || query.clickadd === <span class="hljs-string">'false'</span>) {
+    <span class="hljs-keyword">if</span> (evt.handled || query.clickmode !== <span class="hljs-string">'add'</span>) {
       <span class="hljs-keyword">return</span>;
     }
     <span class="hljs-keyword">if</span> (evt.buttonsDown.left) {
@@ -295,6 +296,10 @@ geojson.  This can become too long for some browsers.</p>
     <span class="hljs-keyword">switch</span> (param) {
       <span class="hljs-keyword">case</span> <span class="hljs-string">'labels'</span>:
         layer.options(<span class="hljs-string">'showLabels'</span>, <span class="hljs-string">''</span> + value !== <span class="hljs-string">'false'</span>);
+        layer.draw();
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'clickmode'</span>:
+        layer.options(<span class="hljs-string">'clickToEdit'</span>, value === <span class="hljs-string">'edit'</span>);
         layer.draw();
         <span class="hljs-keyword">break</span>;
     }
@@ -546,6 +551,10 @@ wasn’t caused by clicking the button, reenable the annotation mode.</p>
         id = ctl.closest(<span class="hljs-string">'.entry'</span>).attr(<span class="hljs-string">'annotation-id'</span>),
         annotation = layer.annotationById(id);
     <span class="hljs-keyword">switch</span> (action) {
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'adjust'</span>:
+        layer.mode(layer.modes.edit, annotation);
+        layer.draw();
+        <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'edit'</span>:
         show_edit_dialog(id, annotation);
         <span class="hljs-keyword">break</span>;
