@@ -1,10 +1,10 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory((function webpackLoadOptionalExternalModule() { try { return require("Hammer"); } catch(e) {} }()), (function webpackLoadOptionalExternalModule() { try { return require("d3"); } catch(e) {} }()));
+		module.exports = factory((function webpackLoadOptionalExternalModule() { try { return require("hammerjs"); } catch(e) {} }()), (function webpackLoadOptionalExternalModule() { try { return require("d3"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["Hammer", "d3"], factory);
+		define(["hammerjs", "d3"], factory);
 	else if(typeof exports === 'object')
-		exports["geo"] = factory((function webpackLoadOptionalExternalModule() { try { return require("Hammer"); } catch(e) {} }()), (function webpackLoadOptionalExternalModule() { try { return require("d3"); } catch(e) {} }()));
+		exports["geo"] = factory((function webpackLoadOptionalExternalModule() { try { return require("hammerjs"); } catch(e) {} }()), (function webpackLoadOptionalExternalModule() { try { return require("d3"); } catch(e) {} }()));
 	else
 		root["geo"] = factory(root["Hammer"], root["d3"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_224__, __WEBPACK_EXTERNAL_MODULE_230__) {
@@ -48667,7 +48667,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 224 */
 /***/ (function(module, exports) {
 
-	if(typeof __WEBPACK_EXTERNAL_MODULE_224__ === 'undefined') {var e = new Error("Cannot find module \"Hammer\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
+	if(typeof __WEBPACK_EXTERNAL_MODULE_224__ === 'undefined') {var e = new Error("Cannot find module \"hammerjs\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
 	module.exports = __WEBPACK_EXTERNAL_MODULE_224__;
 
 /***/ }),
@@ -57003,14 +57003,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = ("0.15.0");
+	module.exports = ("0.15.1");
 
 
 /***/ }),
 /* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = ("b3f34a0382333b7db2e982fc310a2f125003bf26");
+	module.exports = ("36b3b8019ace1421145862b156fc2684b8f59d16");
 
 
 /***/ }),
