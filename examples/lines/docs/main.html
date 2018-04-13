@@ -46,7 +46,15 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>$(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-<span class="hljs-meta">  'use strict'</span>;</pre></div></div>
+<span class="hljs-meta">  'use strict'</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">lineAccessor</span>(<span class="hljs-params">data, index</span>) </span>{
+    <span class="hljs-keyword">return</span> data.data;
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">positionAccessor</span>(<span class="hljs-params">data, index</span>) </span>{
+    <span class="hljs-keyword">return</span> {<span class="hljs-attr">x</span>: data[<span class="hljs-number">0</span>], <span class="hljs-attr">y</span>: data[<span class="hljs-number">1</span>]};
+  }</pre></div></div>
             
         </li>
         
@@ -84,7 +92,8 @@
     },
     <span class="hljs-attr">zoom</span>: <span class="hljs-number">11</span>
   });
-  <span class="hljs-keyword">var</span> osm, mapUrl, layer, lineFeature, lines, rawdata, skipdraw;</pre></div></div>
+  <span class="hljs-keyword">var</span> osm, mapUrl, layer, lineFeature, lines, rawdata, reduceddata, skipdraw,
+      lastSimplifyZoom, resimplifyTimeout;</pre></div></div>
             
         </li>
         
@@ -211,14 +220,22 @@ rendering</p>
           lines = ctlvalue = <span class="hljs-built_in">parseInt</span>(value, <span class="hljs-number">10</span>);
         }
         <span class="hljs-keyword">break</span>;
-      <span class="hljs-keyword">case</span> <span class="hljs-string">'showmap'</span>:
-        ctlvalue = value !== <span class="hljs-string">'false'</span>;
-        <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'miterLimit'</span>:
         value = value.length ? <span class="hljs-built_in">parseFloat</span>(value) : <span class="hljs-literal">undefined</span>;
         <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">isNaN</span>(value) &amp;&amp; value &gt; <span class="hljs-number">0</span> &amp;&amp; value !== <span class="hljs-literal">undefined</span>) {
           lineOptions.style[key] = ctlvalue = value;
         }
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'resimplify'</span>:
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'showmap'</span>:
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'simplify'</span>:
+        ctlvalue = value !== <span class="hljs-string">'false'</span>;
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'resimplify_delay'</span>:
+        ctlvalue = value.length ? <span class="hljs-built_in">parseInt</span>(value) : <span class="hljs-literal">undefined</span>;
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'simplify_tolerance'</span>:
+        ctlvalue = value.length ? <span class="hljs-built_in">parseFloat</span>(value) : <span class="hljs-literal">undefined</span>;
         <span class="hljs-keyword">break</span>;
     }
     <span class="hljs-keyword">if</span> (ctlvalue !== <span class="hljs-literal">undefined</span>) {
@@ -268,11 +285,13 @@ rendering</p>
    * Given a set of lines, optionally truncate or expand it, then show it as a
    * lineFeature.
    *
-   * @param {array} rawdata: an array of lines to show.  Each entry contains an
+   * @param {array} rawdata An array of lines to show.  Each entry contains an
    *    object that has a 'data' element which is an array of points that form
    *    the line.
+   * @param {boolean} [simplify] If present, use this as the flag to decide if
+   *    lines should be simplified.
    */</span>
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show_lines</span>(<span class="hljs-params">rawdata</span>) </span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show_lines</span>(<span class="hljs-params">rawdata, simplify</span>) </span>{
     $(<span class="hljs-string">'#map'</span>).removeClass(<span class="hljs-string">'ready'</span>).attr(<span class="hljs-string">'segments'</span>, <span class="hljs-string">''</span>);
     <span class="hljs-keyword">if</span> (!rawdata) {
       <span class="hljs-keyword">return</span>;
@@ -297,9 +316,34 @@ any number of segments, we have to keep a tally.</p>
     <span class="hljs-keyword">for</span> (numlines = <span class="hljs-number">0</span>; numlines &lt; rawdata.length &amp;&amp; segments &lt; maxsegments; numlines += <span class="hljs-number">1</span>) {
       segments += rawdata[numlines].data.length - <span class="hljs-number">1</span>;
     }
-    <span class="hljs-keyword">var</span> data = rawdata.slice(<span class="hljs-number">0</span>, numlines);
-    lineFeature.data(data);
-    lineFeature.draw();
+    reduceddata = rawdata.slice(<span class="hljs-number">0</span>, numlines);
+    <span class="hljs-keyword">if</span> (simplify === <span class="hljs-literal">undefined</span>) {
+      simplify = query.simplify;
+    }
+    <span class="hljs-keyword">if</span> (!simplify || simplify === <span class="hljs-string">'false'</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>set the data, and reset the line and position accessors in case we
+changed them with the line simplication</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      lineFeature.data(reduceddata)
+        .line(lineAccessor)
+        .position(positionAccessor);
+      lineFeature.draw();
+      $(<span class="hljs-string">'#simple-lines-shown'</span>).text(<span class="hljs-string">''</span>).attr(<span class="hljs-string">'title'</span>, <span class="hljs-string">''</span>);
+    } <span class="hljs-keyword">else</span> {
+      simplify_lines(reduceddata);
+    }
     <span class="hljs-keyword">var</span> text = <span class="hljs-string">'Shown: '</span> + segments;
     $(<span class="hljs-string">'#lines-shown'</span>).text(text).attr(<span class="hljs-string">'title'</span>, text);
     map.onIdle(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
@@ -308,12 +352,73 @@ any number of segments, we have to keep a tally.</p>
   }
 
   <span class="hljs-comment">/**
+   * When the map is zoomed, if resimplifying lines is active, set a timer to
+   * do so after the currently specified delay.
+   *
+   * @param {geo.event} evt geojs event that triggered this call.
+   */</span>
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">resimplifyOnZoom</span>(<span class="hljs-params">evt</span>) </span>{
+    <span class="hljs-keyword">if</span> (resimplifyTimeout) {
+      <span class="hljs-built_in">window</span>.cancelTimeout(resimplifyTimeout);
+      resimplifyTimeout = <span class="hljs-literal">null</span>;
+    }
+    <span class="hljs-keyword">if</span> (!query.simplify || query.simplify === <span class="hljs-string">'false'</span> ||
+        !query.resimplify || query.resimplify === <span class="hljs-string">'false'</span>) {
+      <span class="hljs-keyword">return</span>;
+    }
+    <span class="hljs-built_in">window</span>.setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      resimplifyTimeout = <span class="hljs-literal">null</span>;
+      <span class="hljs-keyword">if</span> (map.zoom() !== lastSimplifyZoom) {
+        simplify_lines(reduceddata);
+      }
+    }, <span class="hljs-built_in">parseInt</span>(query.resimplify_delay, <span class="hljs-number">10</span>) || <span class="hljs-number">500</span>);
+  }
+
+  <span class="hljs-comment">/**
+   * Simplify lines based on the current zoom level.
+   *
+   * @param {array} data The data to simplify.
+   * @param {number} [tolerance=query.simplify_tolerance] The tolerance in
+   *    pixels at the current map zoom level.
+   */</span>
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">simplify_lines</span>(<span class="hljs-params">data, tolerance</span>) </span>{
+    <span class="hljs-keyword">if</span> (!data) {
+      <span class="hljs-keyword">return</span>;
+    }
+    lastSimplifyZoom = map.zoom();
+    <span class="hljs-keyword">if</span> (resimplifyTimeout) {
+      <span class="hljs-built_in">window</span>.cancelTimeout(resimplifyTimeout);
+      resimplifyTimeout = <span class="hljs-literal">null</span>;
+    }
+    tolerance = <span class="hljs-built_in">parseFloat</span>(tolerance !== <span class="hljs-literal">undefined</span> ? tolerance : query.simplify_tolerance || <span class="hljs-number">0.5</span>);
+    lineFeature.rdpSimplifyData(
+      data,
+      map.unitsPerPixel(map.zoom()) * tolerance,
+      positionAccessor,
+      lineAccessor);
+    lineFeature.draw();
+    <span class="hljs-keyword">var</span> segments = <span class="hljs-number">0</span>,
+        lineFunc = lineFeature.line();
+    lineFeature.data().forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">d, i</span>) </span>{
+      <span class="hljs-keyword">var</span> len = lineFunc(d, i).length;
+      segments += len &gt;= <span class="hljs-number">2</span> ? len - <span class="hljs-number">1</span> : <span class="hljs-number">0</span>;
+    });
+    <span class="hljs-keyword">var</span> text = <span class="hljs-string">'Shown: '</span> + segments;
+    $(<span class="hljs-string">'#simple-lines-shown'</span>).text(text).attr(<span class="hljs-string">'title'</span>, text);
+    text = $(<span class="hljs-string">'#lines-shown'</span>).text();
+    <span class="hljs-keyword">if</span> (text.indexOf(<span class="hljs-string">'Shown'</span>) === <span class="hljs-number">0</span>) {
+      text = <span class="hljs-string">'Used'</span> + text.substr(<span class="hljs-number">5</span>);
+      $(<span class="hljs-string">'#lines-shown'</span>).text(text).attr(<span class="hljs-string">'title'</span>, text);
+    }
+  }
+
+  <span class="hljs-comment">/**
    * For styles that can vary, parse the string and either return a simple
    * string or a function that computes the value.
    *
-   * @param {string} key: the property key.  Used to get a default value if
+   * @param {string} key the property key.  Used to get a default value if
    *    needed.
-   * @param {string} value: the string form of the value.  If this has a { in
+   * @param {string} value the string form of the value.  If this has a { in
    *    it, it is parsed as a JSON dictionary, and expects to be a list of
    *    category names which are used to determine the values.  These values
    *    applied uniformly per line.  Otherwise, if this has a , in it, it is a
@@ -361,7 +466,7 @@ any number of segments, we have to keep a tally.</p>
   <span class="hljs-comment">/**
    * Handle changes to our controls.
    *
-   * @param {object} evt jquery evt that triggered this call.
+   * @param {object} evt jquery event that triggered this call.
    */</span>
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">change_controls</span>(<span class="hljs-params">evt</span>) </span>{
     <span class="hljs-keyword">var</span> ctl = $(evt.target),
@@ -414,9 +519,6 @@ any number of segments, we have to keep a tally.</p>
         lines = <span class="hljs-built_in">parseInt</span>(value);
         show_lines(rawdata);
         <span class="hljs-keyword">break</span>;
-      <span class="hljs-keyword">case</span> <span class="hljs-string">'showmap'</span>:
-        set_osm_url(value);
-        <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'miterLimit'</span>:
         value = value.length ? <span class="hljs-built_in">parseFloat</span>(value) : <span class="hljs-literal">undefined</span>;
         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(value) || value &lt;= <span class="hljs-number">0</span> || value === <span class="hljs-literal">undefined</span>) {
@@ -428,16 +530,40 @@ any number of segments, we have to keep a tally.</p>
           lineFeature.draw();
         }
         <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'showmap'</span>:
+        set_osm_url(value);
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'simplify'</span>:
+        <span class="hljs-keyword">if</span> (!processedValue) {
+          show_lines(rawdata, <span class="hljs-literal">false</span>);
+        } <span class="hljs-keyword">else</span> {
+          simplify_lines(reduceddata);
+        }
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'simplify_tolerance'</span>:
+        processedValue = value.length ? <span class="hljs-built_in">parseFloat</span>(value) : <span class="hljs-literal">undefined</span>;
+        <span class="hljs-keyword">if</span> (query.simplify) {
+          simplify_lines(reduceddata, processedValue);
+        }
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'resimplify'</span>:
+        <span class="hljs-keyword">if</span> (processedValue &amp;&amp; query.simplify &amp;&amp; query.simplify !== <span class="hljs-string">'false'</span> &amp;&amp;
+            map.zoom() !== lastSimplifyZoom) {
+          simplify_lines(reduceddata);
+        }
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'resimplify_delay'</span>:
+        <span class="hljs-keyword">break</span>;
     }</pre></div></div>
             
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Update the url to reflect the changes</p>
 
@@ -456,7 +582,7 @@ any number of segments, we have to keep a tally.</p>
   <span class="hljs-comment">/**
    * Handle selecting a preset button.
    *
-   * @param {object} evt: jquery event with the triggered button.
+   * @param {object} evt jquery event with the triggered button.
    */</span>
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">select_preset</span>(<span class="hljs-params">evt</span>) </span>{
     <span class="hljs-keyword">var</span> update;
@@ -485,7 +611,7 @@ any number of segments, we have to keep a tally.</p>
   <span class="hljs-comment">/**
    * Set the map to either use the original default url or a blank white image.
    *
-   * @param {string} value: 'false' to use a white image, anything else to use
+   * @param {string} value 'false' to use a white image, anything else to use
    *    the original url.
    */</span>
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">set_osm_url</span>(<span class="hljs-params">value</span>) </span>{
@@ -502,27 +628,27 @@ any number of segments, we have to keep a tally.</p>
         </li>
         
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
-              </div>
-              <p>Create a tile layer</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  osm = map.createLayer(<span class="hljs-string">'osm'</span>);
-  set_osm_url(query.showmap);</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Create a tile layer</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  osm = map.createLayer(<span class="hljs-string">'osm'</span>, {<span class="hljs-attr">url</span>: query.url || <span class="hljs-literal">undefined</span>});
+  set_osm_url(query.showmap);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Create a feature layer for the lines</p>
 
@@ -533,11 +659,11 @@ any number of segments, we have to keep a tally.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Create a tool-tip layer above the line layer</p>
 
@@ -551,32 +677,28 @@ any number of segments, we have to keep a tally.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Ceate a line feature</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  lineFeature = layer.createFeature(<span class="hljs-string">'line'</span>, lineOptions)
-    .line(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">d</span>) </span>{
-      <span class="hljs-keyword">return</span> d.data;
-    })
-    .position(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">d</span>) </span>{
-      <span class="hljs-keyword">return</span> {<span class="hljs-attr">x</span>: d[<span class="hljs-number">0</span>], <span class="hljs-attr">y</span>: d[<span class="hljs-number">1</span>]};
-    })</pre></div></div>
+    .line(lineAccessor)
+    .position(positionAccessor)</pre></div></div>
             
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>add hover events – use mouseon and mouseoff, since we only show one
 tootip.  If we showed one tooltip per item we were over, use mouseover
@@ -595,16 +717,17 @@ and mouseout.</p>
     })
     .geoOn(geo.event.feature.mouseoff, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) </span>{
       tooltipElem.addClass(<span class="hljs-string">'hidden'</span>);
-    });</pre></div></div>
+    })
+    .geoOn(geo.event.zoom, resimplifyOnZoom);</pre></div></div>
             
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Make some values available in the global context so curious people can
 play with them.</p>
@@ -626,11 +749,11 @@ play with them.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Load our data set</p>
 
