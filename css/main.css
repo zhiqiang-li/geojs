@@ -161,7 +161,11 @@ footer {
     text-transform: none;
     margin: 0 0 10px 0; }
     .page.tutorials .portfolio-item .portfolio-caption h4 a {
-      color: inherit; }
+      color: inherit;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 16px; }
   .page.tutorials .portfolio-item .portfolio-caption:hover .description {
     transform: scaleY(1);
     transition: transform 200ms ease-in-out; }
