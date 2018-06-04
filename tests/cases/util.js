@@ -111,4 +111,16 @@ describe('geo.util', function () {
         {x: 50, y: 10}, {x: 10, y: 5}, {x: 30, y: 3}, {x: 50, y: 5}
     ]);
   });
+
+  it('wrapAngle', function () {
+    expect(util.wrapAngle(0)).toBe(0);
+    expect(util.wrapAngle(2)).toBe(2);
+    expect(util.wrapAngle(4)).toBe(4 - Math.PI * 2);
+    expect(util.wrapAngle(7)).toBe(7 - Math.PI * 2);
+    expect(util.wrapAngle(17)).toBe(17 - Math.PI * 6);
+    expect(util.wrapAngle(-2)).toBe(-2);
+    expect(util.wrapAngle(-4)).toBe(-4 + Math.PI * 2);
+    expect(util.wrapAngle(-7)).toBe(-7 + Math.PI * 2);
+    expect(util.wrapAngle(-17)).toBe(-17 + Math.PI * 6);
+  });
 });
