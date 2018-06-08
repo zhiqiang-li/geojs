@@ -215,13 +215,14 @@ var isolineFeature = function (arg) {
    */
   this._createIsolines = function () {
     var valueFunc = m_this.style.get('value'),
+        usedFunc = m_this.style('used') !== undefined ?
+          m_this.style.get('used') :
+          function (d, i) { return util.isNonNullFinite(valueFunc(d, i)); },
         values,
         hasLabels = false,
         lines = [];
     var mesh = this.createMesh({
-      used: function (d, i) {
-        return util.isNonNullFinite(valueFunc(d, i));
-      },
+      used: usedFunc,
       value: valueFunc
     });
     values = this._getValueList(mesh);
@@ -258,7 +259,7 @@ var isolineFeature = function (arg) {
         count = isoline.get('count')(mesh),
         autofit = isoline.get('autofit')(mesh),
         levels = isoline.get('levels')(mesh),
-        minmax, delta, step, steppow, i;
+        minmax, delta, step, steppow, steplog10, fixedDigits, i;
     if (!mesh.numVertices || !mesh.numElements) {
       return [];
     }
@@ -304,7 +305,9 @@ var isolineFeature = function (arg) {
          * 5/2 of that when adjusted to "nice values" (so between 2/3 and 5/3
          * of the specified count). */
         step = delta / (count * 2 / 3);
-        steppow = Math.pow(10, Math.floor(Math.log10(step)));
+        steplog10 = Math.floor(Math.log10(step));
+        fixedDigits = Math.max(0, -steplog10);
+        steppow = Math.pow(10, steplog10);
         step /= steppow;  // will now be in range [1, 10)
         step = step >= 5 ? 5 : step >= 2 ? 2 : 1;  // now 1, 2, or 5
         spacing = step * steppow;
@@ -314,7 +317,7 @@ var isolineFeature = function (arg) {
        * maximum level. */
       values = [];
       for (i = Math.ceil(mesh.minValue / spacing); i < Math.floor(mesh.maxValue / spacing); i += 1) {
-        values.push({value: i * spacing, position: i});
+        values.push({value: i * spacing, position: i, fixedDigits: fixedDigits});
       }
     }
     /* Mark levels for each value.  These are intended for styling.  All values
@@ -330,7 +333,11 @@ var isolineFeature = function (arg) {
         if (isoline.get('label')(val, val.position)) {
           var label = isoline.get('labelText')(val, val.position);
           if (label === undefined) {
-            label = '' + val.value;
+            if (val.fixedDigits !== undefined) {
+              label = '' + parseFloat(val.value.toFixed(val.fixedDigits));
+            } else {
+              label = '' + val.value;
+            }
           }
           if (label) {
             val.label = label;
@@ -707,6 +714,7 @@ var isolineFeature = function (arg) {
             m_labelFeature.style(styleName, style[styleName]);
           }
         });
+        m_this.dependentFeatures([m_lineFeature, m_labelFeature]);
       }
     } else if (m_lineFeature) {
       m_lineFeature.data([]);

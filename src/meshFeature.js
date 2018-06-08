@@ -204,9 +204,10 @@ var meshFeature = function (arg) {
    * @param {object} [vertexValueFuncs] A dictionary where the keys are the
    *    names of properties to include in the results and the values are
    *    functions that are evaluated at each vertex with the arguments
-   *    (data[idx], idx).  If a key is named `used`, then if its function
-   *    returns a falsy value for a data point, the vertex associated with that
-   *    data point is removed from the resultant mesh.
+   *    `(data[idx], idx, position)`.  If a key is named `used`, then its
+   *    function is passed `(data[idx], idx)` and if it returns a falsy value
+   *    for a data point, the vertex associated with that data point is removed
+   *    from the resultant mesh.
    * @returns {geo.meshFeature.meshInfo} An object with the mesh information.
    */
   this.createMesh = function (vertexValueFuncs) {
@@ -242,7 +243,7 @@ var meshFeature = function (arg) {
       wrapLongitude = !!(wrapLongitude === undefined || wrapLongitude);
       if (!usePos && wrapLongitude && (x0 < -180 || x0 > 180 ||
           x0 + dx * (gridW - 1) < -180 || x0 + dx * (gridW - 1) > 180) &&
-          dx > -180 && dx < 180) {
+          dx > -180 && dx < 180 && dx * (gridW - 1) < 360 + 1e-4) {
         calcX = [];
         for (i = 0; i < gridW; i += 1) {
           x = x0 + i * dx;
@@ -401,10 +402,11 @@ var meshFeature = function (arg) {
         }
         result.pos[i3 + 1] = y0 + dy * Math.floor(idx / gridW);
         result.pos[i3 + 2] = 0;
+        posVal = {x: result.pos[i3], y: result.pos[i3 + 1], z: result.pos[i3 + 2]};
       }
       for (key in vertexValueFuncs) {
         if (key !== 'used' && vertexValueFuncs.hasOwnProperty(key)) {
-          result[key][i] = vertexValueFuncs[key](item, idx);
+          result[key][i] = vertexValueFuncs[key](item, idx, posVal);
         }
       }
     }
