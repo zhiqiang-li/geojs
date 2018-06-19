@@ -710,6 +710,7 @@ var isolineFeature = function (arg) {
             var renderer = registry.rendererForFeatures(['text']);
             m_labelLayer = registry.createLayer('feature', m_this.layer().map(), {renderer: renderer});
             m_this.layer().addChild(m_labelLayer);
+            m_this.layer().node().append(m_labelLayer.node());
           }
           m_labelFeature = (m_labelLayer || m_this.layer()).createFeature('text', {
             selectionAPI: false,
