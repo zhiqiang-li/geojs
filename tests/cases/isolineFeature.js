@@ -449,6 +449,9 @@ describe('Isoline Feature', function () {
       isoline._build();
       expect(isoline.labelPositions()).toBe(isoline);
       expect(layer.children()[2].features()[0].data().length).toBe(10);
+      // make sure label positions are in map gcs
+      expect(layer.children()[2].features()[0].data()[0].x).toBeCloseTo(96566.47);
+      expect(layer.children()[2].features()[0].data()[0].y).toBeCloseTo(34205.96);
       isoline.isoline({labelSpacing: -1});
       expect(isoline.labelPositions()).toBe(isoline);
       expect(layer.children()[2].features()[0].data().length).toBe(0);

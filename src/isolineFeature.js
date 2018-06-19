@@ -182,6 +182,7 @@ var isolineFeature = function (arg) {
   }
 
   var $ = require('jquery');
+  var transform = require('./transform');
   var geo_event = require('./event');
   var textFeature = require('./textFeature');
 
@@ -519,7 +520,11 @@ var isolineFeature = function (arg) {
   };
 
   /**
-   * Compute the positions for labels on each line.
+   * Compute the positions for labels on each line.  This can be called to
+   * recompute label positions without needign to recompute isolines, for
+   * instance when the zoom level changes.  Label positions are computed in the
+   * map gcs coordinates, not interface gcs coordinates, since the interface
+   * gcs may not be linear with the display space.
    *
    * @returns {this}
    */
@@ -538,6 +543,7 @@ var isolineFeature = function (arg) {
         labelViewport = isoline.get('labelViewport')(m_isolines.mesh),
         gcs = m_this.gcs(),
         map = m_this.layer().map(),
+        mapgcs = map.gcs(),
         mapRotation = map.rotation(),
         mapSize = map.size(),
         labelData = [],
@@ -548,20 +554,21 @@ var isolineFeature = function (arg) {
       }
       var spacing = spacingFunc(line.value, line.value.position),
           offset = offsetFunc(line.value, line.value.position) || 0,
-          coor = map.gcsToDisplay(line, gcs),
+          dispCoor = map.gcsToDisplay(line, gcs),
           totalDistance = 0,
-          dist, count, localSpacing, next, lineDistance, i, i2, f, g, pos;
+          dist, count, localSpacing, next, lineDistance, i, i2, f, g, pos,
+          mapCoor;
       if (spacing <= 0 || isNaN(spacing)) {
         return;
       }
       maxSpacing = Math.max(spacing, maxSpacing);
       /* make offset in the range of [0, 1) with the default at 0.5 */
       offset = (offset + 0.5) - Math.floor(offset + 0.5);
-      dist = coor.map(function (pt1, coorIdx) {
-        if (!line.closed && coorIdx + 1 === coor.length) {
+      dist = dispCoor.map(function (pt1, coorIdx) {
+        if (!line.closed && coorIdx + 1 === dispCoor.length) {
           return 0;
         }
-        var val = Math.sqrt(util.distance2dSquared(pt1, coor[coorIdx + 1 < coor.length ? coorIdx + 1 : 0]));
+        var val = Math.sqrt(util.distance2dSquared(pt1, dispCoor[coorIdx + 1 < dispCoor.length ? coorIdx + 1 : 0]));
         totalDistance += val;
         return val;
       });
@@ -569,19 +576,22 @@ var isolineFeature = function (arg) {
       if (!count) {
         return;
       }
+      /* If we have any labels, compute map coordinates of the line and use
+       * those for interpolating label positions */
+      mapCoor = transform.transformCoordinates(gcs, mapgcs, line);
       localSpacing = totalDistance / count;
       next = localSpacing * offset;
       lineDistance = 0;
-      for (i = 0; i < coor.length; i += 1) {
+      for (i = 0; i < dispCoor.length; i += 1) {
         while (lineDistance + dist[i] >= next) {
-          i2 = i + 1 === coor.length ? 0 : i + 1;
+          i2 = i + 1 === dispCoor.length ? 0 : i + 1;
           f = (next - lineDistance) / dist[i];
           g = 1 - f;
           next += localSpacing;
           if (labelViewport > 0) {
             pos = {
-              x: coor[i].x * g + coor[i2].x * f,
-              y: coor[i].y * g + coor[i2].y * f
+              x: dispCoor[i].x * g + dispCoor[i2].x * f,
+              y: dispCoor[i].y * g + dispCoor[i2].y * f
             };
             if (pos.x < -labelViewport || pos.x > mapSize.width + labelViewport ||
                 pos.y < -labelViewport || pos.y > mapSize.height + labelViewport) {
@@ -589,16 +599,17 @@ var isolineFeature = function (arg) {
             }
           }
           labelData.push({
-            x: line[i].x * g + line[i2].x * f,
-            y: line[i].y * g + line[i2].y * f,
-            z: line[i].z * g + line[i2].z * f,
+            x: mapCoor[i].x * g + mapCoor[i2].x * f,
+            y: mapCoor[i].y * g + mapCoor[i2].y * f,
+            z: mapCoor[i].z * g + mapCoor[i2].z * f,
             line: line,
-            rotation: Math.atan2(coor[i].y - coor[i2].y, coor[i].x - coor[i2].x) - mapRotation
+            rotation: Math.atan2(dispCoor[i].y - dispCoor[i2].y, dispCoor[i].x - dispCoor[i2].x) - mapRotation
           });
         }
         lineDistance += dist[i];
       }
     });
+    m_labelFeature.gcs(mapgcs);
     m_labelFeature.data(labelData);
     m_labelFeature.style('renderedZone', maxSpacing * 2);
     m_lastLabelPositions = {
