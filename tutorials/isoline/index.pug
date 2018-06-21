@@ -65,7 +65,7 @@ block mainTutorial
       iso.isoline('count', 10).draw();
     });
   +codeblock_test('isoline count', [
-    'map.layers()[1].features()[0]._createIsolines().values.length === 12'
+    'map.layers()[1].features()[0]._createIsolines().values.length === 13'
     ])
 
   :markdown-it
@@ -75,7 +75,7 @@ block mainTutorial
       iso.isoline('count', 8).draw();
     });
   +codeblock_test('isoline count', [
-    'map.layers()[1].features()[0]._createIsolines().values.length === 6'
+    'map.layers()[1].features()[0]._createIsolines().values.length === 7'
     ])
 
   :markdown-it
@@ -101,7 +101,7 @@ block mainTutorial
       iso.isoline('spacing', 125).draw();
     });
   +codeblock_test('isoline spacing', [
-    'map.layers()[1].features()[0]._createIsolines().values.length === 9'
+    'map.layers()[1].features()[0]._createIsolines().values.length === 10'
     ])
 
   :markdown-it

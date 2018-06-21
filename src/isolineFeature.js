@@ -317,7 +317,7 @@ var isolineFeature = function (arg) {
        * figuring out level further on and is based so that 0 will be the
        * maximum level. */
       values = [];
-      for (i = Math.ceil(mesh.minValue / spacing); i < Math.floor(mesh.maxValue / spacing); i += 1) {
+      for (i = Math.ceil(mesh.minValue / spacing); i <= Math.floor(mesh.maxValue / spacing); i += 1) {
         values.push({value: i * spacing, position: i, fixedDigits: fixedDigits});
       }
     }

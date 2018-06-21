@@ -164,7 +164,7 @@ describe('Isoline Feature', function () {
         var result = isoline._createIsolines();
         expect(result.lines.length).toBe(18);
         expect(result.lines[10].length).toBe(2);
-        expect(result.values.length).toBe(16);
+        expect(result.values.length).toBe(17);
         expect(result.values[2].value).toBe(1);
         expect(result.values[2].level).toBe(0);
         expect(result.values[5].level).toBe(1);
@@ -176,7 +176,7 @@ describe('Isoline Feature', function () {
         var result = isoline._createIsolines();
         expect(result.lines.length).toBe(18);
         expect(result.lines[10].length).toBe(4);
-        expect(result.values.length).toBe(16);
+        expect(result.values.length).toBe(17);
         expect(result.values[2].value).toBe(1);
         expect(result.values[2].level).toBe(0);
         expect(result.values[5].level).toBe(1);
@@ -208,7 +208,7 @@ describe('Isoline Feature', function () {
       var mesh = isoline._createIsolines().mesh;
       var result;
       result = isoline._getValueList(mesh);
-      expect(result.length).toBe(16);
+      expect(result.length).toBe(17);
       expect(result[0].position).toBe(0);
       expect(result[0].level).toBe(2);
       expect(result[1].level).toBe(0);
@@ -220,17 +220,17 @@ describe('Isoline Feature', function () {
       // restrictive max
       isoline.isoline({min: null, max: 5});
       result = isoline._getValueList(mesh);
-      expect(result.length).toBe(10);
+      expect(result.length).toBe(11);
       expect(result[9].value).toBe(4.5);
       // non-restrictive max
       isoline.isoline({min: null, max: 20});
       result = isoline._getValueList(mesh);
-      expect(result.length).toBe(16);
+      expect(result.length).toBe(17);
       expect(result[15].value).toBe(7.5);
       // position should be based on round numbers
       isoline.isoline({min: 1, max: 5});
       result = isoline._getValueList(mesh);
-      expect(result.length).toBe(20);
+      expect(result.length).toBe(21);
       expect(result[0].position).toBe(5);
       expect(result[19].value).toBeCloseTo(4.8);
       expect(result[19].position).toBe(24);
@@ -253,7 +253,7 @@ describe('Isoline Feature', function () {
       // spacing
       isoline.isoline({min: null, max: null, spacing: 0.2});
       result = isoline._getValueList(mesh);
-      expect(result.length).toBe(40);
+      expect(result.length).toBe(41);
       expect(result[0].value).toBeCloseTo(0);
       expect(result[39].value).toBeCloseTo(7.8);
       // values
