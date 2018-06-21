@@ -363,16 +363,16 @@ describe('Isoline Feature', function () {
         // we slice each element of the result to ignore the properties that
         // are added to it.
         expect(result.map(function (d) { return d.slice(); })).toEqual([[
-          {x: 10, y: 0, z: 0}, {x: 9, y: 1, z: 0}, {x: 7, y: 1, z: 0},
-          {x: 5, y: 1, z: 0}, {x: 4, y: 2, z: 0}
+          {x: 4, y: 2, z: 0}, {x: 5, y: 1, z: 0}, {x: 7, y: 1, z: 0},
+          {x: 9, y: 1, z: 0}, {x: 10, y: 0, z: 0}
         ], [
-          {x: 12, y: 2, z: 0}, {x: 13, y: 1, z: 0}, {x: 14, y: 0, z: 0}
+          {x: 14, y: 0, z: 0}, {x: 13, y: 1, z: 0}, {x: 12, y: 2, z: 0}
         ], [
-          {x: 18, y: 0, z: 0}, {x: 17, y: 1, z: 0}, {x: 16, y: 2, z: 0}
+          {x: 16, y: 2, z: 0}, {x: 17, y: 1, z: 0}, {x: 18, y: 0, z: 0}
         ], [
-          {x: 24, y: 2, z: 0}, {x: 23, y: 1, z: 0}, {x: 22, y: 0, z: 0}
+          {x: 22, y: 0, z: 0}, {x: 23, y: 1, z: 0}, {x: 24, y: 2, z: 0}
         ], [
-          {x: 26, y: 0, z: 0}, {x: 27, y: 1, z: 0}
+          {x: 27, y: 1, z: 0}, {x: 26, y: 0, z: 0}
         ]]);
       });
     });
